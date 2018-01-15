@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "express": "^4.16.2",
+    "lodash": "^4.17.4",
+    "shortid": "^2.2.8",
+    "socket.io": "^2.0.4",
+    "socket.io-msgpack-parser": "^2.0.0"
+  },
+  "name": "game-server",
+  "version": "1.0.0",
+  "main": "app.js",
+  "devDependencies": {
+    "nodemon": "^1.13.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "description": ""
+}

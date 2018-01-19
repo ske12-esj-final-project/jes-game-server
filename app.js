@@ -9,7 +9,7 @@ const io = require('socket.io')(server)
 
 const PlayerManager = require('./managers/player')
 const GameManager = require('./managers/game')
-const gameEvents = require('../events')
+const gameEvents = require('./constants/events')
 
 let gameInterval = null
 

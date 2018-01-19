@@ -1,5 +1,5 @@
 const _ = require('lodash')
-const gameEvents = require('../../events')
+const gameEvents = require('../constants/events')
 module.exports = class {
     constructor(socket, gameWorld) {
         this.socket = socket

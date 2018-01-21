@@ -13,10 +13,11 @@ const gameEvents = require('./constants/events')
 
 let gameInterval = null
 
-const gameWorld = {
+let gameWorld = {
     players: [],
     timeout: 100
 }
+
 let gameManager = new GameManager(io, gameWorld)
 
 
@@ -24,10 +25,11 @@ io.on('connection', (socket) => {
     let playerManager = new PlayerManager(socket, gameWorld)
     socket.playerID = shortid.generate()
     console.log('player id', socket.playerID, socket.id)
+
     socket.on('disconnect', () => {
         playerManager.deletePlayer()
-        console.log('remove player',socket.playerID)
-        io.emit(gameEvents.playerDisconnect, socket.playerID)
+        console.log('remove player', socket.playerID)
+        io.emit(gameEvents.playerDisconnect, {d:socket.playerID})
     })
 })
 

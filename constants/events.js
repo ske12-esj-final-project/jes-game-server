@@ -6,4 +6,5 @@ module.exports = {
     "playerDisconnect": "5",
     "playerUpdatePosition":"6",
     "playerEnemyUpdatePosition":"7",
+    "playerUpdateRotation":"8",
 }

@@ -10,6 +10,7 @@ module.exports = class {
         return setInterval(() => {
             _.forEach(this.gameWorld.players, player => {
                 player.updatePostionToClient()
+                player.updateRotationToClient()
             })
         }, this.gameWorld.timeout || 1000 / 60)
     }

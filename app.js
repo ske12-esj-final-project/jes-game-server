@@ -27,9 +27,11 @@ io.on('connection', (socket) => {
     console.log('player id', socket.playerID, socket.id)
 
     socket.on('disconnect', () => {
-        playerManager.deletePlayer()
+        let pid = socket.playerID
+        let data = {"d":pid}
+        io.emit(gameEvents.playerDisconnect, data)
         console.log('remove player', socket.playerID)
-        io.emit(gameEvents.playerDisconnect, {d:socket.playerID})
+        playerManager.deletePlayer()
     })
 })
 

@@ -1,4 +1,5 @@
 module.exports = {
+    "checkShootHit":"0",
     "playerMovement": "1",
     "playerNewPlayer": "2",
     "playerCreated": "3",
@@ -7,4 +8,8 @@ module.exports = {
     "playerUpdatePosition":"6",
     "playerEnemyUpdatePosition":"7",
     "playerUpdateRotation":"8",
+    "playerAttack":"9",
+    "enemyShoot":"10",
+    "playerUpdateStatus":"a",
+    "enemyUpdateStatus":"b"
 }

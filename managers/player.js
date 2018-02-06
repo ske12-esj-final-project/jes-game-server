@@ -9,10 +9,13 @@ module.exports = class {
         socket.on("2", this.newPlayer.bind(this))
         socket.on(gameEvents.playerMovement, this.movement.bind(this))
         socket.on(gameEvents.playerUpdateRotation,this.rotation.bind(this))
-        this.rotage = {
+        socket.on(gameEvents.playerAttack,this.playerShoot.bind(this))
+        socket.on(gameEvents.checkShootHit,this.checkShootHit.bind(this))
+        this.rotate = {
             x:null,
             y:null
         }
+        this.hp = 100
     }
 
     newPlayer(user_name) {
@@ -54,11 +57,37 @@ module.exports = class {
     rotation(data){
         if (!this.playerID) return
         let jsonData = JSON.parse(data["d"])
-        this.rotage = {
-            x:jsonData[0],
-            y:jsonData[1]
+        this.rotate = {
+            w:jsonData[0],
+            x:jsonData[1],
+            y:jsonData[2],
+            z:jsonData[3]
         }
-        console.log('r',jsonData)
+        // console.log('r',jsonData)
+    }
+
+    playerShoot(data){
+        console.log('shoot',data)
+        let sendToOther =  {"d":[
+            this.playerID
+        ]}
+        this.socket.broadcast.emit(gameEvents.enemyShoot,sendToOther)
+    }
+
+    checkShootHit(data){
+        console.log('check-hit-data',data)
+
+        let sendToSelf = {"d":[
+            this.hp
+        ]}
+
+        let sendToOther = {"d":[
+            this.playerID,
+            this.hp
+        ]}
+        this.socket.emit(gameEvents.playerUpdateStatus,sendToSelf)
+        this.socket.broadcast.emit(gameEvents.enemyUpdateStatus,sendToOther)
+
     }
 
     movement(data) {
@@ -112,21 +141,27 @@ module.exports = class {
     }
 
     updateRotationToClient(){
-        if(this.rotage.x==null || this.rotage.y==null) return
-        let currentRotage = {
-            x:this.rotage.x,
-            y:this.rotage.y
+        if(this.rotate.x==null || this.rotate.y==null) return
+        let currentrotate = {
+            w:this.rotate.w,
+            x:this.rotate.x,
+            y:this.rotate.y,
+            z:this.rotate.z
         }
-        if (_.isEqual(this.lastRotage, currentRotage)) return
-        this.lastRotage = {
-            x:this.rotage.x,
-            y:this.rotage.y
+        if (_.isEqual(this.lastrotate, currentrotate)) return
+        this.lastrotate = {
+            w:this.rotate.w,
+            x:this.rotate.x,
+            y:this.rotate.y,
+            z:this.rotate.z
         }
 
         let sendToOther = [
             this.playerID,
-            this.rotage.x,
-            this.rotage.y
+            this.rotate.w,
+            this.rotate.x,
+            this.rotate.y,
+            this.rotate.z
         ]
         
         this.socket.broadcast.emit(gameEvents.playerUpdateRotation, {d:sendToOther})
@@ -137,11 +172,11 @@ module.exports = class {
         return _.map(players, (player) => this.getPlayerSendData(player))
     }
 
-    getPlayerSendRotageData(player){
+    getPlayerSendrotateData(player){
         return[
             this.playerID,
-            this.rotage.x,
-            ths.rotage.y
+            this.rotate.x,
+            ths.rotate.y
         ]
     }
 

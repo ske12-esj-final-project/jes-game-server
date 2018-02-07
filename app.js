@@ -35,7 +35,7 @@ io.on('connection', (socket) => {
     })
 })
 
-const PORT = process.env.PORT || 2000
+const PORT = process.env.PORT || 3000
 server.listen(PORT, () => {
     console.log(`Lisnten on http://localhost:${PORT}`)
     gameInterval = gameManager.createGameInterval()

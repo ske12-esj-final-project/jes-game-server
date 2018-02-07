@@ -20,7 +20,7 @@ let gameWorld = {
 
 let gameManager = new GameManager(io, gameWorld)
 
-
+console.log('version : 1')
 io.on('connection', (socket) => {
     let playerManager = new PlayerManager(socket, gameWorld)
     socket.playerID = shortid.generate()

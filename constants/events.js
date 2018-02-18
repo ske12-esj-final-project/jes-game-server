@@ -10,6 +10,7 @@ module.exports = {
     "playerUpdateRotation":"8",
     "playerAttack":"9",
     "enemyShoot":"10",
-    "playerUpdateStatus":"a",
-    "enemyUpdateStatus":"b"
+    "updatePlayersStatus":"a",
+    "":"b",
+    "setupEquitment":"c"
 }

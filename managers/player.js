@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const gameEvents = require('../constants/events')
-const WEAPON = require('../constants/weapon')
+const WEAPON = require('../data/equitments')
 module.exports = class {
     constructor(socket, gameWorld) {
         this.socket = socket
@@ -9,8 +9,8 @@ module.exports = class {
         console.log('player-class')
 
         this.init()
-
         this.socketHandler(socket)
+
     }
 
     socketHandler(socket) {
@@ -22,7 +22,7 @@ module.exports = class {
     }
 
     init() {
-        this.weapon = WEAPON.BASIC_GUN
+        this.currentEquitment = WEAPON.ARM.Index
         this.rotate = {
             x: null,
             y: null
@@ -41,7 +41,7 @@ module.exports = class {
         this.gameWorld.players.push(this)
 
 
-        let currentPlayerData = this.getPlayerSendData(this)
+        let currentPlayerData = this.getPlayerInitData(this)
 
         // Create the player in the game
         /**
@@ -70,12 +70,10 @@ module.exports = class {
         if (!this.playerID) return
         let jsonData = JSON.parse(data["d"])
         this.rotate = {
-            w: jsonData[0],
-            x: jsonData[1],
-            y: jsonData[2],
-            z: jsonData[3]
+            x: jsonData[0],
+            y: jsonData[1]
         }
-        // console.log('r',jsonData)
+        // console.log('r',this.rotate)
     }
 
     playerShoot(data) {
@@ -89,22 +87,45 @@ module.exports = class {
     }
 
     checkShootHit(data) {
-        console.log('check-hit-data', data)
-
-        let sendToSelf = {
-            "d": [
-                this.hp
-            ]
+        data['d'] = data['d'].replace(/@/g, "\"")
+        let jsonData = JSON.parse(data["d"])
+        console.log('check-hit-data', jsonData)
+        let targetId, dmg
+        if (jsonData.length >= 2) {
+            targetId = jsonData[0]
+            dmg = jsonData[1]
+        } else {
+            console.error('[error]-checkShootHit wrong data pattern', data)
         }
 
-        let sendToOther = {
-            "d": [
-                this.playerID,
-                this.hp
-            ]
+        let targetEnemy = _.find(this.gameWorld.players, { playerID: targetId })
+
+        if (targetEnemy) {
+            targetEnemy.hp -= dmg
+            let sendToOther = {
+                "d": [
+                    targetId,
+                    this.playerID,
+                    targetEnemy.hp
+                ]
+            }
+            console.log('checkShoothit-senddata', sendToOther)
+            this.gameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
+
+        } else {
+            console.log('no enemy shooted in this game')
         }
-        this.socket.emit(gameEvents.playerUpdateStatus, sendToSelf)
-        this.socket.broadcast.emit(gameEvents.enemyUpdateStatus, sendToOther)
+        // // let sendToSelf = {
+        // //     "d": [
+        // //         this.hp
+        // //     ]
+        // // }
+
+
+
+
+        // this.socket.emit(gameEvents.playerUpdateStatus, sendToSelf)
+        // this.socket.broadcast.emit(gameEvents.enemyUpdateStatus, sendToOther)
 
     }
 
@@ -161,33 +182,26 @@ module.exports = class {
     updateRotationToClient() {
         if (this.rotate.x == null || this.rotate.y == null) return
         let currentrotate = {
-            w: this.rotate.w,
             x: this.rotate.x,
-            y: this.rotate.y,
-            z: this.rotate.z
+            y: this.rotate.y
         }
         if (_.isEqual(this.lastrotate, currentrotate)) return
         this.lastrotate = {
-            w: this.rotate.w,
             x: this.rotate.x,
-            y: this.rotate.y,
-            z: this.rotate.z
+            y: this.rotate.y
         }
 
         let sendToOther = [
             this.playerID,
-            this.rotate.w,
             this.rotate.x,
-            this.rotate.y,
-            this.rotate.z
+            this.rotate.y
         ]
-
         this.socket.broadcast.emit(gameEvents.playerUpdateRotation, { d: sendToOther })
 
     }
 
     getAllPlayerSendData(players) {
-        return _.map(players, (player) => this.getPlayerSendData(player))
+        return _.map(players, (player) => this.getPlayerInitData(player))
     }
 
     getPlayerSendrotateData(player) {
@@ -198,14 +212,14 @@ module.exports = class {
         ]
     }
 
-    getPlayerSendData(player) {
+    getPlayerInitData(player) {
         return [
             player.playerID,
             player.x,
             player.y,
             player.z,
             player.username,
-            player.weapon
+            player.currentEquitment
         ]
     }
 

@@ -5,6 +5,7 @@ module.exports = class {
         this.io = io
         this.gameWorld = gameWorld
     }
+    // plane axis x,z
 
     createGameInterval() {
         return setInterval(() => {

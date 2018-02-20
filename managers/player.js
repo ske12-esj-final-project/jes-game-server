@@ -19,6 +19,7 @@ module.exports = class {
         socket.on(gameEvents.playerUpdateRotation, this.rotation.bind(this))
         socket.on(gameEvents.playerAttack, this.playerShoot.bind(this))
         socket.on(gameEvents.checkShootHit, this.checkShootHit.bind(this))
+        socket.on(gameEvents.updateCurrentEquitment, this.updateCurrentEquitment.bind(this))
     }
 
     init() {
@@ -129,6 +130,18 @@ module.exports = class {
 
     }
 
+    updateCurrentEquitment(data) {
+        data['d'] = data['d'].replace(/@/g, "\"")
+        let jsonData = JSON.parse(data["d"])
+        console.log('updateCurrentEquitment-get', jsonData)
+        let playerID = jsonData[0]
+        let weaponIndex = jsonData[1]
+        this.currentEquitment = weaponIndex
+        console.log('updateCurrentEquitment-send to other', { d: this.getCurrentEquitment(this) })
+        let sendToOther =
+            this.socket.broadcast.emit(gameEvents.updateCurrentEquitment, { d: this.getCurrentEquitment(this) })
+    }
+
     movement(data) {
         if (!this.playerID) return
         let jsonData = JSON.parse(data["d"])
@@ -210,6 +223,14 @@ module.exports = class {
             this.rotate.x,
             ths.rotate.y
         ]
+    }
+
+    getCurrentEquitment(player) {
+        return [
+            player.playerID,
+            player.currentEquitment
+        ]
+
     }
 
     getPlayerInitData(player) {

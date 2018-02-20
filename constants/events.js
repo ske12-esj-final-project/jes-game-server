@@ -11,6 +11,6 @@ module.exports = {
     "playerAttack":"9",
     "enemyShoot":"10",
     "updatePlayersStatus":"a",
-    "":"b",
+    "updateCurrentEquitment":"b",
     "setupEquitment":"c"
 }

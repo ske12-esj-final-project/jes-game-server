@@ -5,8 +5,6 @@ const _ = require('lodash')
 const shortid = require('shortid')
 const path = require('path')
 
-
-const msgPackParser = require('socket.io-msgpack-parser')
 const io = require('socket.io')(server)
 
 const PlayerManager = require('./managers/player')

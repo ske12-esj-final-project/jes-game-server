@@ -36,7 +36,7 @@ module.exports = class {
         console.log('created - new player', username)
         this.playerID = this.socket.playerID
         this.x = this.randomInt(-250, 250)
-        this.y = 0
+        this.y = 500
         this.z = this.randomInt(-250, 200)
         this.username = username || "anonymous"
         this.gameWorld.players.push(this)

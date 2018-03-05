@@ -10,7 +10,6 @@ module.exports = class {
 
         this.init()
         this.socketHandler(socket)
-
     }
 
     socketHandler(socket) {
@@ -20,6 +19,7 @@ module.exports = class {
         socket.on(gameEvents.playerAttack, this.playerShoot.bind(this))
         socket.on(gameEvents.checkShootHit, this.checkShootHit.bind(this))
         socket.on(gameEvents.updateCurrentEquitment, this.updateCurrentEquitment.bind(this))
+        socket.on(gameEvents.getEquitment, this.getEquitment.bind(this))
     }
 
     init() {
@@ -57,6 +57,26 @@ module.exports = class {
         // Send the info of the new player to other gamers!
         this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
         console.log('send-complete')
+    }
+    removeEquitmentInClient(data){
+        
+    }
+
+    getEquitment(data){
+        data['d'] = data['d'].replace(/@/g, "\"")
+        console.log('get-equiment',data)
+        let jsonData = JSON.parse(data["d"])
+        if (jsonData.length >= 1) {
+            let weaponID = jsonData[0]
+            // asign to player
+            // remove from list
+            _.remove(this.gameWorld.equitments,item=>item.uid === weaponID)
+            // update to all
+            // this.gameWorld.updateWeaponInMap()
+            this.gameWorld.sendRemoveWeapon(weaponID)
+        } else {
+            console.error('[error]-checkShootHit wrong data pattern', data)
+        }
     }
 
     deletePlayer() {

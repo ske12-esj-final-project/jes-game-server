@@ -31,33 +31,34 @@ module.exports = class {
         this.hp = 100
     }
 
-    newPlayer(user_name) {
-        let username = user_name.username
+    newPlayer(data) {
+        let username = data.username
         console.log('created - new player', username)
         this.playerID = this.socket.playerID
-        this.x = this.randomInt(-250, 250)
-        this.y = 500
-        this.z = this.randomInt(-250, 200)
+        // this.x = this.randomInt(-250, 250)
+        // this.y = 500
+        // this.z = this.randomInt(-250, 200)
         this.username = username || "anonymous"
         this.gameWorld.players.push(this)
 
-
         let currentPlayerData = this.getPlayerInitData(this)
+
+        this.socket.emit(gameEvents.playerCreated, { d: [this.playerID] })
 
         // Create the player in the game
         /**
          * index 0 : player
          * index 1 : enemies
          */
-        let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
-        console.log('getAllEnemiesData', getAllEnemiesData)
-        console.log('currentPlayerData', currentPlayerData)
-        // if(getAllEnemiesData.length==0) return
-        this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
+        // let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
+        // console.log('getAllEnemiesData', getAllEnemiesData)
+        // console.log('currentPlayerData', currentPlayerData)
+        // this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
         // Send the info of the new player to other gamers!
-        this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
-        console.log('send-complete')
+        // this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
+        // console.log('send-complete')
     }
+    
     removeEquitmentInClient(data){
         
     }
@@ -168,23 +169,6 @@ module.exports = class {
         this.x = parseFloat(jsonData[0])
         this.y = parseFloat(jsonData[1])
         this.z = parseFloat(jsonData[2])
-        // console.log('m',jsonData)
-        // const playerSpeed = 16
-        // // console.log('playerMovement', directions, this.socket.playerID)
-        // let point1 = {
-        //     x: 0,
-        //     y: 0
-        // }
-        // let point2 = {
-        //     x: directions[0],
-        //     y: directions[1]
-        // }
-        // let angleRadians = this.getAngleRadians(point1, point2)
-
-        // this.x += parseInt((playerSpeed * Math.cos(angleRadians) * Math.abs(directions[0])))
-        // this.y += parseInt((playerSpeed * Math.sin(angleRadians) * Math.abs(directions[1])))
-
-
     }
 
     updatePostionToClient() {

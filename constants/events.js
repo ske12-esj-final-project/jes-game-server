@@ -14,4 +14,5 @@ module.exports = {
     "updateCurrentEquitment":"b",
     "setupEquitment":"c",
     "getEquitment":"d",
+    "playerJoinRoom": "e"
 }

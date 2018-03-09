@@ -13,7 +13,7 @@ module.exports = class {
     }
 
     socketHandler(socket) {
-        socket.on(gameEvents.playerNewPlayer, this.newPlayer.bind(this))
+        socket.on(gameEvents.playerNewPlayer, this.setupPlayer.bind(this))
         socket.on(gameEvents.playerMovement, this.movement.bind(this))
         socket.on(gameEvents.playerUpdateRotation, this.rotation.bind(this))
         socket.on(gameEvents.playerAttack, this.playerShoot.bind(this))
@@ -31,13 +31,14 @@ module.exports = class {
         this.hp = 100
     }
 
-    newPlayer(data) {
-        let username = data.username
-        console.log('created - new player', username)
-        this.playerID = this.socket.playerID
-        // this.x = this.randomInt(-250, 250)
-        // this.y = 500
-        // this.z = this.randomInt(-250, 200)
+    setupPlayer(data) {
+        data['d'] = data['d'].replace(/@/g, "\"")
+        let jsonData = JSON.parse(data["d"])
+        let playerID = jsonData[0]
+        let player = _.find(this.gameWorld.players, { 'id': this.playerID })
+        player.x = this.randomInt(-250, 250)
+        player.y = 500
+        player.z = this.randomInt(-250, 200)
         this.username = username || "anonymous"
         this.gameWorld.players.push(this)
 
@@ -59,19 +60,19 @@ module.exports = class {
         // console.log('send-complete')
     }
     
-    removeEquitmentInClient(data){
-        
+    removeEquitmentInClient(data) {
+
     }
 
-    getEquitment(data){
+    getEquitment(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
-        console.log('get-equiment',data)
+        console.log('get-equiment', data)
         let jsonData = JSON.parse(data["d"])
         if (jsonData.length >= 1) {
             let weaponID = jsonData[0]
             // asign to player
             // remove from list
-            _.remove(this.gameWorld.equitments,item=>item.uid === weaponID)
+            _.remove(this.gameWorld.equitments, item => item.uid === weaponID)
             // update to all
             // this.gameWorld.updateWeaponInMap()
             this.gameWorld.sendRemoveWeapon(weaponID)

@@ -17,7 +17,7 @@ module.exports = class {
             weaponIndex: 1,
             position: {}
         }
-        this.players = [];
+        this.players = []
         this.itemList = [_.clone(item), _.clone(item)]
         // [id,weaponindex,posx,posy,posz]
         this.equitments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
@@ -36,16 +36,16 @@ module.exports = class {
             return item
         })
     }
-    sendRemoveWeapon(weaponID){
-        console.log('remove-weapon',weaponID)
+    sendRemoveWeapon(weaponID) {
+        console.log('remove-weapon', weaponID)
         // remove weapon in client
-        this.io.emit(gameEvents.getEquitment,{d:[weaponID]})
+        this.io.emit(gameEvents.getEquitment, { d: [weaponID] })
     }
 
     getUpdateWeaponInMap() {
         let sendData = []
         _.map(this.equitments, item => {
-            let data = [item.uid, item.weaponIndex, item.position.x,item.position.y, item.position.z]
+            let data = [item.uid, item.weaponIndex, item.position.x, item.position.y, item.position.z]
             sendData.push(data)
         })
         return sendData

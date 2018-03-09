@@ -1,7 +1,7 @@
 module.exports = {
     "checkShootHit":"0",
     "playerMovement": "1",
-    "playerNewPlayer": "2",
+    "playerSetupPlayer": "2",
     "playerCreated": "3",
     "playerEnemyCreated": "4",
     "playerDisconnect": "5",
@@ -14,5 +14,7 @@ module.exports = {
     "updateCurrentEquitment":"b",
     "setupEquitment":"c",
     "getEquitment":"d",
-    "playerJoinRoom": "e"
+
+    "playerJoinGame": "z",
+    "playerJoinRoom": "y",
 }

@@ -9,9 +9,9 @@ const shortid = require('shortid')
 const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
 
 module.exports = class {
-    constructor(io, config) {
+    constructor(socket, config) {
         this.config(config)
-        this.io = io
+        this.socket = socket
         let item = {
             uid: "",
             weaponIndex: 1,
@@ -39,7 +39,7 @@ module.exports = class {
     sendRemoveWeapon(weaponID) {
         console.log('remove-weapon', weaponID)
         // remove weapon in client
-        this.io.emit(gameEvents.getEquitment, { d: [weaponID] })
+        this.socket.emit(gameEvents.getEquitment, { d: [weaponID] })
     }
 
     getUpdateWeaponInMap() {

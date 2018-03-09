@@ -1,17 +1,26 @@
 'use strict'
 const _ = require('lodash')
+const gameWorldConfig = require('../config/gameworld')
+const GameWorld = require('../managers/gameworld')
+const PlayerManager = require('../managers/player')
 
 module.exports = class {
 
-    constructor(name, gameWorld) {
-        this.name = name;
-        this.gameWorld = gameWorld;
+    constructor(name, socket) {
+        this.name = name
+        this.gameWorld = new GameWorld(socket, gameWorldConfig)
+        this.playerManager = new PlayerManager(socket, this.gameWorld)
     }
 
-    addPlayer(playerID) {
-        let player = _.find(this.gameWorld.players, 'playerID', playerID)
-        this.gameWorld.players.push(player);
-        console.log('Player', playerID, 'has joined', this.name)
+    addPlayer(player) {
+        // let player = new Player(playerID, 
+        //     this.randomInt(-250, 250), 
+        //     500,  
+        //     this.randomInt(-250, 200),
+        //     "1234",
+        //     -1)
+        this.gameWorld.players.push(player)
+        console.log('Player', player.playerID, 'has joined', this.name)
     }
 
     removePlayer() {

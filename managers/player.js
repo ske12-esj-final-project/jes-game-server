@@ -35,12 +35,7 @@ module.exports = class {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
         this.playerID = jsonData[0]
-        let player = _.find(this.gameWorld.players, { 'id': this.playerID })
-        player.x = this.randomInt(-250, 250)
-        player.y = 500
-        player.z = this.randomInt(-250, 200)
-        this.gameWorld.players.push(this)
-
+        let player = _.find(this.gameWorld.players, 'playerID', this.playerID)
         let currentPlayerData = this.getPlayerInitData(this)
 
         // Create the player in the game
@@ -251,6 +246,7 @@ module.exports = class {
     }
 
     getAllEnemies() {
-        return _.filter(this.gameWorld.players, player => player.playerID !== this.socket.playerID)
+        console.log(this.gameWorld.players);
+        return _.filter(this.gameWorld.players, (player) => player.playerID !== this.socket.playerID)
     }
 }

@@ -13,7 +13,7 @@ module.exports = class {
     }
 
     socketHandler(socket) {
-        socket.on(gameEvents.playerNewPlayer, this.setupPlayer.bind(this))
+        socket.on(gameEvents.playerSetupPlayer, this.setupPlayer.bind(this))
         socket.on(gameEvents.playerMovement, this.movement.bind(this))
         socket.on(gameEvents.playerUpdateRotation, this.rotation.bind(this))
         socket.on(gameEvents.playerAttack, this.playerShoot.bind(this))
@@ -34,32 +34,29 @@ module.exports = class {
     setupPlayer(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
-        let playerID = jsonData[0]
+        this.playerID = jsonData[0]
         let player = _.find(this.gameWorld.players, { 'id': this.playerID })
         player.x = this.randomInt(-250, 250)
         player.y = 500
         player.z = this.randomInt(-250, 200)
-        this.username = username || "anonymous"
         this.gameWorld.players.push(this)
 
         let currentPlayerData = this.getPlayerInitData(this)
-
-        this.socket.emit(gameEvents.playerCreated, { d: [this.playerID] })
 
         // Create the player in the game
         /**
          * index 0 : player
          * index 1 : enemies
          */
-        // let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
-        // console.log('getAllEnemiesData', getAllEnemiesData)
-        // console.log('currentPlayerData', currentPlayerData)
-        // this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
+        let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
+        console.log('getAllEnemiesData', getAllEnemiesData)
+        console.log('currentPlayerData', currentPlayerData)
+        this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
         // Send the info of the new player to other gamers!
-        // this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
-        // console.log('send-complete')
+        this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
+        console.log('send-complete')
     }
-    
+
     removeEquitmentInClient(data) {
 
     }

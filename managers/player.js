@@ -36,7 +36,7 @@ module.exports = class {
         let jsonData = JSON.parse(data["d"])
         this.playerID = jsonData[0]
         let player = _.find(this.gameWorld.players, 'playerID', this.playerID)
-        let currentPlayerData = this.getPlayerInitData(this)
+        let currentPlayerData = this.getPlayerInitData(player)
 
         // Create the player in the game
         /**

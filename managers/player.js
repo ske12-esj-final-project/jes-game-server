@@ -32,24 +32,25 @@ module.exports = class {
     }
 
     setupPlayer(data) {
-        data['d'] = data['d'].replace(/@/g, "\"")
-        let jsonData = JSON.parse(data["d"])
-        this.playerID = jsonData[0]
-        let player = _.find(this.gameWorld.players, 'playerID', this.playerID)
-        let currentPlayerData = this.getPlayerInitData(player)
+        console.log('setupPlayer')
+        // data['d'] = data['d'].replace(/@/g, "\"")
+        // let jsonData = JSON.parse(data["d"])
+        // this.playerID = jsonData[0]
+        // let player = _.find(this.gameWorld.players, 'playerID', this.playerID)
+        // let currentPlayerData = this.getPlayerInitData(player)
 
-        // Create the player in the game
-        /**
-         * index 0 : player
-         * index 1 : enemies
-         */
-        let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
-        console.log('getAllEnemiesData', getAllEnemiesData)
-        console.log('currentPlayerData', currentPlayerData)
-        this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
-        // Send the info of the new player to other gamers!
-        this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
-        console.log('send-complete')
+        // // Create the player in the game
+        // /**
+        //  * index 0 : player
+        //  * index 1 : enemies
+        //  */
+        // let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
+        // console.log('getAllEnemiesData', getAllEnemiesData)
+        // console.log('currentPlayerData', currentPlayerData)
+        // this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
+        // // Send the info of the new player to other gamers!
+        // this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
+        // console.log('send-complete')
     }
 
     removeEquitmentInClient(data) {
@@ -130,18 +131,6 @@ module.exports = class {
         } else {
             console.log('no enemy shooted in this game')
         }
-        // // let sendToSelf = {
-        // //     "d": [
-        // //         this.hp
-        // //     ]
-        // // }
-
-
-
-
-        // this.socket.emit(gameEvents.playerUpdateStatus, sendToSelf)
-        // this.socket.broadcast.emit(gameEvents.enemyUpdateStatus, sendToOther)
-
     }
 
     updateCurrentEquitment(data) {

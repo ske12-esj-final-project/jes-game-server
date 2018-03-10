@@ -13,12 +13,7 @@ module.exports = class {
     }
 
     addPlayer(player) {
-        // let player = new Player(playerID, 
-        //     this.randomInt(-250, 250), 
-        //     500,  
-        //     this.randomInt(-250, 200),
-        //     "1234",
-        //     -1)
+        // this.randomInt(-250, 250), 500, this.randomInt(-250, 200)
         this.gameWorld.players.push(player)
         console.log('Player', player.playerID, 'has joined', this.name)
     }

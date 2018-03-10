@@ -25,11 +25,12 @@ module.exports = class {
     }
 
     setupPlayer(data) {
-        console.log('setupPlayer')
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
-        this.playerID = jsonData[0]
-        this.player = Mediator.getInstance().players[this.playerID]
+        this.player = Mediator.getInstance().players[jsonData[0]]
+        this.player.x = 0
+        this.player.y = 0
+        this.player.z = 0
         let currentPlayerData = this.getPlayerInitData(this.player)
 
         // Create the player in the game
@@ -56,7 +57,7 @@ module.exports = class {
         let jsonData = JSON.parse(data["d"])
         if (jsonData.length >= 1) {
             let weaponID = jsonData[0]
-            let room = Mediator.getInstance().players[this.playerID].currentRoom
+            let room = this.player.currentRoom
             _.remove(room.gameWorld.equitments, item => item.uid === weaponID)
             // update to all
             room.gameWorld.sendRemoveWeapon(weaponID)
@@ -72,7 +73,7 @@ module.exports = class {
     }
 
     rotation(data) {
-        if (!this.playerID) return
+        if (!this.player.playerID) return
         let jsonData = JSON.parse(data["d"])
         this.player.rotate = {
             x: jsonData[0],
@@ -84,7 +85,7 @@ module.exports = class {
         console.log('shoot', data)
         let sendToOther = {
             "d": [
-                this.playerID
+                this.player.playerID
             ]
         }
         this.socket.broadcast.emit(gameEvents.enemyShoot, sendToOther)
@@ -109,7 +110,7 @@ module.exports = class {
             let sendToOther = {
                 "d": [
                     targetId,
-                    this.playerID,
+                    this.player.playerID,
                     targetEnemy.hp
                 ]
             }
@@ -128,13 +129,13 @@ module.exports = class {
         let playerID = jsonData[0]
         let weaponIndex = jsonData[1]
         this.currentEquitment = weaponIndex
-        console.log('updateCurrentEquitment-send to other', { d: this.getCurrentEquitment(this) })
+        console.log('updateCurrentEquitment-send to other', { d: this.getCurrentEquitment(this.player) })
         let sendToOther =
-            this.socket.broadcast.emit(gameEvents.updateCurrentEquitment, { d: this.getCurrentEquitment(this) })
+            this.socket.broadcast.emit(gameEvents.updateCurrentEquitment, { d: this.getCurrentEquitment(this.player) })
     }
 
     movement(data) {
-        if (!this.playerID) return
+        if (!this.player.playerID) return
         let jsonData = JSON.parse(data["d"])
         this.player.x = parseFloat(jsonData[0])
         this.player.y = parseFloat(jsonData[1])
@@ -156,7 +157,7 @@ module.exports = class {
         }
         let sendToPlayer = [this.player.x, this.player.y, this.player.z]
         let sendToOther = [
-            this.playerID,
+            this.player.playerID,
             this.player.x,
             this.player.y,
             this.player.z
@@ -181,7 +182,7 @@ module.exports = class {
         }
 
         let sendToOther = [
-            this.playerID,
+            this.player.playerID,
             this.player.rotate.x,
             this.player.rotate.y
         ]
@@ -226,7 +227,7 @@ module.exports = class {
 
     getAllEnemies() {
         return _.pickBy(Mediator.getInstance().players, (value, key) => {
-            return key != this.playerID
+            return key != this.player.playerID
         })
     }
 }

@@ -20,7 +20,7 @@ module.exports = class {
         let username = data.username
         console.log('Created new player', username)
         let playerID = this.socket.playerID
-        let player = new Player(playerID, 0, 0, 0, username)
+        let player = new Player(playerID, null, null, null, username)
         Mediator.getInstance().players[playerID] = player
         this.socket.emit(gameEvents.playerJoinGame, { d: [playerID] })
     }

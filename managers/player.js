@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const gameEvents = require('../constants/events')
 const Mediator = require('./mediator')
-const WEAPON = require('../data/equitments')
+const WEAPON = require('../data/equipments')
 
 module.exports = class {
     constructor(socket) {
@@ -20,8 +20,8 @@ module.exports = class {
         socket.on(gameEvents.playerUpdateRotation, this.rotation.bind(this))
         socket.on(gameEvents.playerAttack, this.playerShoot.bind(this))
         socket.on(gameEvents.checkShootHit, this.checkShootHit.bind(this))
-        socket.on(gameEvents.updateCurrentEquitment, this.updateCurrentEquitment.bind(this))
-        socket.on(gameEvents.getEquitment, this.getEquitment.bind(this))
+        socket.on(gameEvents.updateCurrentEquipment, this.updateCurrentEquipment.bind(this))
+        socket.on(gameEvents.getEquipment, this.getEquipment.bind(this))
     }
 
     setupPlayer(data) {
@@ -47,21 +47,21 @@ module.exports = class {
         console.log('send-complete')
     }
 
-    removeEquitmentInClient(data) {
+    removeEquipmentInClient(data) {
 
     }
 
-    getEquitment(data) {
+    getEquipment(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         console.log('get-equiment', data)
         let jsonData = JSON.parse(data["d"])
         if (jsonData.length >= 1) {
             let weaponID = jsonData[0]
             let room = this.player.currentRoom
-            _.remove(room.gameWorld.equitments, item => item.uid === weaponID)
+            _.remove(room.gameWorld.equipments, item => item.uid === weaponID)
             // update to all
             room.gameWorld.sendRemoveWeapon(weaponID)
-            this.socket.emit(gameEvents.getEquitment, { d: [weaponID] })
+            this.socket.emit(gameEvents.getEquipment, { d: [weaponID] })
         }
         else {
             console.error('[error]-checkShootHit wrong data pattern', data)
@@ -122,16 +122,16 @@ module.exports = class {
         }
     }
 
-    updateCurrentEquitment(data) {
+    updateCurrentEquipment(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
-        console.log('updateCurrentEquitment-get', jsonData)
+        console.log('updateCurrentEquipment-get', jsonData)
         let playerID = jsonData[0]
         let weaponIndex = jsonData[1]
-        this.currentEquitment = weaponIndex
-        console.log('updateCurrentEquitment-send to other', { d: this.getCurrentEquitment(this.player) })
+        this.player.currentEquipment = weaponIndex
+        console.log('updateCurrentEquipment-send to other', { d: this.getCurrentEquipment(this.player) })
         let sendToOther =
-            this.socket.broadcast.emit(gameEvents.updateCurrentEquitment, { d: this.getCurrentEquitment(this.player) })
+            this.socket.broadcast.emit(gameEvents.updateCurrentEquipment, { d: this.getCurrentEquipment(this.player) })
     }
 
     movement(data) {
@@ -202,10 +202,10 @@ module.exports = class {
         ]
     }
 
-    getCurrentEquitment(player) {
+    getCurrentEquipment(player) {
         return [
             player.playerID,
-            player.currentEquitment
+            player.currentEquipment
         ]
 
     }
@@ -217,7 +217,7 @@ module.exports = class {
             player.y,
             player.z,
             player.username,
-            player.currentEquitment
+            player.currentEquipment
         ]
     }
 

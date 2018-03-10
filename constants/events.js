@@ -11,9 +11,9 @@ module.exports = {
     "playerAttack": "9",
     "enemyShoot": "10",
     "updatePlayersStatus": "a",
-    "updateCurrentEquitment": "b",
-    "setupEquitment": "c",
-    "getEquitment": "d",
+    "updateCurrentEquipment": "b",
+    "setupEquipment": "c",
+    "getEquipment": "d",
 
     "playerJoinGame": "z",
     "playerJoinRoom": "y",

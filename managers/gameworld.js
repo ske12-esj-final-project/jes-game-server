@@ -2,7 +2,7 @@
 const _ = require('lodash')
 
 const gameEvents = require('../constants/events')
-const WEAPON = require('../data/equitments')
+const WEAPON = require('../data/equipments')
 const Utils = require('../utils')
 const shortid = require('shortid')
 const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
@@ -18,7 +18,7 @@ module.exports = class {
         this.players = []
         this.itemList = [_.clone(item), _.clone(item)]
         // [id,weaponindex,posx,posy,posz]
-        this.equitments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
+        this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
     }
 
     assignRandomPositions(items, spawnPoints) {
@@ -41,7 +41,7 @@ module.exports = class {
 
     getUpdateWeaponInMap() {
         let sendData = []
-        _.map(this.equitments, item => {
+        _.map(this.equipments, item => {
             let data = [item.uid, item.weaponIndex, item.position.x, item.position.y, item.position.z]
             sendData.push(data)
         })

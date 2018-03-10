@@ -12,6 +12,6 @@ module.exports = class {
         this.username = username
         this.hp = 100
         this.currentRoom = null
-        this.currentEquitment = 0
+        this.currentEquipment = 0
     }
 }

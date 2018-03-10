@@ -2,14 +2,12 @@
 const _ = require('lodash')
 const gameWorldConfig = require('../config/gameworld')
 const GameWorld = require('../managers/gameworld')
-const PlayerManager = require('../managers/player')
 
 module.exports = class {
 
     constructor(name, socket) {
         this.name = name
         this.gameWorld = new GameWorld(socket, gameWorldConfig)
-        this.playerManager = new PlayerManager(socket, this.gameWorld)
     }
 
     addPlayer(player) {

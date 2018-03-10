@@ -2,53 +2,46 @@ const _ = require('lodash')
 const gameEvents = require('../constants/events')
 const Player = require('../model/player')
 const Room = require('../model/room')
+const shortid = require('shortid')
+const Mediator = require('./mediator')
 
 module.exports = class {
-    constructor(socket, rooms) {
+    constructor(socket) {
         this.socket = socket
-        this.rooms = rooms
-        this.players = []
         this.socketHandler(socket)
     }
 
     socketHandler(socket) {
-        socket.on(gameEvents.playerJoinGame, this.newPlayer.bind(this))
-        socket.on(gameEvents.playerJoinRoom, this.playerJoinRoom.bind(this))
+        socket.on(gameEvents.playerJoinGame, this.onPlayerConnect.bind(this))
+        socket.on(gameEvents.playerJoinRoom, this.onPlayerJoinRoom.bind(this))
     }
 
-    newPlayer(data) {
+    onPlayerConnect(data) {
         let username = data.username
-        console.log('created - new player', username)
+        console.log('Created new player', username)
         let playerID = this.socket.playerID
-        let player = new Player(playerID, 0, 0, 0, "1234", -1)
-        this.players.push(player)
+        let player = new Player(playerID, 0, 0, 0, username)
+        Mediator.getInstance().players[playerID] = player
         this.socket.emit(gameEvents.playerJoinGame, { d: [playerID] })
     }
 
-    playerJoinRoom(data) {
+    onPlayerJoinRoom(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
-        let player = _.find(this.players, 'playerID', jsonData[0])
-        let roomIndex = parseInt(jsonData[1])
-        this.joinRoom(player, roomIndex)
+        let player = Mediator.getInstance().players[jsonData[0]]
+        let roomID = parseInt(jsonData[1])
+        player.currentRoom = Mediator.getInstance().rooms[roomID]
+        Mediator.getInstance().rooms[roomID].addPlayer(player)
         this.socket.emit(gameEvents.playerJoinRoom, { d: [player.playerID] })
     }
 
-    createNewRoom() {
-        let roomA = new Room('Room A', this.socket)
-        let roomB = new Room('Room B', this.socket)
-        this.rooms = [roomA, roomB]
+    addRoom(roomName, roomID) {
+        // let roomID = shortid.generate()
+        let room = new Room(roomName, this.socket)
+        Mediator.getInstance().rooms[roomID] = room
     }
 
-    addRoom(newRoom) {
-        this.rooms.push(newRoom)
-    }
-
-    joinRoom(player, roomIndex) {
-        this.rooms[roomIndex].addPlayer(player)
-    }
-
-    deletePlayer() {
-        _.remove(this.players, player => player.playerID === this.socket.playerID)
+    onPlayerDisconnect() {
+        _.remove(Mediator.getInstance().players, player => player.playerID === this.socket.playerID)
     }
 }

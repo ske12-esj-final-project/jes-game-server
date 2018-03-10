@@ -1,4 +1,3 @@
-
 'use strict'
 const _ = require('lodash')
 
@@ -9,9 +8,8 @@ const shortid = require('shortid')
 const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
 
 module.exports = class {
-    constructor(socket, config) {
+    constructor(config) {
         this.config(config)
-        this.socket = socket
         let item = {
             uid: "",
             weaponIndex: 1,
@@ -36,10 +34,9 @@ module.exports = class {
             return item
         })
     }
+
     sendRemoveWeapon(weaponID) {
         console.log('remove-weapon', weaponID)
-        // remove weapon in client
-        this.socket.emit(gameEvents.getEquitment, { d: [weaponID] })
     }
 
     getUpdateWeaponInMap() {

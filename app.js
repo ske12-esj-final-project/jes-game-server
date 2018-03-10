@@ -1,28 +1,29 @@
-
 const express = require('express')
 const app = express()
 const server = require('http').Server(app)
 const _ = require('lodash')
 const shortid = require('shortid')
 const path = require('path')
-
 const io = require('socket.io')(server)
 
 const GameManager = require('./managers/game')
-const gameEvents = require('./constants/events')
 const RoomManager = require('./managers/room')
+const PlayerManager = require('./managers/player')
+
+const gameEvents = require('./constants/events')
 
 const APP_CONFIG = require('./config.json')
 
 let gameInterval = null
-
 // let gameManager = new GameManager(io, gameWorld)
 
 console.log('GAME-SERVER VERSION :: ', APP_CONFIG.GAME_VERSION)
 
 io.on('connection', (socket) => {
-    let roomManager = new RoomManager(socket);
-    roomManager.createNewRoom();
+    let roomManager = new RoomManager(socket)
+    let playerManager = new PlayerManager(socket)
+    roomManager.addRoom('Room A', 0)
+    roomManager.addRoom('Room B', 1)
     socket.playerID = shortid.generate()
     console.log('Player', socket.playerID, socket.id, 'connected')
     // let weaponsInMap = gameWorld.getUpdateWeaponInMap()
@@ -34,7 +35,7 @@ io.on('connection', (socket) => {
         let data = { "d": pid }
         io.emit(gameEvents.playerDisconnect, data)
         console.log('remove player', socket.playerID)
-        roomManager.deletePlayer()
+        roomManager.onPlayerDisconnect()
     })
 })
 

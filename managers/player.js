@@ -1,15 +1,17 @@
 const _ = require('lodash')
 const gameEvents = require('../constants/events')
+const Mediator = require('./mediator')
 const WEAPON = require('../data/equitments')
-module.exports = class {
-    constructor(socket, gameWorld) {
-        this.socket = socket
-        this.gameWorld = gameWorld
-        this.playerID = null
-        console.log('player-class')
 
-        this.init()
+module.exports = class {
+    constructor(socket) {
+        this.socket = socket
         this.socketHandler(socket)
+
+        setInterval(() => {
+            this.updatePostionToClient()
+            this.updateRotationToClient()
+        }, this.timeout || 1000 / 60)
     }
 
     socketHandler(socket) {
@@ -22,35 +24,26 @@ module.exports = class {
         socket.on(gameEvents.getEquitment, this.getEquitment.bind(this))
     }
 
-    init() {
-        this.currentEquitment = WEAPON.ARM.Index
-        this.rotate = {
-            x: null,
-            y: null
-        }
-        this.hp = 100
-    }
-
     setupPlayer(data) {
         console.log('setupPlayer')
-        // data['d'] = data['d'].replace(/@/g, "\"")
-        // let jsonData = JSON.parse(data["d"])
-        // this.playerID = jsonData[0]
-        // let player = _.find(this.gameWorld.players, 'playerID', this.playerID)
-        // let currentPlayerData = this.getPlayerInitData(player)
+        data['d'] = data['d'].replace(/@/g, "\"")
+        let jsonData = JSON.parse(data["d"])
+        this.playerID = jsonData[0]
+        this.player = Mediator.getInstance().players[this.playerID]
+        let currentPlayerData = this.getPlayerInitData(this.player)
 
-        // // Create the player in the game
-        // /**
-        //  * index 0 : player
-        //  * index 1 : enemies
-        //  */
-        // let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
-        // console.log('getAllEnemiesData', getAllEnemiesData)
-        // console.log('currentPlayerData', currentPlayerData)
-        // this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
-        // // Send the info of the new player to other gamers!
-        // this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
-        // console.log('send-complete')
+        // Create the player in the game
+        /**
+         * index 0 : player
+         * index 1 : enemies
+         */
+        let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
+        console.log('getAllEnemiesData', getAllEnemiesData)
+        console.log('currentPlayerData', currentPlayerData)
+        this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
+        // Send the info of the new player to other gamers!
+        this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
+        console.log('send-complete')
     }
 
     removeEquitmentInClient(data) {
@@ -63,19 +56,15 @@ module.exports = class {
         let jsonData = JSON.parse(data["d"])
         if (jsonData.length >= 1) {
             let weaponID = jsonData[0]
-            // asign to player
-            // remove from list
-            _.remove(this.gameWorld.equitments, item => item.uid === weaponID)
+            let room = Mediator.getInstance().players[this.playerID].currentRoom
+            _.remove(room.gameWorld.equitments, item => item.uid === weaponID)
             // update to all
-            // this.gameWorld.updateWeaponInMap()
-            this.gameWorld.sendRemoveWeapon(weaponID)
-        } else {
+            room.gameWorld.sendRemoveWeapon(weaponID)
+            this.socket.emit(gameEvents.getEquitment, { d: [weaponID] })
+        }
+        else {
             console.error('[error]-checkShootHit wrong data pattern', data)
         }
-    }
-
-    deletePlayer() {
-        _.remove(this.gameWorld.players, player => player.playerID === this.socket.playerID)
     }
 
     randomInt(low, high) {
@@ -85,11 +74,10 @@ module.exports = class {
     rotation(data) {
         if (!this.playerID) return
         let jsonData = JSON.parse(data["d"])
-        this.rotate = {
+        this.player.rotate = {
             x: jsonData[0],
             y: jsonData[1]
         }
-        // console.log('r',this.rotate)
     }
 
     playerShoot(data) {
@@ -148,29 +136,30 @@ module.exports = class {
     movement(data) {
         if (!this.playerID) return
         let jsonData = JSON.parse(data["d"])
-        this.x = parseFloat(jsonData[0])
-        this.y = parseFloat(jsonData[1])
-        this.z = parseFloat(jsonData[2])
+        this.player.x = parseFloat(jsonData[0])
+        this.player.y = parseFloat(jsonData[1])
+        this.player.z = parseFloat(jsonData[2])
     }
 
     updatePostionToClient() {
+        if (!this.player) return;
         let currentMove = {
-            x: this.x,
-            y: this.y,
-            z: this.z
+            x: this.player.x,
+            y: this.player.y,
+            z: this.player.z
         }
         if (_.isEqual(this.lastMove, currentMove)) return
         this.lastMove = {
-            x: this.x,
-            y: this.y,
-            z: this.z
+            x: this.player.x,
+            y: this.player.y,
+            z: this.player.z
         }
-        let sendToPlayer = [this.x, this.y, this.z]
+        let sendToPlayer = [this.player.x, this.player.y, this.player.z]
         let sendToOther = [
             this.playerID,
-            this.x,
-            this.y,
-            this.z
+            this.player.x,
+            this.player.y,
+            this.player.z
         ]
         this.socket.emit(gameEvents.playerUpdatePosition, { d: sendToPlayer })
 
@@ -179,21 +168,22 @@ module.exports = class {
     }
 
     updateRotationToClient() {
-        if (this.rotate.x == null || this.rotate.y == null) return
+        if (!this.player) return;
+        if (this.player.rotate.x == null || this.player.rotate.y == null) return
         let currentrotate = {
-            x: this.rotate.x,
-            y: this.rotate.y
+            x: this.player.rotate.x,
+            y: this.player.rotate.y
         }
         if (_.isEqual(this.lastrotate, currentrotate)) return
         this.lastrotate = {
-            x: this.rotate.x,
-            y: this.rotate.y
+            x: this.player.rotate.x,
+            y: this.player.rotate.y
         }
 
         let sendToOther = [
             this.playerID,
-            this.rotate.x,
-            this.rotate.y
+            this.player.rotate.x,
+            this.player.rotate.y
         ]
         this.socket.broadcast.emit(gameEvents.playerUpdateRotation, { d: sendToOther })
 
@@ -203,11 +193,11 @@ module.exports = class {
         return _.map(players, (player) => this.getPlayerInitData(player))
     }
 
-    getPlayerSendrotateData(player) {
+    getPlayerSendRotateData(player) {
         return [
-            this.playerID,
-            this.rotate.x,
-            ths.rotate.y
+            player.playerID,
+            player.rotate.x,
+            player.rotate.y
         ]
     }
 
@@ -235,7 +225,8 @@ module.exports = class {
     }
 
     getAllEnemies() {
-        console.log(this.gameWorld.players);
-        return _.filter(this.gameWorld.players, (player) => player.playerID !== this.socket.playerID)
+        return _.pickBy(Mediator.getInstance().players, (value, key) => {
+            return key != this.playerID
+        })
     }
 }

@@ -47,10 +47,10 @@ module.exports = class {
         let countDownInterval = setInterval(() => {
             timeLeft -= 1
             console.log('Match will start in', timeLeft)
-            this.io.to(this.roomID).emit(gameEvents.countdown, { d: [timeLeft] })
+            this.io.emit(gameEvents.countdown, { d: [timeLeft] })
             if (timeLeft <= 0) {
                 clearInterval(countDownInterval)
-                this.io.to(this.roomID).emit(gameEvents.finishCountdown)
+                this.io.emit(gameEvents.finishCountdown)
             }
         }, 1000)
     }

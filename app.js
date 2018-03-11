@@ -28,10 +28,6 @@ io.on('connection', (socket) => {
     socket.playerID = shortid.generate()
     console.log('Player', socket.playerID, socket.id, 'connected')
 
-    // let weaponsInMap = gameWorld.getUpdateWeaponInMap()
-    // console.log('send-weapon-data',weaponsInMap)
-    // socket.emit(gameEvents.setupEquipment,{d:weaponsInMap})
-
     socket.on('disconnect', () => {
         let pid = socket.playerID
         let data = { "d": pid }

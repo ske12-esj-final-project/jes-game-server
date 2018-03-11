@@ -134,7 +134,7 @@ module.exports = class {
                 ]
             }
             console.log('checkShoothit-senddata', sendToOther)
-            this.gameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
+            this.currentRoom.gameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
 
         } else {
             console.log('no enemy shooted in this game')

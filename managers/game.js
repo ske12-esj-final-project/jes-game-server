@@ -13,6 +13,15 @@ module.exports = {
         return instance
     },
 
+    createGameInterval() {
+        return setInterval(() => {
+            for (let playerID in instance.players) {
+                instance.players[playerID].updatePostionToClient()
+                instance.players[playerID].updateRotationToClient()
+            }
+        }, this.timeout || 1000 / 60)
+    },
+
     getRooms() {
         return instance.rooms
     },
@@ -20,7 +29,7 @@ module.exports = {
     getPlayers() {
         return instance.players
     },
-    
+
     getRoom(roomID) {
         return instance.rooms[roomID]
     },

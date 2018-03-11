@@ -8,20 +8,17 @@ const io = require('socket.io')(server)
 
 const GameManager = require('./managers/game')
 const RoomManager = require('./managers/room')
-const PlayerManager = require('./managers/player')
 
 const gameEvents = require('./constants/events')
 
 const APP_CONFIG = require('./config.json')
 
 let gameInterval = null
-// let gameManager = new GameManager(io, gameWorld)
 
 console.log('GAME-SERVER VERSION :: ', APP_CONFIG.GAME_VERSION)
 
 io.on('connection', (socket) => {
     let roomManager = new RoomManager(socket)
-    let playerManager = new PlayerManager(socket)
     roomManager.addRoom('Room A', 0)
     roomManager.addRoom('Room B', 1)
     socket.playerID = shortid.generate()
@@ -42,7 +39,7 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 5000
 server.listen(PORT, () => {
     console.log(`Listen on http://localhost:${PORT}`)
-    // gameInterval = gameManager.createGameInterval()
+    gameInterval = GameManager.getInstance().createGameInterval()
 })
 
 app.get('/', (req, res) => {

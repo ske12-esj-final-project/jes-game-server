@@ -1,8 +1,8 @@
 const _ = require('lodash')
 const gameEvents = require('../constants/events')
-const Player = require('../model/player')
 const Room = require('../model/room')
 const shortid = require('shortid')
+const Player = require('./player')
 const GameManager = require('./game')
 
 module.exports = class {
@@ -20,7 +20,7 @@ module.exports = class {
         let username = data.username
         console.log('Created new player', username)
         let playerID = this.socket.playerID
-        let player = new Player(playerID, null, null, null, username)
+        let player = new Player(this.socket, playerID, username)
         GameManager.getInstance().addPlayer(playerID, player)
         this.socket.emit(gameEvents.playerJoinGame, { d: [playerID] })
     }

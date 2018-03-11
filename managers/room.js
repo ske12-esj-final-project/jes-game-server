@@ -37,7 +37,7 @@ module.exports = class {
         this.socket.emit(gameEvents.playerJoinRoom, { d: [player.playerID] })
         console.log(room.getPlayers())
         if (_.size(room.getPlayers()) === 2) {
-            room.onCountdown()
+            room.gameWorld.onCountdown()
         }
     }
 

@@ -44,6 +44,7 @@ module.exports = class {
         }
         let currentPlayerData = this.getPlayerInitData(this)
         let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
+        console.log('check---',{ d: [currentPlayerData, getAllEnemiesData] })
         this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
         this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
     }

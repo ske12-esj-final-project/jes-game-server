@@ -8,7 +8,8 @@ const shortid = require('shortid')
 const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
 
 module.exports = class {
-    constructor(config) {
+    constructor(io, config) {
+        this.io = io
         this.config(config)
         let item = {
             uid: "",
@@ -40,6 +41,20 @@ module.exports = class {
         console.log('remove-weapon', weaponID)
     }
 
+    onCountdown() {
+        console.log('Countdown started')
+        let timeLeft = 10
+        let countDownInterval = setInterval(() => {
+            timeLeft -= 1
+            console.log('Match will start in', timeLeft)
+            this.io.to(this.roomID).emit(gameEvents.countdown, { d: [timeLeft] })
+            if (timeLeft <= 0) {
+                clearInterval(countDownInterval)
+                this.io.to(this.roomID).emit(gameEvents.finishCountdown)
+            }
+        }, 1000)
+    }
+
     getUpdateWeaponInMap() {
         let sendData = []
         _.map(this.equipments, item => {
@@ -55,5 +70,8 @@ module.exports = class {
         })
     }
 
+    reset(){
+        
+    }
 
 }

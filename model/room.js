@@ -10,7 +10,7 @@ module.exports = class {
         this.io = io
         this.name = name
         this.roomID = roomID
-        this.gameWorld = new GameWorld(gameWorldConfig)
+        this.gameWorld = new GameWorld(this.io.to(this.roomID), gameWorldConfig)
     }
 
     addPlayer(player) {
@@ -25,19 +25,5 @@ module.exports = class {
 
     getPlayers() {
         return this.gameWorld.players
-    }
-
-    onCountdown() {
-        console.log('Countdown started')
-        let timeLeft = 10
-        let countDownInterval = setInterval(() => {
-            timeLeft -= 1
-            console.log('Match will start in', timeLeft)
-            this.io.to(this.roomID).emit(gameEvents.countdown, { d: [timeLeft] })
-            if (timeLeft <= 0) {
-                clearInterval(countDownInterval)
-                this.io.to(this.roomID).emit(gameEvents.finishCountdown)
-            }
-        }, 1000)
     }
 }

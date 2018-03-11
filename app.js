@@ -27,6 +27,7 @@ io.on('connection', (socket) => {
     roomManager.addRoom(roomB)
     socket.playerID = shortid.generate()
     console.log('Player', socket.playerID, socket.id, 'connected')
+
     // let weaponsInMap = gameWorld.getUpdateWeaponInMap()
     // console.log('send-weapon-data',weaponsInMap)
     // socket.emit(gameEvents.setupEquipment,{d:weaponsInMap})

@@ -1,6 +1,6 @@
 module.exports = {
-    ARM:{
-        "Index":0,
+    ARM: {
+        "Index": 0,
         "Damage": 5,
     },
     GLICK: {

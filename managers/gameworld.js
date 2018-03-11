@@ -1,25 +1,25 @@
-
 'use strict'
 const _ = require('lodash')
 
 const gameEvents = require('../constants/events')
-const WEAPON = require('../data/equitments')
+const WEAPON = require('../data/equipments')
 const Utils = require('../utils')
 const shortid = require('shortid')
 const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
 
 module.exports = class {
-    constructor(io, config) {
+    constructor(config) {
         this.config(config)
-        this.io = io
         let item = {
             uid: "",
             weaponIndex: 1,
             position: {}
         }
+        this.players = []
         this.itemList = [_.clone(item), _.clone(item)]
         // [id,weaponindex,posx,posy,posz]
-        this.equitments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
+        this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
+        this.isInGame = false
     }
 
     assignRandomPositions(items, spawnPoints) {
@@ -35,16 +35,15 @@ module.exports = class {
             return item
         })
     }
-    sendRemoveWeapon(weaponID){
-        console.log('remove-weapon',weaponID)
-        // remove weapon in client
-        this.io.emit(gameEvents.getEquitment,{d:[weaponID]})
+
+    sendRemoveWeapon(weaponID) {
+        console.log('remove-weapon', weaponID)
     }
 
     getUpdateWeaponInMap() {
         let sendData = []
-        _.map(this.equitments, item => {
-            let data = [item.uid, item.weaponIndex, item.position.x,item.position.y, item.position.z]
+        _.map(this.equipments, item => {
+            let data = [item.uid, item.weaponIndex, item.position.x, item.position.y, item.position.z]
             sendData.push(data)
         })
         return sendData

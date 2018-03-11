@@ -1,86 +1,86 @@
 const _ = require('lodash')
 const gameEvents = require('../constants/events')
-const WEAPON = require('../data/equitments')
+const GameManager = require('./game')
+const WEAPON = require('../data/equipments')
+
 module.exports = class {
-    constructor(socket, gameWorld) {
+    constructor(socket, playerID, username) {
         this.socket = socket
-        this.gameWorld = gameWorld
-        this.playerID = null
-        console.log('player-class')
-
-        this.init()
-        this.socketHandler(socket)
-    }
-
-    socketHandler(socket) {
-        socket.on(gameEvents.playerNewPlayer, this.newPlayer.bind(this))
-        socket.on(gameEvents.playerMovement, this.movement.bind(this))
-        socket.on(gameEvents.playerUpdateRotation, this.rotation.bind(this))
-        socket.on(gameEvents.playerAttack, this.playerShoot.bind(this))
-        socket.on(gameEvents.checkShootHit, this.checkShootHit.bind(this))
-        socket.on(gameEvents.updateCurrentEquitment, this.updateCurrentEquitment.bind(this))
-        socket.on(gameEvents.getEquitment, this.getEquitment.bind(this))
-    }
-
-    init() {
-        this.currentEquitment = WEAPON.ARM.Index
+        this.playerID = playerID
+        this.username = username
+        this.position = {
+            x: null,
+            y: null,
+            z: null
+        }
         this.rotate = {
             x: null,
             y: null
         }
         this.hp = 100
+        this.currentRoom = null
+        this.currentEquipment = 0
+        this.socketHandler(socket)
     }
 
-    newPlayer(user_name) {
-        let username = user_name.username
-        console.log('created - new player', username)
-        this.playerID = this.socket.playerID
-        this.x = this.randomInt(-250, 250)
-        this.y = 500
-        this.z = this.randomInt(-250, 200)
-        this.username = username || "anonymous"
-        this.gameWorld.players.push(this)
-
-
-        let currentPlayerData = this.getPlayerInitData(this)
-
-        // Create the player in the game
-        /**
-         * index 0 : player
-         * index 1 : enemies
-         */
-        let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
-        console.log('getAllEnemiesData', getAllEnemiesData)
-        console.log('currentPlayerData', currentPlayerData)
-        // if(getAllEnemiesData.length==0) return
-        this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
-        // Send the info of the new player to other gamers!
-        this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
-        console.log('send-complete')
-    }
-    removeEquitmentInClient(data){
-        
+    socketHandler(socket) {
+        socket.on(gameEvents.playerSetupPlayer, this.setupPlayer.bind(this))
+        socket.on(gameEvents.startGame, this.startGame.bind(this))
+        socket.on(gameEvents.playerMovement, this.movement.bind(this))
+        socket.on(gameEvents.playerUpdateRotation, this.rotation.bind(this))
+        socket.on(gameEvents.playerAttack, this.playerShoot.bind(this))
+        socket.on(gameEvents.checkShootHit, this.checkShootHit.bind(this))
+        socket.on(gameEvents.updateCurrentEquipment, this.updateCurrentEquipment.bind(this))
+        socket.on(gameEvents.getEquipment, this.getEquipment.bind(this))
     }
 
-    getEquitment(data){
+    setupPlayer(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
-        console.log('get-equiment',data)
+        let jsonData = JSON.parse(data["d"])
+        this.position = {
+            x: 0,
+            y: 0,
+            z: 0
+        }
+        let currentPlayerData = this.getPlayerInitData(this)
+        let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
+        this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
+        this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
+    }
+
+    startGame(data) {
+        data['d'] = data['d'].replace(/@/g, "\"")
+        let jsonData = JSON.parse(data["d"])
+        this.position = {
+            x: this.randomInt(-250, 250),
+            y: 500,
+            z: this.randomInt(-250, 200)
+        }
+        let currentPlayerData = this.getPlayerInitData(this)
+        let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
+        this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
+        this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
+    }
+
+    removeEquipmentInClient(data) {
+
+    }
+
+    getEquipment(data) {
+        data['d'] = data['d'].replace(/@/g, "\"")
+        console.log('get-equiment', data)
         let jsonData = JSON.parse(data["d"])
         if (jsonData.length >= 1) {
             let weaponID = jsonData[0]
-            // asign to player
-            // remove from list
-            _.remove(this.gameWorld.equitments,item=>item.uid === weaponID)
+            let room = this.currentRoom
+            _.remove(room.gameWorld.equipments, item => item.uid === weaponID)
             // update to all
-            // this.gameWorld.updateWeaponInMap()
-            this.gameWorld.sendRemoveWeapon(weaponID)
-        } else {
+            room.gameWorld.sendRemoveWeapon(weaponID)
+            this.socket.emit(gameEvents.getEquipment, { d: [weaponID] })
+        }
+        else {
             console.error('[error]-checkShootHit wrong data pattern', data)
         }
-    }
-
-    deletePlayer() {
-        _.remove(this.gameWorld.players, player => player.playerID === this.socket.playerID)
     }
 
     randomInt(low, high) {
@@ -94,7 +94,6 @@ module.exports = class {
             x: jsonData[0],
             y: jsonData[1]
         }
-        // console.log('r',this.rotate)
     }
 
     playerShoot(data) {
@@ -119,7 +118,7 @@ module.exports = class {
             console.error('[error]-checkShootHit wrong data pattern', data)
         }
 
-        let targetEnemy = _.find(this.gameWorld.players, { playerID: targetId })
+        let targetEnemy = GameManager.getInstance().getPlayer(targetId)
 
         if (targetEnemy) {
             targetEnemy.hp -= dmg
@@ -136,75 +135,42 @@ module.exports = class {
         } else {
             console.log('no enemy shooted in this game')
         }
-        // // let sendToSelf = {
-        // //     "d": [
-        // //         this.hp
-        // //     ]
-        // // }
-
-
-
-
-        // this.socket.emit(gameEvents.playerUpdateStatus, sendToSelf)
-        // this.socket.broadcast.emit(gameEvents.enemyUpdateStatus, sendToOther)
-
     }
 
-    updateCurrentEquitment(data) {
+    updateCurrentEquipment(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
-        console.log('updateCurrentEquitment-get', jsonData)
+        console.log('updateCurrentEquipment-get', jsonData)
         let playerID = jsonData[0]
         let weaponIndex = jsonData[1]
-        this.currentEquitment = weaponIndex
-        console.log('updateCurrentEquitment-send to other', { d: this.getCurrentEquitment(this) })
-        let sendToOther =
-            this.socket.broadcast.emit(gameEvents.updateCurrentEquitment, { d: this.getCurrentEquitment(this) })
+        this.currentEquipment = weaponIndex
+        console.log('updateCurrentEquipment-send to other', { d: this.getCurrentEquipment(this) })
+        let sendToOther = this.socket.broadcast.emit(
+            gameEvents.updateCurrentEquipment, 
+            { d: this.getCurrentEquipment(this) })
     }
 
     movement(data) {
         if (!this.playerID) return
         let jsonData = JSON.parse(data["d"])
-        this.x = parseFloat(jsonData[0])
-        this.y = parseFloat(jsonData[1])
-        this.z = parseFloat(jsonData[2])
-        // console.log('m',jsonData)
-        // const playerSpeed = 16
-        // // console.log('playerMovement', directions, this.socket.playerID)
-        // let point1 = {
-        //     x: 0,
-        //     y: 0
-        // }
-        // let point2 = {
-        //     x: directions[0],
-        //     y: directions[1]
-        // }
-        // let angleRadians = this.getAngleRadians(point1, point2)
-
-        // this.x += parseInt((playerSpeed * Math.cos(angleRadians) * Math.abs(directions[0])))
-        // this.y += parseInt((playerSpeed * Math.sin(angleRadians) * Math.abs(directions[1])))
-
-
+        this.position = {
+            x: parseFloat(jsonData[0]),
+            y: parseFloat(jsonData[1]),
+            z: parseFloat(jsonData[2])
+        }
     }
 
     updatePostionToClient() {
-        let currentMove = {
-            x: this.x,
-            y: this.y,
-            z: this.z
-        }
+        if (!this.playerID) return;
+        let currentMove = this.position
         if (_.isEqual(this.lastMove, currentMove)) return
-        this.lastMove = {
-            x: this.x,
-            y: this.y,
-            z: this.z
-        }
-        let sendToPlayer = [this.x, this.y, this.z]
+        this.lastMove = this.position
+        let sendToPlayer = [this.position.x, this.position.y, this.position.z]
         let sendToOther = [
             this.playerID,
-            this.x,
-            this.y,
-            this.z
+            this.position.x,
+            this.position.y,
+            this.position.z
         ]
         this.socket.emit(gameEvents.playerUpdatePosition, { d: sendToPlayer })
 
@@ -213,6 +179,7 @@ module.exports = class {
     }
 
     updateRotationToClient() {
+        if (!this.playerID) return;
         if (this.rotate.x == null || this.rotate.y == null) return
         let currentrotate = {
             x: this.rotate.x,
@@ -237,18 +204,18 @@ module.exports = class {
         return _.map(players, (player) => this.getPlayerInitData(player))
     }
 
-    getPlayerSendrotateData(player) {
+    getPlayerSendRotateData(player) {
         return [
-            this.playerID,
-            this.rotate.x,
-            ths.rotate.y
+            player.playerID,
+            player.rotate.x,
+            player.rotate.y
         ]
     }
 
-    getCurrentEquitment(player) {
+    getCurrentEquipment(player) {
         return [
             player.playerID,
-            player.currentEquitment
+            player.currentEquipment
         ]
 
     }
@@ -256,19 +223,21 @@ module.exports = class {
     getPlayerInitData(player) {
         return [
             player.playerID,
-            player.x,
-            player.y,
-            player.z,
+            player.position.x,
+            player.position.y,
+            player.position.z,
             player.username,
-            player.currentEquitment
+            player.currentEquipment
         ]
     }
 
     getAngleRadians(p1, p2) {
-        return Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        return Math.atan2(p2.position.y - p1.position.y, p2.position.x - p1.position.x);
     }
 
     getAllEnemies() {
-        return _.filter(this.gameWorld.players, player => player.playerID !== this.socket.playerID)
+        return _.pickBy(GameManager.getInstance().getPlayers(), (value, key) => {
+            return key != this.playerID
+        })
     }
 }

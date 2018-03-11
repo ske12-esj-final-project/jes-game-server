@@ -6,5 +6,5 @@ module.exports = {
         y:32,
         z:32
     },
-    equitments:[]
+    equipments:[]
 }

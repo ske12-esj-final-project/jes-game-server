@@ -1,18 +1,56 @@
 const _ = require('lodash')
 
-module.exports = class {
-    constructor(io, gameWorld) {
-        this.io = io
-        this.gameWorld = gameWorld
-    }
-    // plane axis x,z
+let instance = null
+
+module.exports = {
+    getInstance() {
+        if (!instance) {
+            instance = this
+            instance.rooms = {}
+            instance.players = {}
+        }
+
+        return instance
+    },
 
     createGameInterval() {
         return setInterval(() => {
-            _.forEach(this.gameWorld.players, player => {
-                player.updatePostionToClient()
-                player.updateRotationToClient()
-            })
-        }, this.gameWorld.timeout || 1000 / 60)
+            for (let playerID in instance.players) {
+                instance.players[playerID].updatePostionToClient()
+                instance.players[playerID].updateRotationToClient()
+            }
+        }, this.timeout || 1000 / 60)
+    },
+
+    getRooms() {
+        return instance.rooms
+    },
+
+    getPlayers() {
+        return instance.players
+    },
+
+    getRoom(roomID) {
+        return instance.rooms[roomID]
+    },
+
+    getPlayer(playerID) {
+        return instance.players[playerID]
+    },
+
+    addPlayer(playerID, player) {
+        instance.players[playerID] = player
+    },
+
+    addRoom(room) {
+        instance.rooms[room.roomID] = room
+    },
+
+    removePlayer(playerID) {
+        delete instance.players[playerID]
+    },
+
+    removeRoom(roomID) {
+        delete instance.rooms[roomID]
     }
 }

@@ -42,8 +42,8 @@ module.exports = {
         instance.players[playerID] = player
     },
 
-    addRoom(roomID, room) {
-        instance.rooms[roomID] = room
+    addRoom(room) {
+        instance.rooms[room.roomID] = room
     },
 
     removePlayer(playerID) {

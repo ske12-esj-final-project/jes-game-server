@@ -19,6 +19,7 @@ module.exports = class {
         this.itemList = [_.clone(item), _.clone(item)]
         // [id,weaponindex,posx,posy,posz]
         this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
+        this.isInGame = false
     }
 
     assignRandomPositions(items, spawnPoints) {

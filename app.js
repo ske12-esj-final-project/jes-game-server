@@ -6,6 +6,7 @@ const shortid = require('shortid')
 const path = require('path')
 const io = require('socket.io')(server)
 
+const Room = require('./model/room')
 const GameManager = require('./managers/game')
 const RoomManager = require('./managers/room')
 
@@ -17,10 +18,13 @@ let gameInterval = null
 
 console.log('GAME-SERVER VERSION :: ', APP_CONFIG.GAME_VERSION)
 
+let roomA = new Room(io, 'Room A', '0')
+let roomB = new Room(io, 'Room B', '1')
+
 io.on('connection', (socket) => {
     let roomManager = new RoomManager(socket)
-    roomManager.addRoom('Room A', 0)
-    roomManager.addRoom('Room B', 1)
+    roomManager.addRoom(roomA)
+    roomManager.addRoom(roomB)
     socket.playerID = shortid.generate()
     console.log('Player', socket.playerID, socket.id, 'connected')
     // let weaponsInMap = gameWorld.getUpdateWeaponInMap()

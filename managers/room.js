@@ -29,16 +29,21 @@ module.exports = class {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
         let player = GameManager.getInstance().getPlayer(jsonData[0])
-        let room = GameManager.getInstance().getRoom(parseInt(jsonData[1]))
+        let roomID = jsonData[1]
+        let room = GameManager.getInstance().getRoom(roomID)
         player.currentRoom = room
         room.addPlayer(player)
+        this.socket.join(roomID)
         this.socket.emit(gameEvents.playerJoinRoom, { d: [player.playerID] })
+        console.log(room.getPlayers())
+        if (_.size(room.getPlayers()) === 2) {
+            room.onCountdown()
+        }
     }
 
-    addRoom(roomName, roomID) {
+    addRoom(room) {
         // let roomID = shortid.generate()
-        let room = new Room(roomName)
-        GameManager.getInstance().addRoom(roomID, room)
+        GameManager.getInstance().addRoom(room)
     }
 
     onPlayerDisconnect() {

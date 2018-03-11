@@ -1,12 +1,15 @@
 'use strict'
 const _ = require('lodash')
 const gameWorldConfig = require('../config/gameworld')
+const gameEvents = require('../constants/events')
 const GameWorld = require('../managers/gameworld')
 
 module.exports = class {
 
-    constructor(name) {
+    constructor(io, name, roomID) {
+        this.io = io
         this.name = name
+        this.roomID = roomID
         this.gameWorld = new GameWorld(gameWorldConfig)
     }
 
@@ -18,5 +21,20 @@ module.exports = class {
 
     removePlayer() {
         _.remove(this.gameWorld.players, player => player.playerID === this.socket.playerID)
+    }
+
+    getPlayers() {
+        return this.gameWorld.players
+    }
+
+    onCountdown() {
+        console.log('Countdown started')
+        let timeLeft = 10
+        let countDownInterval = setInterval(() => {
+            timeLeft -= 1
+            console.log('Match will start in', timeLeft)
+            this.io.to(this.roomID).emit(gameEvents.countdown, { d: [timeLeft] })
+            if (timeLeft <= 0) clearInterval(countDownInterval)
+        }, 1000)
     }
 }

@@ -60,6 +60,9 @@ module.exports = class {
         let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
         this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
         this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
+        let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
+        console.log('send-weapon-data', weaponsInMap)
+        this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
     }
 
     removeEquipmentInClient(data) {
@@ -146,7 +149,7 @@ module.exports = class {
         this.currentEquipment = weaponIndex
         console.log('updateCurrentEquipment-send to other', { d: this.getCurrentEquipment(this) })
         let sendToOther = this.socket.broadcast.emit(
-            gameEvents.updateCurrentEquipment, 
+            gameEvents.updateCurrentEquipment,
             { d: this.getCurrentEquipment(this) })
     }
 

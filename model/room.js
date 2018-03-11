@@ -5,9 +5,9 @@ const GameWorld = require('../managers/gameworld')
 
 module.exports = class {
 
-    constructor(name, socket) {
+    constructor(name) {
         this.name = name
-        this.gameWorld = new GameWorld(socket, gameWorldConfig)
+        this.gameWorld = new GameWorld(gameWorldConfig)
     }
 
     addPlayer(player) {

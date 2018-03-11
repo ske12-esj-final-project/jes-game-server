@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const gameEvents = require('../constants/events')
-const Mediator = require('./mediator')
+const GameManager = require('./game')
 const WEAPON = require('../data/equipments')
 
 module.exports = class {
@@ -27,7 +27,7 @@ module.exports = class {
     setupPlayer(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
-        this.player = Mediator.getInstance().players[jsonData[0]]
+        this.player = GameManager.getInstance().getPlayer(jsonData[0])
         this.player.x = 0
         this.player.y = 0
         this.player.z = 0
@@ -103,7 +103,7 @@ module.exports = class {
             console.error('[error]-checkShootHit wrong data pattern', data)
         }
 
-        let targetEnemy = _.find(this.gameWorld.players, { playerID: targetId })
+        let targetEnemy = GameManager.getInstance().getPlayer(targetId)
 
         if (targetEnemy) {
             targetEnemy.hp -= dmg
@@ -226,7 +226,7 @@ module.exports = class {
     }
 
     getAllEnemies() {
-        return _.pickBy(Mediator.getInstance().players, (value, key) => {
+        return _.pickBy(GameManager.getInstance().getPlayers(), (value, key) => {
             return key != this.player.playerID
         })
     }

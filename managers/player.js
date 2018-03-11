@@ -25,6 +25,7 @@ module.exports = class {
 
     socketHandler(socket) {
         socket.on(gameEvents.playerSetupPlayer, this.setupPlayer.bind(this))
+        socket.on(gameEvents.startGame, this.startGame.bind(this))
         socket.on(gameEvents.playerMovement, this.movement.bind(this))
         socket.on(gameEvents.playerUpdateRotation, this.rotation.bind(this))
         socket.on(gameEvents.playerAttack, this.playerShoot.bind(this))
@@ -42,19 +43,23 @@ module.exports = class {
             z: 0
         }
         let currentPlayerData = this.getPlayerInitData(this)
-
-        // Create the player in the game
-        /**
-         * index 0 : player
-         * index 1 : enemies
-         */
         let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
-        console.log('getAllEnemiesData', getAllEnemiesData)
-        console.log('currentPlayerData', currentPlayerData)
         this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
-        // Send the info of the new player to other gamers!
         this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
-        console.log('send-complete')
+    }
+
+    startGame(data) {
+        data['d'] = data['d'].replace(/@/g, "\"")
+        let jsonData = JSON.parse(data["d"])
+        this.position = {
+            x: this.randomInt(-250, 250),
+            y: 500,
+            z: this.randomInt(-250, 200)
+        }
+        let currentPlayerData = this.getPlayerInitData(this)
+        let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
+        this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
+        this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
     }
 
     removeEquipmentInClient(data) {

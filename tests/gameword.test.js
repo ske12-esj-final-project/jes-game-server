@@ -1,13 +1,7 @@
 const _ = require('lodash')
-
 const { expect } = require('chai')
-
-
-const MANAGER_PATH = '../managers'
-
 const assert = require('assert')
-
-const GameWorld = require(`${MANAGER_PATH}/gameworld`)
+const GameWorld = require(`../managers/gameworld`)
 
 describe('gameworld-manager', () => {
     describe('assignRandomPositions()', () => {

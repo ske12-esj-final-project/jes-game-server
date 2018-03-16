@@ -20,9 +20,10 @@ console.log('GAME-SERVER VERSION :: ', APP_CONFIG.GAME_VERSION)
 
 let roomA = new Room(io, 'Room A', '0')
 let roomB = new Room(io, 'Room B', '1')
+let roomManager
 
 io.on('connection', (socket) => {
-    let roomManager = new RoomManager(socket)
+    roomManager = new RoomManager(socket)
     roomManager.addRoom(roomA)
     roomManager.addRoom(roomB)
     socket.playerID = shortid.generate()

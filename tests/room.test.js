@@ -16,29 +16,32 @@ let options = {
 };
 
 describe('Room Manager', () => {
-    afterEach(() => {
-        GameManager.instance = null
-    })
 
     describe('Player join game', () => {
-        let client
-        beforeEach(() => {
-            client = io.connect(SOCKET_URL, options)
+        afterEach(() => {
+            GameManager.instance = null
+        })
+
+        it('should add player to the list', (done) => {
+            let client = io.connect(SOCKET_URL, options)
             client.on('connect', (data) => {
                 client.emit(gameEvents.playerJoinGame, { username: '1234' })
             })
-        })
-        
-        it('should add player to the list', () => {
+
             client.on(gameEvents.playerJoinGame, (data) => {
                 let player = GameManager.getPlayer(data.d[0])
-                expect(player).to.not.be.null
+                expect(player).to.not.be.undefined
                 client.disconnect()
                 done()
             })
         })
 
-        it('should add player with client username', () => {
+        it('should add player with client username', (done) => {
+            let client = io.connect(SOCKET_URL, options)
+            client.on('connect', (data) => {
+                client.emit(gameEvents.playerJoinGame, { username: '1234' })
+            })
+
             client.on(gameEvents.playerJoinGame, (data) => {
                 let player = GameManager.getPlayer(data.d[0])
                 expect(player.username).to.equal('1234')
@@ -49,31 +52,58 @@ describe('Room Manager', () => {
     })
 
     describe('Player join room', () => {
-        let client, playerID
-        beforeEach(() => {
+        afterEach(() => {
+            GameManager.instance = null
+        })
+
+        it('should add player to room', (done) => {
+            let client, playerID
             client = io.connect(SOCKET_URL, options)
             client.on('connect', (data) => {
                 client.emit(gameEvents.playerJoinGame, { username: '1234' })
             })
-            
+
             client.on(gameEvents.playerJoinGame, (data) => {
                 playerID = data.d[0]
-                client.emit(gameEvents.playerJoinRoom, { d: [`@${playerID}@`, '0'] })
+                client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
             })
-        })
 
-        it('should add player to room', () => {
             client.on(gameEvents.playerJoinRoom, (data) => {
-                expect(GameManager.getRoom('0').getPlayer(playerID)).to.not.be.null
+                expect(GameManager.getRoom('0')).to.not.be.undefined
                 client.disconnect()
                 done()
             })
         })
 
-        it('should not add player if room is full', () => {
+        it('should not add player if room is full', (done) => {
+            let client = io.connect(SOCKET_URL, options)
+            client.on('connect', (data) => {
+                client.emit(gameEvents.playerJoinGame, { username: '1234' })
+            })
+
+            client.on(gameEvents.playerJoinGame, (data) => {
+                let playerID = data.d[0]
+                client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
+            })
+
             client.on(gameEvents.playerJoinRoom, (data) => {
-                client.disconnect()
-                done()
+                let anotherClient = io.connect(SOCKET_URL, options)
+                anotherClient.on('connect', (data) => {
+                    anotherClient.emit(gameEvents.playerJoinGame, { username: '5678' })
+                })
+
+                anotherClient.on(gameEvents.playerJoinGame, (data) => {
+                    let anotherPlayerID = data.d[0]
+                    anotherClient.emit(gameEvents.playerJoinRoom, { d: `[@${anotherPlayerID}@,0]` })
+                })
+
+                anotherClient.on(gameEvents.playerJoinRoom, (data) => {
+                    let playersInRoom = GameManager.getRoom('0').getPlayers()
+                    expect(playersInRoom.length).to.equal(1)
+                    client.disconnect()
+                    anotherClient.disconnect()
+                    done()
+                })
             })
         })
     })

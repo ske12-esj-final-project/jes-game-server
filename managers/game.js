@@ -15,7 +15,7 @@ module.exports = {
 
     createGameInterval() {
         return setInterval(() => {
-            for (let playerID in instance.players) {
+            for (let playerID in this.getPlayers()) {
                 instance.players[playerID].updatePostionToClient()
                 instance.players[playerID].updateRotationToClient()
             }
@@ -23,34 +23,34 @@ module.exports = {
     },
 
     getRooms() {
-        return instance.rooms
+        return this.getInstance().rooms
     },
 
     getPlayers() {
-        return instance.players
+        return this.getInstance().players
     },
 
     getRoom(roomID) {
-        return instance.rooms[roomID]
+        return this.getInstance().rooms[roomID]
     },
 
     getPlayer(playerID) {
-        return instance.players[playerID]
+        return this.getInstance().players[playerID]
     },
 
     addPlayer(playerID, player) {
-        instance.players[playerID] = player
+        this.getInstance().players[playerID] = player
     },
 
     addRoom(room) {
-        instance.rooms[room.roomID] = room
+        this.getInstance().rooms[room.roomID] = room
     },
 
     removePlayer(playerID) {
-        delete instance.players[playerID]
+        delete this.getInstance().players[playerID]
     },
 
     removeRoom(roomID) {
-        delete instance.rooms[roomID]
+        delete this.getInstance().rooms[roomID]
     }
 }

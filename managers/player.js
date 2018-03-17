@@ -122,7 +122,7 @@ module.exports = class {
             console.error('[error]-checkShootHit wrong data pattern', data)
         }
 
-        let targetEnemy = GameManager.getInstance().getPlayer(targetId)
+        let targetEnemy = GameManager.getPlayer(targetId)
 
         if (targetEnemy) {
             targetEnemy.hp -= dmg
@@ -240,7 +240,7 @@ module.exports = class {
     }
 
     getAllEnemies() {
-        return _.pickBy(GameManager.getInstance().getPlayers(), (value, key) => {
+        return _.pickBy(GameManager.getPlayers(), (value, key) => {
             return key != this.playerID
         })
     }

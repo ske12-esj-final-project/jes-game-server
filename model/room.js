@@ -14,7 +14,6 @@ module.exports = class {
     }
 
     addPlayer(player) {
-        // this.randomInt(-250, 250), 500, this.randomInt(-250, 200)
         this.gameWorld.players.push(player)
         console.log('Player', player.playerID, 'has joined', this.name)
     }

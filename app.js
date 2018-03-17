@@ -41,7 +41,7 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 5000
 server.listen(PORT, () => {
     console.log(`Listen on http://localhost:${PORT}`)
-    gameInterval = GameManager.getInstance().createGameInterval()
+    gameInterval = GameManager.createGameInterval()
 })
 
 app.get('/', (req, res) => {

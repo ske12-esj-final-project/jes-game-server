@@ -21,16 +21,16 @@ module.exports = class {
         console.log('Created new player', username)
         let playerID = this.socket.playerID
         let player = new Player(this.socket, playerID, username)
-        GameManager.getInstance().addPlayer(playerID, player)
+        GameManager.addPlayer(playerID, player)
         this.socket.emit(gameEvents.playerJoinGame, { d: [playerID] })
     }
 
     onPlayerJoinRoom(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
-        let player = GameManager.getInstance().getPlayer(jsonData[0])
+        let player = GameManager.getPlayer(jsonData[0])
         let roomID = jsonData[1]
-        let room = GameManager.getInstance().getRoom(roomID)
+        let room = GameManager.getRoom(roomID)
         player.currentRoom = room
         room.addPlayer(player)
         this.socket.join(roomID)
@@ -43,10 +43,10 @@ module.exports = class {
 
     addRoom(room) {
         // let roomID = shortid.generate()
-        GameManager.getInstance().addRoom(room)
+        GameManager.addRoom(room)
     }
 
     onPlayerDisconnect() {
-        _.remove(GameManager.getInstance().getPlayers(), player => player.playerID === this.socket.playerID)
+        _.remove(GameManager.getPlayers(), player => player.playerID === this.socket.playerID)
     }
 }

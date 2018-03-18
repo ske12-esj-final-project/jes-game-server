@@ -29,12 +29,17 @@ io.on('connection', (socket) => {
     socket.playerID = shortid.generate()
     console.log('Player', socket.playerID, socket.id, 'connected')
 
+    socket.on('disconnecting', (reason) => {
+        let currentRoom = GameManager.getPlayer(socket.playerID).currentRoom
+        if (currentRoom) {
+            currentRoom.removePlayer(socket.playerID)
+        }
+    });
+
     socket.on('disconnect', () => {
-        let pid = socket.playerID
-        let data = { "d": pid }
-        io.emit(gameEvents.playerDisconnect, data)
-        console.log('remove player', socket.playerID)
         roomManager.onPlayerDisconnect()
+        io.emit(gameEvents.playerDisconnect, { d: socket.playerID })
+        console.log('remove player', socket.playerID)
     })
 })
 

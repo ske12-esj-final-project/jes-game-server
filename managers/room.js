@@ -4,6 +4,7 @@ const Room = require('../model/room')
 const shortid = require('shortid')
 const Player = require('./player')
 const GameManager = require('./game')
+const ROOM_STATE = require('../constants/roomstate')
 
 module.exports = class {
     constructor(socket) {
@@ -31,13 +32,24 @@ module.exports = class {
         let player = GameManager.getPlayer(jsonData[0])
         let roomID = jsonData[1]
         let room = GameManager.getRoom(roomID)
+
+        if (room.getState() !== ROOM_STATE.OPEN) {
+            return this.socket.emit(gameEvents.playerJoinFullRoom, {d: ['Room is full'] })
+        }
+
         player.currentRoom = room
         room.addPlayer(player)
         this.socket.join(roomID)
         this.socket.emit(gameEvents.playerJoinRoom, { d: [player.playerID] })
-        if (_.size(room.getPlayers()) === 2) {
+
+        if (this.isRoomFull(room)) {
+            room.setState(ROOM_STATE.COUNTDOWN)
             room.gameWorld.onCountdown()
         }
+    }
+
+    isRoomFull(room) {
+        return _.size(room.getPlayers()) === room.gameWorld.getMaxPlayers()
     }
 
     addRoom(room) {

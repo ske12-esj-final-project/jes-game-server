@@ -17,6 +17,7 @@ module.exports = {
 
     "playerJoinGame": "z",
     "playerJoinRoom": "y",
+    "playerJoinFullRoom": "f",
     "countdown": "x",
     "finishCountdown": "w",
     "startGame": "v"

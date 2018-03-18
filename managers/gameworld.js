@@ -10,7 +10,7 @@ const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
 module.exports = class {
     constructor(io, config) {
         this.io = io
-        this.config(config)
+        this.config = config
         let item = {
             uid: "",
             weaponIndex: 1,
@@ -64,14 +64,11 @@ module.exports = class {
         return sendData
     }
 
-    config(config) {
-        _.forOwn(config, (value, key) => {
-            this[key] = value
-        })
+    setMaxPlayers(newMaxPlayers) {
+        this.config.maxPlayers = newMaxPlayers
     }
 
-    reset(){
-        
+    getMaxPlayers() {
+        return this.config.maxPlayers
     }
-
 }

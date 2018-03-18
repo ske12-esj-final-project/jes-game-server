@@ -1,5 +1,6 @@
 module.exports = {
     maxPlayers: 1,
-    triggerTime: 30000,
+    warningTime: 5000,
+    triggerTime: 10000,
     restrictTime: 10000
 }

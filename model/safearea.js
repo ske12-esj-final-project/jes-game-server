@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const SAFE_AREA_STATE = require('../constants/safestate')
 
 module.exports = class {
     constructor() {
@@ -14,11 +15,19 @@ module.exports = class {
             z: 300
         }
 
-        this.isRestricting = false
+        this.setState(SAFE_AREA_STATE.WAITING)
     }
 
     getSendData() {
         return _.concat(Object.values(this.position),
             Object.values(this.scale))
+    }
+
+    setState(newState) {
+        this.currentState = newState
+    }
+
+    getState() {
+        return this.currentState
     }
 }

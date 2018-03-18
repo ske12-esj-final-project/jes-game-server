@@ -8,6 +8,7 @@ const Utils = require('../utils')
 const WEAPON = require('../data/equipments')
 const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
 const GAME_STATE = require('../constants/gamestate')
+const SAFE_AREA_STATE = require('../constants/safestate')
 
 module.exports = class {
     constructor(io, config) {
@@ -22,8 +23,9 @@ module.exports = class {
         this.itemList = [_.clone(item), _.clone(item)]
         this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
         this.safeArea = new SafeArea()
-        this.setState(GAME_STATE.OPEN)
+
         this.duration = 0
+        this.setState(GAME_STATE.OPEN)
         this.createGameInterval()
     }
 
@@ -83,21 +85,30 @@ module.exports = class {
     }
 
     updateSafeArea() {
-        if (this.duration >= this.config.triggerTime && !this.safeArea.isRestricting) {
+        if (this.duration >= this.config.warningTime && this.safeArea.getState() === SAFE_AREA_STATE.WAITING) {
+            this.safeArea.setState(SAFE_AREA_STATE.WARNING)
+            this.onWarningSafeArea()
+        }
+
+        if (this.duration >= this.config.triggerTime && this.safeArea.getState() === SAFE_AREA_STATE.WARNING) {
+            this.safeArea.setState(SAFE_AREA_STATE.TRIGGERING)
             this.onMoveSafeArea()
-            this.safeArea.isRestricting = true
-            setTimeout(() => {
-                this.safeArea.isRestricting = false
-                this.duration = 0
-            }, this.config.restrictTime)
         }
     }
 
-    onMoveSafeArea() {
+    onWarningSafeArea() {
+        let players = GameManager.getPlayers()
+        let sumX = 0, sumZ = 0, count = 0
+        for (let playerID in players) {
+            sumX += players[playerID].position.x
+            sumZ += players[playerID].position.z
+            count++
+        }
+
         this.safeArea.position = {
-            x: this.safeArea.position.x / 2,
+            x: (sumX / count) + this.safeArea.scale.x,
             y: 3,
-            z: this.safeArea.position.z / 2
+            z: (sumZ / count)
         }
 
         this.safeArea.scale = {
@@ -106,7 +117,16 @@ module.exports = class {
             z: this.safeArea.scale.z - 50
         }
 
+        this.io.emit(gameEvents.warnSafeArea, { d: this.safeArea.position })
+    }
+
+    onMoveSafeArea() {
         this.io.emit(gameEvents.moveSafeArea, { d: this.safeArea.getSendData() })
+
+        setTimeout(() => {
+            this.safeArea.setState(SAFE_AREA_STATE.WAITING)
+            this.duration = 0
+        }, this.config.restrictTime)
     }
 
     getUpdateWeaponInMap() {

@@ -85,29 +85,16 @@ describe('Room Manager', () => {
 
             client.on(gameEvents.playerJoinGame, (data) => {
                 let playerID = data.d[0]
-                GameManager.getRoom('0').gameWorld.setMaxPlayers(1)
+                GameManager.getRoom('0').gameWorld.setMaxPlayers(0)
                 client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
             })
 
-            client.on(gameEvents.playerJoinRoom, (data) => {
-                let anotherClient = io.connect(SOCKET_URL, options)
-                anotherClient.on('connect', (data) => {
-                    anotherClient.emit(gameEvents.playerJoinGame, { username: '5678' })
-                })
-
-                anotherClient.on(gameEvents.playerJoinGame, (data) => {
-                    let anotherPlayerID = data.d[0]
-                    anotherClient.emit(gameEvents.playerJoinRoom, { d: `[@${anotherPlayerID}@,0]` })
-                })
-
-                anotherClient.on(gameEvents.playerJoinFullRoom, (data) => {
-                    let playersInRoom = GameManager.getRoom('0').getPlayers()
-                    expect(_.size(playersInRoom)).to.equal(1)
-                    GameManager.getRoom('0').gameWorld.setMaxPlayers(defaultConfig.maxPlayers)
-                    client.disconnect()
-                    anotherClient.disconnect()
-                    done()
-                })
+            client.on(gameEvents.playerJoinFullRoom, (data) => {
+                let playersInRoom = GameManager.getRoom('0').getPlayers()
+                expect(_.size(playersInRoom)).to.equal(0)
+                GameManager.getRoom('0').gameWorld.setMaxPlayers(defaultConfig.maxPlayers)
+                client.disconnect()
+                done()
             })
         })
     })

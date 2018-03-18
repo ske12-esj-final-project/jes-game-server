@@ -1,4 +1,4 @@
 module.exports = {
-    maxPlayers: 10,
+    maxPlayers: 1,
     timeout: 100,
 }

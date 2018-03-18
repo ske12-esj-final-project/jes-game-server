@@ -1,10 +1,10 @@
 'use strict'
 const _ = require('lodash')
-
-const gameEvents = require('../constants/events')
-const WEAPON = require('../data/equipments')
-const Utils = require('../utils')
 const shortid = require('shortid')
+const gameEvents = require('../constants/events')
+const SafeArea = require('../model/safearea')
+const Utils = require('../utils')
+const WEAPON = require('../data/equipments')
 const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
 
 module.exports = class {
@@ -18,9 +18,8 @@ module.exports = class {
         }
         this.players = {}
         this.itemList = [_.clone(item), _.clone(item)]
-        // [id,weaponindex,posx,posy,posz]
         this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
-        this.isInGame = false
+        this.safeArea = new SafeArea()
     }
 
     assignRandomPositions(items, spawnPoints) {
@@ -53,6 +52,22 @@ module.exports = class {
                 this.io.emit(gameEvents.finishCountdown)
             }
         }, 1000)
+    }
+
+    onMoveSafeArea() {
+        this.safeArea.position = {
+            x: 150,
+            y: 3,
+            z: 150
+        }
+
+        this.safeArea.scale = {
+            x: 200,
+            y: 40,
+            z: 200
+        }
+
+        this.io.emit(gameEvents.moveSafeArea, { d: this.safeArea.getSendData() })
     }
 
     getUpdateWeaponInMap() {

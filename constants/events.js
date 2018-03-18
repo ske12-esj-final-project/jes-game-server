@@ -20,5 +20,6 @@ module.exports = {
     "playerJoinFullRoom": "f",
     "countdown": "x",
     "finishCountdown": "w",
-    "startGame": "v"
+    "startGame": "v",
+    "moveSafeArea": "u"
 }

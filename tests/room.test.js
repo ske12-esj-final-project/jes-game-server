@@ -69,8 +69,29 @@ describe('Room Manager', () => {
             })
 
             client.on(gameEvents.playerJoinRoom, (data) => {
-                expect(GameManager.getRoom('0')).to.not.be.undefined
+                let player = GameManager.getRoom('0').getPlayer(playerID)
+                expect(playerID).to.not.be.undefined
                 client.disconnect()
+                done()
+            })
+        })
+
+        it('should empty room when last player is disconnected', () => {
+            let client, playerID
+            client = io.connect(SOCKET_URL, options)
+            client.on('connect', (data) => {
+                client.emit(gameEvents.playerJoinGame, { username: '1234' })
+            })
+
+            client.on(gameEvents.playerJoinGame, (data) => {
+                playerID = data.d[0]
+                client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
+            })
+
+            client.on(gameEvents.playerJoinRoom, (data) => {
+                client.disconnect()
+                let playersInRoom = GameManager.getRoom('0').getPlayers()
+                expect(_.size(playersInRoom)).to.equal(0)
                 done()
             })
         })
@@ -99,7 +120,7 @@ describe('Room Manager', () => {
 
                 anotherClient.on(gameEvents.playerJoinRoom, (data) => {
                     let playersInRoom = GameManager.getRoom('0').getPlayers()
-                    expect(playersInRoom.length).to.equal(1)
+                    expect(_.size(playersInRoom)).to.equal(1)
                     client.disconnect()
                     anotherClient.disconnect()
                     done()

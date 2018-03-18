@@ -16,7 +16,7 @@ module.exports = class {
             weaponIndex: 1,
             position: {}
         }
-        this.players = []
+        this.players = {}
         this.itemList = [_.clone(item), _.clone(item)]
         // [id,weaponindex,posx,posy,posz]
         this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)

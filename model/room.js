@@ -14,7 +14,7 @@ module.exports = class {
     }
 
     addPlayer(player) {
-        this.gameWorld.players.push(player)
+        this.gameWorld.players[player.playerID] = player
         console.log('Player', player.playerID, 'has joined', this.name)
     }
 
@@ -24,5 +24,9 @@ module.exports = class {
 
     getPlayers() {
         return this.gameWorld.players
+    }
+
+    getPlayer(playerID) {
+        return this.gameWorld.players[playerID]
     }
 }

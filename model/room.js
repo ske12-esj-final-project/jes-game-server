@@ -3,7 +3,6 @@ const _ = require('lodash')
 const defaultConfig = require('../config/gameworld')
 const gameEvents = require('../constants/events')
 const GameWorld = require('../managers/gameworld')
-const ROOM_STATE = require('../constants/roomstate')
 
 module.exports = class {
     constructor(io, name, roomID) {
@@ -11,8 +10,6 @@ module.exports = class {
         this.name = name
         this.roomID = roomID
         this.gameWorld = new GameWorld(this.io.to(this.roomID), defaultConfig)
-
-        this.currentState = ROOM_STATE.OPEN
     }
 
     addPlayer(player) {
@@ -31,13 +28,5 @@ module.exports = class {
 
     getPlayer(playerID) {
         return this.gameWorld.players[playerID]
-    }
-
-    setState(newState) {
-        this.currentState = newState
-    }
-
-    getState() {
-        return this.currentState
     }
 }

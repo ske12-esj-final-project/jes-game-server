@@ -13,6 +13,8 @@ module.exports = class {
             y: 40,
             z: 300
         }
+
+        this.isRestricting = false
     }
 
     getSendData() {

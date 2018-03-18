@@ -2,10 +2,12 @@
 const _ = require('lodash')
 const shortid = require('shortid')
 const gameEvents = require('../constants/events')
+const GameManager = require('../managers/game')
 const SafeArea = require('../model/safearea')
 const Utils = require('../utils')
 const WEAPON = require('../data/equipments')
 const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
+const GAME_STATE = require('../constants/gamestate')
 
 module.exports = class {
     constructor(io, config) {
@@ -20,9 +22,9 @@ module.exports = class {
         this.itemList = [_.clone(item), _.clone(item)]
         this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
         this.safeArea = new SafeArea()
-        this.time = 0
-
-        createGameInterval()
+        this.setState(GAME_STATE.OPEN)
+        this.duration = 0
+        this.createGameInterval()
     }
 
     assignRandomPositions(items, spawnPoints) {
@@ -53,6 +55,7 @@ module.exports = class {
             if (timeLeft <= 0) {
                 clearInterval(countDownInterval)
                 this.io.emit(gameEvents.finishCountdown)
+                this.setState(GAME_STATE.INGAME)
             }
         }, 1000)
     }
@@ -65,26 +68,42 @@ module.exports = class {
 
     update() {
         this.updateAllPlayersMovement()
+        if (this.getState() === GAME_STATE.INGAME) {
+            this.duration += 1000 / 60
+            this.updateSafeArea()
+        }
     }
 
     updateAllPlayersMovement() {
-        for (let playerID in this.getPlayers()) {
-            instance.players[playerID].updatePostionToClient()
-            instance.players[playerID].updateRotationToClient()
+        let players = GameManager.getPlayers()
+        for (let playerID in players) {
+            players[playerID].updatePostionToClient()
+            players[playerID].updateRotationToClient()
+        }
+    }
+
+    updateSafeArea() {
+        if (this.duration >= this.config.triggerTime && !this.safeArea.isRestricting) {
+            this.onMoveSafeArea()
+            this.safeArea.isRestricting = true
+            setTimeout(() => {
+                this.safeArea.isRestricting = false
+                this.duration = 0
+            }, this.config.restrictTime)
         }
     }
 
     onMoveSafeArea() {
         this.safeArea.position = {
-            x: 150,
+            x: this.safeArea.position.x / 2,
             y: 3,
-            z: 150
+            z: this.safeArea.position.z / 2
         }
 
         this.safeArea.scale = {
-            x: 200,
+            x: this.safeArea.scale.x - 50,
             y: 40,
-            z: 200
+            z: this.safeArea.scale.z - 50
         }
 
         this.io.emit(gameEvents.moveSafeArea, { d: this.safeArea.getSendData() })
@@ -105,5 +124,13 @@ module.exports = class {
 
     getMaxPlayers() {
         return this.config.maxPlayers
+    }
+
+    setState(newState) {
+        this.currentState = newState
+    }
+
+    getState() {
+        return this.currentState
     }
 }

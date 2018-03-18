@@ -64,8 +64,6 @@ module.exports = class {
         let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
         console.log('send-weapon-data', weaponsInMap)
         this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
-        
-        this.currentRoom.gameWorld.onMoveSafeArea()
     }
 
     removeEquipmentInClient(data) {

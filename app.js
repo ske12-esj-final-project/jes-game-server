@@ -14,8 +14,6 @@ const gameEvents = require('./constants/events')
 
 const APP_CONFIG = require('./config.json')
 
-let gameInterval = null
-
 console.log('GAME-SERVER VERSION :: ', APP_CONFIG.GAME_VERSION)
 
 let roomA = new Room(io, 'Room A', '0')
@@ -46,9 +44,10 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 5000
 server.listen(PORT, () => {
     console.log(`Listen on http://localhost:${PORT}`)
-    gameInterval = GameManager.createGameInterval()
 })
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '/index.html'))
 })
+
+module.exports = server

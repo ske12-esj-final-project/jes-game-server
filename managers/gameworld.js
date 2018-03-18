@@ -20,6 +20,9 @@ module.exports = class {
         this.itemList = [_.clone(item), _.clone(item)]
         this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
         this.safeArea = new SafeArea()
+        this.time = 0
+
+        createGameInterval()
     }
 
     assignRandomPositions(items, spawnPoints) {
@@ -52,6 +55,23 @@ module.exports = class {
                 this.io.emit(gameEvents.finishCountdown)
             }
         }, 1000)
+    }
+
+    createGameInterval() {
+        return setInterval(() => {
+            this.update()
+        }, this.timeout || 1000 / 60)
+    }
+
+    update() {
+        this.updateAllPlayersMovement()
+    }
+
+    updateAllPlayersMovement() {
+        for (let playerID in this.getPlayers()) {
+            instance.players[playerID].updatePostionToClient()
+            instance.players[playerID].updateRotationToClient()
+        }
     }
 
     onMoveSafeArea() {

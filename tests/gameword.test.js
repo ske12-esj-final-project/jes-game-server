@@ -1,11 +1,13 @@
 const _ = require('lodash')
 const { expect } = require('chai')
 const assert = require('assert')
+const io = require('socket.io-client')
 const GameWorld = require(`../managers/gameworld`)
+const defaultConfig = require('../config/gameworld')
 
 describe('gameworld-manager', () => {
     describe('assignRandomPositions()', () => {
-        let gameworld = new GameWorld()
+        let gameworld = new GameWorld(io, defaultConfig)
 
         it('should be same size of set of result and size of result means each item is distinct', () => {
             let item = {

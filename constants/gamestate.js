@@ -1,5 +1,5 @@
 module.exports = Object.freeze({
-    'OPEN': Symbol(),
-    'COUNTDOWN': Symbol(),
-    'INGAME': Symbol()
+    'OPEN': Symbol('OPEN'),
+    'COUNTDOWN': Symbol('COUNTDOWN'),
+    'INGAME': Symbol('INGAME')
 })

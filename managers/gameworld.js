@@ -5,7 +5,6 @@ const gameEvents = require('../constants/events')
 const GameManager = require('../managers/game')
 const SafeArea = require('../model/safearea')
 const Utils = require('../utils')
-const WEAPON = require('../data/equipments')
 const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
 const GAME_STATE = require('../constants/gamestate')
 const SAFE_AREA_STATE = require('../constants/safestate')
@@ -50,7 +49,7 @@ module.exports = class {
     onCountdown() {
         let timeLeft = 10
         let countDownInterval = setInterval(() => {
-            if (this.getState() !== GAME_STATE.COUNTDOWN) {
+            if (!this.isCountdown()) {
                 clearInterval(countDownInterval)
             }
 
@@ -67,13 +66,13 @@ module.exports = class {
     createGameInterval() {
         return setInterval(() => {
             this.update()
-        }, this.timeout || 1000 / 60)
+        }, 1000 / this.config.tickRate)
     }
 
     update() {
         this.updateAllPlayersMovement()
-        if (this.getState() === GAME_STATE.INGAME) {
-            this.duration += 1000 / 60
+        if (this.isInGame()) {
+            this.duration += 1000 / this.config.tickRate
             this.updateSafeArea()
         }
     }
@@ -87,20 +86,20 @@ module.exports = class {
     }
 
     updateSafeArea() {
-        if (this.duration >= this.config.warningTime && this.safeArea.getState() === SAFE_AREA_STATE.WAITING) {
+        if (this.duration >= this.config.warningTime && this.safeArea.isWaiting()) {
             this.safeArea.setState(SAFE_AREA_STATE.WARNING)
             this.onWarningSafeArea()
         }
 
-        if (this.duration >= this.config.triggerTime && this.safeArea.getState() === SAFE_AREA_STATE.WARNING) {
+        if (this.duration >= this.config.triggerTime && this.safeArea.isWarning()) {
             this.safeArea.setState(SAFE_AREA_STATE.TRIGGERING)
             this.onMoveSafeArea()
         }
     }
 
-    onWarningSafeArea() {
+    calculateSafeArea() {
         let players = GameManager.getPlayers()
-        let sumX = 0, sumZ = 0, count = 0
+        let sumX, sumZ, count
         for (let playerID in players) {
             sumX += players[playerID].position.x
             sumZ += players[playerID].position.z
@@ -118,7 +117,10 @@ module.exports = class {
             y: 40,
             z: this.safeArea.scale.z - 50
         }
+    }
 
+    onWarningSafeArea() {
+        this.calculateSafeArea()
         this.io.emit(gameEvents.warnSafeArea, { d: this.safeArea.position })
     }
 
@@ -154,5 +156,17 @@ module.exports = class {
 
     getState() {
         return this.currentState
+    }
+
+    isOpen() {
+        return this.currentState === GAME_STATE.OPEN
+    }
+
+    isCountdown() {
+        return this.currentState === GAME_STATE.COUNTDOWN
+    }
+
+    isInGame() {
+        return this.currentState === GAME_STATE.INGAME
     }
 }

@@ -19,7 +19,7 @@ module.exports = class {
 
     removePlayer(playerID) {
         delete this.gameWorld.players[playerID]
-        if(!this.isRoomFull() && this.gameWorld.getState() === GAME_STATE.COUNTDOWN) {
+        if(!this.isRoomFull() && this.gameWorld.isCountdown()) {
             this.gameWorld.setState(GAME_STATE.OPEN)
         }
     }

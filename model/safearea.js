@@ -30,4 +30,16 @@ module.exports = class {
     getState() {
         return this.currentState
     }
+
+    isWaiting() {
+        return this.currentState === SAFE_AREA_STATE.WAITING
+    }
+
+    isWarning() {
+        return this.currentState === SAFE_AREA_STATE.WARNING
+    }
+
+    isTriggering() {
+        return this.currentState === SAFE_AREA_STATE.TRIGGERING
+    }
 }

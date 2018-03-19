@@ -1,7 +1,6 @@
 const _ = require('lodash')
 const gameEvents = require('../constants/events')
 const Room = require('../model/room')
-const shortid = require('shortid')
 const Player = require('./player')
 const GameManager = require('./game')
 const GAME_STATE = require('../constants/gamestate')
@@ -19,7 +18,6 @@ module.exports = class {
 
     onPlayerConnect(data) {
         let username = data.username
-        console.log('Created new player', username)
         let playerID = this.socket.playerID
         let player = new Player(this.socket, playerID, username)
         GameManager.addPlayer(playerID, player)
@@ -33,7 +31,7 @@ module.exports = class {
         let roomID = jsonData[1]
         let room = GameManager.getRoom(roomID)
 
-        if (room.gameWorld.getState() !== GAME_STATE.OPEN) {
+        if (room.isRoomFull()) {
             return this.socket.emit(gameEvents.playerJoinFullRoom, {d: ['Room is full'] })
         }
 
@@ -42,18 +40,13 @@ module.exports = class {
         this.socket.join(roomID)
         this.socket.emit(gameEvents.playerJoinRoom, { d: [player.playerID] })
 
-        if (this.isRoomFull(room)) {
+        if (room.isRoomFull()) {
             room.gameWorld.setState(GAME_STATE.COUNTDOWN)
             room.gameWorld.onCountdown()
         }
     }
 
-    isRoomFull(room) {
-        return _.size(room.getPlayers()) === room.gameWorld.getMaxPlayers()
-    }
-
     addRoom(room) {
-        // let roomID = shortid.generate()
         GameManager.addRoom(room)
     }
 

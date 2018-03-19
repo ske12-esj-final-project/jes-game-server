@@ -44,7 +44,6 @@ module.exports = class {
         }
         let currentPlayerData = this.getPlayerInitData(this)
         let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
-        console.log('check---',{ d: [currentPlayerData, getAllEnemiesData] })
         this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
         this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
     }
@@ -62,7 +61,6 @@ module.exports = class {
         this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
         this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
         let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
-        console.log('send-weapon-data', weaponsInMap)
         this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
     }
 
@@ -72,7 +70,6 @@ module.exports = class {
 
     getEquipment(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
-        console.log('get-equiment', data)
         let jsonData = JSON.parse(data["d"])
         if (jsonData.length >= 1) {
             let weaponID = jsonData[0]
@@ -101,7 +98,6 @@ module.exports = class {
     }
 
     playerShoot(data) {
-        console.log('shoot', data)
         let sendToOther = {
             "d": [
                 this.playerID
@@ -113,7 +109,6 @@ module.exports = class {
     checkShootHit(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
-        console.log('check-hit-data', jsonData)
         let targetId, dmg
         if (jsonData.length >= 2) {
             targetId = jsonData[0]
@@ -133,7 +128,7 @@ module.exports = class {
                     targetEnemy.hp
                 ]
             }
-            console.log('checkShoothit-senddata', sendToOther)
+
             this.currentRoom.gameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
 
         } else {
@@ -144,11 +139,9 @@ module.exports = class {
     updateCurrentEquipment(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
-        console.log('updateCurrentEquipment-get', jsonData)
         let playerID = jsonData[0]
         let weaponIndex = jsonData[1]
         this.currentEquipment = weaponIndex
-        console.log('updateCurrentEquipment-send to other', { d: this.getCurrentEquipment(this) })
         let sendToOther = this.socket.broadcast.emit(
             gameEvents.updateCurrentEquipment,
             { d: this.getCurrentEquipment(this) })

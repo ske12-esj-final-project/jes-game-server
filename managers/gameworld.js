@@ -44,15 +44,17 @@ module.exports = class {
     }
 
     sendRemoveWeapon(weaponID) {
-        console.log('remove-weapon', weaponID)
+
     }
 
     onCountdown() {
-        console.log('Countdown started')
         let timeLeft = 10
         let countDownInterval = setInterval(() => {
+            if (this.getState() !== GAME_STATE.COUNTDOWN) {
+                clearInterval(countDownInterval)
+            }
+
             timeLeft -= 1
-            console.log('Match will start in', timeLeft)
             this.io.emit(gameEvents.countdown, { d: [timeLeft] })
             if (timeLeft <= 0) {
                 clearInterval(countDownInterval)

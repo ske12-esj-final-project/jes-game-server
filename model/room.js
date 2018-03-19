@@ -3,6 +3,7 @@ const _ = require('lodash')
 const defaultConfig = require('../config/gameworld')
 const gameEvents = require('../constants/events')
 const GameWorld = require('../managers/gameworld')
+const GAME_STATE = require('../constants/gamestate')
 
 module.exports = class {
     constructor(io, name, roomID) {
@@ -14,12 +15,13 @@ module.exports = class {
 
     addPlayer(player) {
         this.gameWorld.players[player.playerID] = player
-        console.log('Player', player.playerID, 'has joined', this.name)
     }
 
     removePlayer(playerID) {
         delete this.gameWorld.players[playerID]
-        console.log('Gameworld', this.roomID)
+        if(!this.isRoomFull() && this.gameWorld.getState() === GAME_STATE.COUNTDOWN) {
+            this.gameWorld.setState(GAME_STATE.OPEN)
+        }
     }
 
     getPlayers() {
@@ -28,5 +30,9 @@ module.exports = class {
 
     getPlayer(playerID) {
         return this.gameWorld.players[playerID]
+    }
+
+    isRoomFull() {
+        return _.size(this.getPlayers()) === this.gameWorld.getMaxPlayers()
     }
 }

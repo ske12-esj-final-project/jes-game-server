@@ -8,18 +8,12 @@ module.exports = class {
         this.socket = socket
         this.playerID = playerID
         this.username = username
-        this.position = {
-            x: null,
-            y: null,
-            z: null
-        }
-        this.rotate = {
-            x: null,
-            y: null
-        }
+        this.position = { x: null, y: null, z: null }
+        this.rotate = { x: null, y: null }
         this.hp = 100
         this.currentRoom = null
         this.currentEquipment = 0
+        this.damageInterval = null
         this.socketHandler(socket)
     }
 
@@ -33,6 +27,8 @@ module.exports = class {
         socket.on(gameEvents.checkShootHit, this.checkShootHit.bind(this))
         socket.on(gameEvents.updateCurrentEquipment, this.updateCurrentEquipment.bind(this))
         socket.on(gameEvents.getEquipment, this.getEquipment.bind(this))
+        socket.on(gameEvents.playerOutSafeArea, this.onPlayerOutSafeArea.bind(this))
+        socket.on(gameEvents.playerBackInSafeArea, this.onPlayerBackSafeArea.bind(this))
     }
 
     setupPlayer(data) {
@@ -76,13 +72,29 @@ module.exports = class {
             let weaponID = jsonData[0]
             let room = this.currentRoom
             _.remove(room.gameWorld.equipments, item => item.uid === weaponID)
-            // update to all
             room.gameWorld.sendRemoveWeapon(weaponID)
             this.socket.emit(gameEvents.getEquipment, { d: [weaponID] })
         }
         else {
             console.error('[error]-checkShootHit wrong data pattern', data)
         }
+    }
+
+    onPlayerOutSafeArea(data) {
+        let damage = 5
+        this.damageInterval = this.createDamageInterval(damage)
+    }
+
+    onPlayerBackSafeArea(data) {
+        clearInterval(this.damageInterval)
+    }
+
+    createDamageInterval(damage) {
+        return setInterval(() => {
+            this.hp -= damage
+            let sendToOther = { "d": [this.playerID, null, this.hp] }
+            this.currentRoom.gameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
+        }, 1000)
     }
 
     randomInt(low, high) {
@@ -111,25 +123,14 @@ module.exports = class {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
         let targetId, dmg
-        if (jsonData.length >= 2) {
-            targetId = jsonData[0]
-            dmg = jsonData[1]
-        } else {
-            console.error('[error]-checkShootHit wrong data pattern', data)
-        }
+        targetId = jsonData[0]
+        dmg = jsonData[1]
 
         let targetEnemy = GameManager.getPlayer(targetId)
 
         if (targetEnemy) {
             targetEnemy.hp -= dmg
-            let sendToOther = {
-                "d": [
-                    targetId,
-                    this.playerID,
-                    targetEnemy.hp
-                ]
-            }
-
+            let sendToOther = { "d": [targetId, this.playerID, targetEnemy.hp] }
             this.currentRoom.gameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
 
         } else {

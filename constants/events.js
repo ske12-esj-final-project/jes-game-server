@@ -22,5 +22,7 @@ module.exports = {
     "finishCountdown": "w",
     "startGame": "v",
     "moveSafeArea": "u",
-    "warnSafeArea": "t"
+    "warnSafeArea": "t",
+    "playerOutSafeArea": "s",
+    "playerBackInSafeArea": "r"
 }

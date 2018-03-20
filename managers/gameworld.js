@@ -99,12 +99,14 @@ module.exports = class {
 
     calculateSafeArea() {
         let players = GameManager.getPlayers()
-        let sumX, sumZ, count
+        let sumX = 0, sumZ = 0, count = 0
         for (let playerID in players) {
             sumX += players[playerID].position.x
             sumZ += players[playerID].position.z
             count++
         }
+
+        if (count === 0) return
 
         this.safeArea.position = {
             x: (sumX / count) + this.safeArea.scale.x,

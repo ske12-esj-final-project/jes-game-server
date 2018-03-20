@@ -24,6 +24,7 @@ module.exports = class {
     }
 
     socketHandler(socket) {
+        if (!socket) return
         socket.on(gameEvents.playerSetupPlayer, this.setupPlayer.bind(this))
         socket.on(gameEvents.startGame, this.startGame.bind(this))
         socket.on(gameEvents.playerMovement, this.movement.bind(this))
@@ -148,7 +149,6 @@ module.exports = class {
     }
 
     movement(data) {
-        if (!this.playerID) return
         let jsonData = JSON.parse(data["d"])
         this.position = {
             x: parseFloat(jsonData[0]),
@@ -158,7 +158,7 @@ module.exports = class {
     }
 
     updatePostionToClient() {
-        if (!this.playerID) return;
+        if (!this.socket) return;
         let currentMove = this.position
         if (_.isEqual(this.lastMove, currentMove)) return
         this.lastMove = this.position
@@ -176,8 +176,7 @@ module.exports = class {
     }
 
     updateRotationToClient() {
-        if (!this.playerID) return;
-        if (this.rotate.x == null || this.rotate.y == null) return
+        if (!this.socket || this.rotate.x == null || this.rotate.y == null) return;
         let currentrotate = {
             x: this.rotate.x,
             y: this.rotate.y

@@ -31,7 +31,7 @@ module.exports = class {
         let roomID = jsonData[1]
         let room = GameManager.getRoom(roomID)
 
-        if (room.isRoomFull()) {
+        if (room.isFull()) {
             return this.socket.emit(gameEvents.playerJoinFullRoom, {d: ['Room is full'] })
         }
 
@@ -40,7 +40,7 @@ module.exports = class {
         this.socket.join(roomID)
         this.socket.emit(gameEvents.playerJoinRoom, { d: [player.playerID] })
 
-        if (room.isRoomFull()) {
+        if (room.isFull()) {
             room.gameWorld.setState(GAME_STATE.COUNTDOWN)
             room.gameWorld.onCountdown()
         }

@@ -19,8 +19,13 @@ module.exports = class {
 
     removePlayer(playerID) {
         delete this.gameWorld.players[playerID]
-        if(!this.isRoomFull() && this.gameWorld.isCountdown()) {
+
+        if (!this.isFull() && this.gameWorld.isCountdown()) {
             this.gameWorld.setState(GAME_STATE.OPEN)
+        }
+
+        else if(this.isEmpty()) {
+            this.gameWorld.reset()
         }
     }
 
@@ -32,7 +37,11 @@ module.exports = class {
         return this.gameWorld.players[playerID]
     }
 
-    isRoomFull() {
+    isFull() {
         return _.size(this.getPlayers()) === this.gameWorld.getMaxPlayers()
+    }
+
+    isEmpty() {
+        return _.size(this.getPlayers()) === 0
     }
 }

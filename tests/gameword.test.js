@@ -110,4 +110,50 @@ describe('Gameworld', () => {
             expect(gameWorld.onMoveSafeArea.called).to.be.true
         })
     })
+
+    describe('reset', () => {
+        it('should empty all players', () => {
+            gameWorld.reset()
+            expect(gameWorld.players).to.deep.equal({})
+        })
+
+        it('should set equipments back to default', () => {
+            let expectedItemList = gameWorld.itemList
+            gameWorld.reset()
+            expect(gameWorld.itemList).to.deep.equal(expectedItemList)
+        })
+
+        // it('should not be called if game state is not END', () => {
+        //     gameWorld.reset()
+        // })
+
+        it('should reset duration back', () => {
+            gameWorld.reset()
+            expect(gameWorld.duration).to.equal(0)
+        })
+
+        it('should set GAME_STATE back to OPEN', () => {
+            gameWorld.reset()
+            expect(gameWorld.getState()).to.equal(GAME_STATE.OPEN)
+        })
+
+        it('should reset safeArea to be same size', () => {
+            gameWorld.reset()
+            expect(gameWorld.safeArea.position).to.deep.equal(gameWorld.safeArea.getDefaultPosition())
+        })
+
+        it('should reset safeArea to be same scale', () => {
+            gameWorld.reset()
+            expect(gameWorld.safeArea.scale).to.deep.equal(gameWorld.safeArea.getDefaultScale())
+        })
+
+        it('should stop updateSafeArea in the game', () => {
+            this.clock = sinon.useFakeTimers()
+            gameWorld.updateSafeArea = sinon.spy()
+            gameWorld.reset()
+            this.clock.tick(1000 / gameWorld.config.tickRate)
+            expect(gameWorld.updateSafeArea.called).to.be.false
+            this.clock.restore()
+        })
+    })
 })

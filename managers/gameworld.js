@@ -45,15 +45,15 @@ module.exports = class {
 
     onCountdown() {
         let timeLeft = 10
-        let countDownInterval = setInterval(() => {
+        this.countDownInterval = setInterval(() => {
             if (!this.isCountdown()) {
-                clearInterval(countDownInterval)
+                clearInterval(this.countDownInterval)
             }
 
             timeLeft -= 1
             this.io.emit(gameEvents.countdown, { d: [timeLeft] })
             if (timeLeft <= 0) {
-                clearInterval(countDownInterval)
+                clearInterval(this.countDownInterval)
                 this.io.emit(gameEvents.finishCountdown)
                 this.setState(GAME_STATE.INGAME)
             }
@@ -75,10 +75,9 @@ module.exports = class {
     }
 
     updateAllPlayersMovement() {
-        let players = GameManager.getPlayers()
-        for (let playerID in players) {
-            players[playerID].updatePostionToClient()
-            players[playerID].updateRotationToClient()
+        for (let playerID in this.players) {
+            this.players[playerID].updatePostionToClient()
+            this.players[playerID].updateRotationToClient()
         }
     }
 
@@ -138,6 +137,17 @@ module.exports = class {
             sendData.push(data)
         })
         return sendData
+    }
+
+    reset() {
+        this.players = {}
+        let item = { uid: "", weaponIndex: 1, position: {} }
+        this.itemList = [_.clone(item), _.clone(item)]
+        this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
+        this.safeArea = new SafeArea()
+
+        this.duration = 0
+        this.setState(GAME_STATE.OPEN)
     }
 
     setMaxPlayers(newMaxPlayers) {

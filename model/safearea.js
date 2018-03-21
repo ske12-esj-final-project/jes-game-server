@@ -40,4 +40,8 @@ module.exports = class {
     isTriggering() {
         return this.currentState === SAFE_AREA_STATE.TRIGGERING
     }
+
+    isAtSmallest() {
+        return this.scale.x === 0 || this.scale.z === 0
+    }
 }

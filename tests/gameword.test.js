@@ -21,6 +21,7 @@ let options = {
 
 describe('Gameworld', () => {
     let gameWorld
+    io.emit = () => { return }
 
     beforeEach(() => {
         gameWorld = new GameWorld(io, DEFAULT_CONFIG)
@@ -87,6 +88,8 @@ describe('Gameworld', () => {
     describe('update', () => {
         beforeEach(() => {
             this.clock = sinon.useFakeTimers()
+            gameWorld.setState(GAME_STATE.INGAME)
+            this.gameInterval = gameWorld.createGameInterval()
         })
 
         afterEach(() => {
@@ -95,8 +98,6 @@ describe('Gameworld', () => {
 
         it(`should warn safe area all players when duration ${DEFAULT_CONFIG.warningTime} ms`, () => {
             gameWorld.onWarningSafeArea = sinon.spy()
-            gameWorld.setState(GAME_STATE.INGAME)
-            let gameInterval = gameWorld.createGameInterval()
             this.clock.tick(DEFAULT_CONFIG.warningTime)
             expect(gameWorld.safeArea.isWarning()).to.be.true
             expect(gameWorld.onWarningSafeArea).to.have.been.calledOnce
@@ -104,12 +105,19 @@ describe('Gameworld', () => {
 
         it(`should trigger safe area all players when duration ${DEFAULT_CONFIG.triggerTime} ms`, () => {
             gameWorld.onMoveSafeArea = sinon.spy()
-            gameWorld.setState(GAME_STATE.INGAME)
-            let gameInterval = gameWorld.createGameInterval()
             gameWorld.safeArea.setState(SAFE_AREA_STATE.WARNING)
             this.clock.tick(DEFAULT_CONFIG.triggerTime)
             expect(gameWorld.safeArea.isTriggering()).to.be.true
             expect(gameWorld.onMoveSafeArea).to.have.been.calledOnce
+        })
+
+        it('should not send back safe area data when safe area is at smallest', () => {
+            let player1 = new Player(null, 'p1', 'Player_1')
+            player1.position = { x: -100, y: 25, z: 20 }
+            gameWorld.players[player1.playerID] = player1
+            
+            this.clock.tick((gameWorld.config.triggerTime + gameWorld.config.restrictTime) * 7)
+            expect(gameWorld.safeArea.scale).to.deep.equal({ x: 0, y: 40, z: 0 })
         })
     })
 

@@ -101,7 +101,7 @@ module.exports = class {
             count++
         }
 
-        if (count === 0) return
+        if (count === 0 || this.safeArea.isAtSmallest()) return
 
         this.safeArea.position = {
             x: (sumX / count) + this.safeArea.scale.x,

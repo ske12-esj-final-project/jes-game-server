@@ -90,11 +90,12 @@ module.exports = class {
     }
 
     createDamageInterval(damage) {
+        let currentGameWorld = this.currentRoom.gameWorld
         return setInterval(() => {
             this.hp -= damage
             let sendToOther = { "d": [this.playerID, null, this.hp] }
-            this.currentRoom.gameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
-        }, 1000)
+            currentGameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
+        }, currentGameWorld.config.damageInterval)
     }
 
     randomInt(low, high) {

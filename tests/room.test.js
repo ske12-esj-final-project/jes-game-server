@@ -8,7 +8,7 @@ const SOCKET_URL = `http://localhost:${PORT}`
 const server = require('../app')
 const GameManager = require('../managers/game')
 const gameEvents = require('../constants/events')
-const defaultConfig = require('../config/gameworld')
+const DEFAULT_CONFIG = require('../config/gameworld')
 
 const GAME_STATE = require('../constants/gamestate')
 
@@ -16,7 +16,7 @@ let options = {
     transports: ['websocket'],
     forceNew: true,
     reconnection: false
-};
+}
 
 describe('Room Manager', () => {
 
@@ -78,7 +78,7 @@ describe('Room Manager', () => {
                 let player = room.getPlayer(playerID)
                 expect(playerID).to.not.be.undefined
                 client.disconnect()
-                gameWorld.setMaxPlayers(defaultConfig.maxPlayers)
+                gameWorld.setDefaultConfig()
                 done()
             })
         })
@@ -101,7 +101,7 @@ describe('Room Manager', () => {
             client.on(gameEvents.playerJoinFullRoom, (data) => {
                 let playersInRoom = room.getPlayers()
                 expect(_.size(playersInRoom)).to.equal(0)
-                gameWorld.setMaxPlayers(defaultConfig.maxPlayers)
+                gameWorld.setDefaultConfig()
                 done()
             })
         })

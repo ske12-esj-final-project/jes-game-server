@@ -5,19 +5,19 @@ const io = require('socket.io-client')
 const GameManager = require('../managers/game')
 const GameWorld = require(`../managers/gameworld`)
 const Player = require('../managers/player')
-const defaultConfig = require('../config/gameworld')
+const DEFAULT_CONFIG = require('../config/gameworld')
 
 let options = {
     transports: ['websocket'],
     forceNew: true,
     reconnection: false
-};
+}
 
 describe('Gameworld', () => {
     let gameworld
 
     beforeEach(() => {
-        gameworld = new GameWorld(io, defaultConfig)
+        gameworld = new GameWorld(io, DEFAULT_CONFIG)
     })
     
     describe('assignRandomPositions', () => {

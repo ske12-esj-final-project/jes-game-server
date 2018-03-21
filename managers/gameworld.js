@@ -8,6 +8,7 @@ const Utils = require('../utils')
 const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
 const GAME_STATE = require('../constants/gamestate')
 const SAFE_AREA_STATE = require('../constants/safestate')
+const DEFAULT_CONFIG = require('../config/gameworld')
 
 module.exports = class {
     constructor(io, config) {
@@ -56,7 +57,7 @@ module.exports = class {
                 this.io.emit(gameEvents.finishCountdown)
                 this.setState(GAME_STATE.INGAME)
             }
-        }, 1000)
+        }, this.config.countdownInterval)
     }
 
     createGameInterval() {
@@ -148,8 +149,20 @@ module.exports = class {
         return this.config.maxPlayers
     }
 
+    setDamageInterval(newDamageInterval) {
+        this.config.damageInterval = newDamageInterval
+    }
+
+    setCountdownInterval(newCountdownInterval) {
+        this.config.countdownInterval = newCountdownInterval
+    }
+
     setState(newState) {
         this.currentState = newState
+    }
+
+    setDefaultConfig() {
+        this.config = DEFAULT_CONFIG
     }
 
     getState() {

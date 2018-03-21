@@ -9,7 +9,7 @@ const GameManager = require('../managers/game')
 const GameWorld = require(`../managers/gameworld`)
 const Room = require('../model/room')
 const Player = require('../managers/player')
-const DEFAULT_CONFIG = require('../config/gameWorld')
+const DEFAULT_CONFIG = require('../config/gameworld')
 const GAME_STATE = require('../constants/gamestate')
 const SAFE_AREA_STATE = require('../constants/safestate')
 

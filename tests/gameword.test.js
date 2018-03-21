@@ -6,7 +6,7 @@ const expect = chai.expect
 
 const io = require('socket.io-client')
 const GameManager = require('../managers/game')
-const GameWorld = require(`../managers/gameWorld`)
+const GameWorld = require(`../managers/gameworld`)
 const Room = require('../model/room')
 const Player = require('../managers/player')
 const DEFAULT_CONFIG = require('../config/gameWorld')

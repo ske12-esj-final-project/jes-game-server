@@ -32,6 +32,7 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
         
       # run tests!
+      - run: yarn
       - run: yarn test
       - run: echo $KNOWN_HOST>> ~/.ssh/known_hosts
       - run:

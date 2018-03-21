@@ -18,12 +18,13 @@ let options = {
     reconnection: false
 }
 
-describe('Room Manager', () => {
+describe('Events', () => {
+
+    afterEach(() => {
+        GameManager.instance = null
+    })
 
     describe('Player join game', () => {
-        afterEach(() => {
-            GameManager.instance = null
-        })
 
         it('should add player to the list', (done) => {
             let client = io.connect(SOCKET_URL, options)
@@ -55,9 +56,6 @@ describe('Room Manager', () => {
     })
 
     describe('Player join room', () => {
-        afterEach(() => {
-            GameManager.instance = null
-        })
 
         it('should add player to room', (done) => {
             let client, playerID, gameWorld, room
@@ -102,6 +100,38 @@ describe('Room Manager', () => {
                 let playersInRoom = room.getPlayers()
                 expect(_.size(playersInRoom)).to.equal(0)
                 gameWorld.setDefaultConfig()
+                done()
+            })
+        })
+    })
+
+    describe('Player enters safe area', () => {
+        it('should decrease player hp when out of safe area', (done) => {
+            let client, playerID, gameWorld, room
+            client = io.connect(SOCKET_URL, options)
+            client.on('connect', (data) => {
+                room = GameManager.getRoom('0')
+                gameWorld = room.gameWorld
+                gameWorld.setDamageInterval(0)
+                gameWorld.setMaxPlayers(10)
+                client.emit(gameEvents.playerJoinGame, { username: '1234' })
+            })
+
+            client.on(gameEvents.playerJoinGame, (data) => {
+                playerID = data.d[0]
+                client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
+            })
+
+            client.on(gameEvents.playerJoinRoom, (data) => {
+                client.emit(gameEvents.playerOutSafeArea)
+                GameManager.getPlayer(playerID).onPlayerBackSafeArea()
+            })
+
+            client.on(gameEvents.updatePlayersStatus, (data) => {
+                let playerHealth = parseInt(data.d[2])
+                expect(playerHealth).to.equal(95)
+                gameWorld.setDefaultConfig()
+                client.disconnect()
                 done()
             })
         })

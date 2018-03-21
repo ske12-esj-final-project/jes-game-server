@@ -1,11 +1,15 @@
 const _ = require('lodash')
 const { expect } = require('chai')
+const sinon = require('sinon')
 
 const io = require('socket.io-client')
 const GameManager = require('../managers/game')
-const GameWorld = require(`../managers/gameworld`)
+const GameWorld = require(`../managers/gameWorld`)
+const Room = require('../model/room')
 const Player = require('../managers/player')
-const DEFAULT_CONFIG = require('../config/gameworld')
+const DEFAULT_CONFIG = require('../config/gameWorld')
+const GAME_STATE = require('../constants/gamestate')
+const SAFE_AREA_STATE = require('../constants/safestate')
 
 let options = {
     transports: ['websocket'],
@@ -14,12 +18,12 @@ let options = {
 }
 
 describe('Gameworld', () => {
-    let gameworld
+    let gameWorld
 
     beforeEach(() => {
-        gameworld = new GameWorld(io, DEFAULT_CONFIG)
+        gameWorld = new GameWorld(io, DEFAULT_CONFIG)
     })
-    
+
     describe('assignRandomPositions', () => {
         it('should be same size of set of result and size of result means each item is distinct', () => {
             let item = {
@@ -42,7 +46,7 @@ describe('Gameworld', () => {
                 items.push(t)
             }
 
-            let resultList = gameworld.assignRandomPositions(items, spawnPoints)
+            let resultList = gameWorld.assignRandomPositions(items, spawnPoints)
             let setResult = {}
             _.map(resultList, (item) => {
                 _.set(setResult, JSON.stringify(item.position), {})
@@ -55,10 +59,10 @@ describe('Gameworld', () => {
 
     describe('calculateSafeArea', () => {
         it('should not change safe area when no players', () => {
-            gameworld.calculateSafeArea()
-            expect(gameworld.safeArea.position).to.deep.equal({ x: 300, y: 3, z: 60 })
+            gameWorld.calculateSafeArea()
+            expect(gameWorld.safeArea.position).to.deep.equal({ x: 300, y: 3, z: 60 })
         })
-        
+
         it('should calculate safe area correctly', () => {
             let player1 = new Player(null, 'p1', 'Player_1')
             let player2 = new Player(null, 'p2', 'Player_2')
@@ -68,13 +72,42 @@ describe('Gameworld', () => {
             player2.position = { x: 30, y: 0, z: -180 }
             player3.position = { x: 160, y: 15, z: 40 }
 
-            GameManager.addPlayer(player1.playerID, player1)
-            GameManager.addPlayer(player2.playerID, player2)
-            GameManager.addPlayer(player3.playerID, player3)
+            gameWorld.players[player1.playerID] = player1
+            gameWorld.players[player2.playerID] = player2
+            gameWorld.players[player3.playerID] = player3
 
-            gameworld.calculateSafeArea()
+            gameWorld.calculateSafeArea()
 
-            expect(gameworld.safeArea.position).to.deep.equal({ x: 330, y: 3, z: -40 })
+            expect(gameWorld.safeArea.position).to.deep.equal({ x: 330, y: 3, z: -40 })
+        })
+    })
+
+    describe('update', () => {
+        beforeEach(() => {
+            this.clock = sinon.useFakeTimers()
+        })
+
+        afterEach(() => {
+            this.clock.restore()
+        })
+
+        it(`should warn safe area all players when duration ${DEFAULT_CONFIG.warningTime} ms`, () => {
+            gameWorld.onWarningSafeArea = sinon.spy()
+            gameWorld.setState(GAME_STATE.INGAME)
+            let gameInterval = gameWorld.createGameInterval()
+            this.clock.tick(DEFAULT_CONFIG.warningTime)
+            expect(gameWorld.safeArea.isWarning()).to.be.true
+            expect(gameWorld.onWarningSafeArea.called).to.be.true
+        })
+
+        it(`should trigger safe area all players when duration ${DEFAULT_CONFIG.triggerTime} ms`, () => {
+            gameWorld.onMoveSafeArea = sinon.spy()
+            gameWorld.setState(GAME_STATE.INGAME)
+            let gameInterval = gameWorld.createGameInterval()
+            gameWorld.safeArea.setState(SAFE_AREA_STATE.WARNING)
+            this.clock.tick(DEFAULT_CONFIG.triggerTime)
+            expect(gameWorld.safeArea.isTriggering()).to.be.true
+            expect(gameWorld.onMoveSafeArea.called).to.be.true
         })
     })
 })

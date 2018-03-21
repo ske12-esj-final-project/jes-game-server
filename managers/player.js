@@ -198,6 +198,11 @@ module.exports = class {
 
     }
 
+    leaveRoom() {
+        this.currentRoom.removePlayer(this.playerID)
+        this.currentRoom = null
+    }
+
     getAllPlayerSendData(players) {
         return _.map(players, (player) => this.getPlayerInitData(player))
     }

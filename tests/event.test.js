@@ -1,5 +1,8 @@
 const _ = require('lodash')
-const { expect } = require('chai')
+const chai = require('chai')
+const sinon = require('sinon')
+chai.use(require('sinon-chai'))
+const expect = chai.expect
 
 const io = require('socket.io-client')
 const PORT = process.env.PORT || 5000
@@ -130,6 +133,34 @@ describe('Events', () => {
             client.on(gameEvents.updatePlayersStatus, (data) => {
                 let playerHealth = parseInt(data.d[2])
                 expect(playerHealth).to.equal(95)
+                gameWorld.setDefaultConfig()
+                client.disconnect()
+                done()
+            })
+        })
+    })
+
+    
+    describe('Player leaves the room', () => {
+        it('should reset gameWorld when last player leaves', (done) => {
+            let client, playerID, gameWorld, room
+            client = io.connect(SOCKET_URL, options)
+            client.on('connect', (data) => {
+                room = GameManager.getRoom('0')
+                gameWorld = room.gameWorld
+                gameWorld.setMaxPlayers(1)
+                client.emit(gameEvents.playerJoinGame, { username: '1234' })
+            })
+
+            client.on(gameEvents.playerJoinGame, (data) => {
+                playerID = data.d[0]
+                client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
+            })
+
+            client.on(gameEvents.playerJoinRoom, (data) => {
+                gameWorld.reset = sinon.spy()
+                GameManager.getPlayer(playerID).leaveRoom()
+                expect(gameWorld.reset).to.have.been.calledOnce
                 gameWorld.setDefaultConfig()
                 client.disconnect()
                 done()

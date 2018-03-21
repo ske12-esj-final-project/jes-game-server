@@ -24,7 +24,7 @@ module.exports = class {
             this.gameWorld.setState(GAME_STATE.OPEN)
         }
 
-        else if(this.isEmpty()) {
+        if (this.isEmpty()) {
             this.gameWorld.reset()
         }
     }

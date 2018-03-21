@@ -1,6 +1,8 @@
 const _ = require('lodash')
-const { expect } = require('chai')
+const chai = require('chai')
 const sinon = require('sinon')
+chai.use(require('sinon-chai'))
+const expect = chai.expect
 
 const io = require('socket.io-client')
 const GameManager = require('../managers/game')
@@ -97,7 +99,7 @@ describe('Gameworld', () => {
             let gameInterval = gameWorld.createGameInterval()
             this.clock.tick(DEFAULT_CONFIG.warningTime)
             expect(gameWorld.safeArea.isWarning()).to.be.true
-            expect(gameWorld.onWarningSafeArea.called).to.be.true
+            expect(gameWorld.onWarningSafeArea).to.have.been.calledOnce
         })
 
         it(`should trigger safe area all players when duration ${DEFAULT_CONFIG.triggerTime} ms`, () => {
@@ -107,7 +109,7 @@ describe('Gameworld', () => {
             gameWorld.safeArea.setState(SAFE_AREA_STATE.WARNING)
             this.clock.tick(DEFAULT_CONFIG.triggerTime)
             expect(gameWorld.safeArea.isTriggering()).to.be.true
-            expect(gameWorld.onMoveSafeArea.called).to.be.true
+            expect(gameWorld.onMoveSafeArea).to.have.been.calledOnce
         })
     })
 
@@ -152,7 +154,7 @@ describe('Gameworld', () => {
             gameWorld.updateSafeArea = sinon.spy()
             gameWorld.reset()
             this.clock.tick(1000 / gameWorld.config.tickRate)
-            expect(gameWorld.updateSafeArea.called).to.be.false
+            expect(gameWorld.updateSafeArea).to.not.have.been.calledOnce
             this.clock.restore()
         })
     })

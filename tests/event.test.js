@@ -159,7 +159,7 @@ describe('Events', () => {
 
             client.on(gameEvents.playerJoinRoom, (data) => {
                 gameWorld.reset = sinon.spy()
-                GameManager.getPlayer(playerID).leaveRoom()
+                GameManager.getPlayer(playerID).leaveCurrentRoom()
                 expect(gameWorld.reset).to.have.been.calledOnce
                 gameWorld.setDefaultConfig()
                 client.disconnect()

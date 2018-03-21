@@ -198,9 +198,11 @@ module.exports = class {
 
     }
 
-    leaveRoom() {
-        this.currentRoom.removePlayer(this.playerID)
-        this.currentRoom = null
+    leaveCurrentRoom() {
+        if (this.currentRoom) {
+            this.currentRoom.removePlayer(this.playerID)
+            this.currentRoom = null
+        }
     }
 
     getAllPlayerSendData(players) {

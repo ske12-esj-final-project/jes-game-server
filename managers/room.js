@@ -1,5 +1,7 @@
 const _ = require('lodash')
+const axios = require('axios')
 const gameEvents = require('../constants/events')
+const API = require('../constants/api')
 const Room = require('../model/room')
 const Player = require('./player')
 const GameManager = require('./game')
@@ -17,11 +19,20 @@ module.exports = class {
     }
 
     onPlayerConnect(data) {
-        let username = data.username
+        data['d'] = data['d'].replace(/@/g, "\"")
+        let jsonData = JSON.parse(data["d"])
+        let username = jsonData[0]
+        this.socket.token = jsonData[1]
         let playerID = this.socket.playerID
         let player = new Player(this.socket, playerID, username)
         GameManager.addPlayer(playerID, player)
         this.socket.emit(gameEvents.playerJoinGame, { d: [playerID] })
+        axios.get(API.USER + '/me', {
+            "headers": { "access-token": this.socket.token }
+        }).then((res) => {
+            this.socket.id = res.data.id
+            player.username = res.data.username
+        })
     }
 
     onPlayerJoinRoom(data) {
@@ -32,7 +43,7 @@ module.exports = class {
         let room = GameManager.getRoom(roomID)
 
         if (room.isFull()) {
-            return this.socket.emit(gameEvents.playerJoinFullRoom, {d: ['Room is full'] })
+            return this.socket.emit(gameEvents.playerJoinFullRoom, { d: ['Room is full'] })
         }
 
         player.currentRoom = room

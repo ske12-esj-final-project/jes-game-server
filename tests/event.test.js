@@ -32,7 +32,7 @@ describe('Events', () => {
         it('should add player to the list', (done) => {
             let client = io.connect(SOCKET_URL, options)
             client.on('connect', (data) => {
-                client.emit(gameEvents.playerJoinGame, { username: '1234' })
+                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
             })
 
             client.on(gameEvents.playerJoinGame, (data) => {
@@ -46,7 +46,7 @@ describe('Events', () => {
         it('should add player with client username', (done) => {
             let client = io.connect(SOCKET_URL, options)
             client.on('connect', (data) => {
-                client.emit(gameEvents.playerJoinGame, { username: '1234' })
+                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
             })
 
             client.on(gameEvents.playerJoinGame, (data) => {
@@ -66,7 +66,7 @@ describe('Events', () => {
             client.on('connect', (data) => {
                 room = GameManager.getRoom('0')
                 gameWorld = room.gameWorld
-                client.emit(gameEvents.playerJoinGame, { username: '1234' })
+                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
             })
 
             client.on(gameEvents.playerJoinGame, (data) => {
@@ -90,7 +90,7 @@ describe('Events', () => {
             client.on('connect', (data) => {
                 room = GameManager.getRoom('0')
                 gameWorld = room.gameWorld
-                client.emit(gameEvents.playerJoinGame, { username: '1234' })
+                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
             })
 
             client.on(gameEvents.playerJoinGame, (data) => {
@@ -117,7 +117,7 @@ describe('Events', () => {
                 gameWorld = room.gameWorld
                 gameWorld.setDamageInterval(0)
                 gameWorld.setMaxPlayers(10)
-                client.emit(gameEvents.playerJoinGame, { username: '1234' })
+                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
             })
 
             client.on(gameEvents.playerJoinGame, (data) => {
@@ -149,7 +149,7 @@ describe('Events', () => {
                 room = GameManager.getRoom('0')
                 gameWorld = room.gameWorld
                 gameWorld.setMaxPlayers(1)
-                client.emit(gameEvents.playerJoinGame, { username: '1234' })
+                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
             })
 
             client.on(gameEvents.playerJoinGame, (data) => {

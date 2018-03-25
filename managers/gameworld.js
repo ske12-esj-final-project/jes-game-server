@@ -1,11 +1,13 @@
 'use strict'
 const _ = require('lodash')
 const shortid = require('shortid')
+const axios = require('axios')
 const gameEvents = require('../constants/events')
 const GameManager = require('../managers/game')
 const SafeArea = require('../model/safearea')
 const Utils = require('../utils')
 const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
+const API = require('../constants/api')
 const GAME_STATE = require('../constants/gamestate')
 const SAFE_AREA_STATE = require('../constants/safestate')
 const DEFAULT_CONFIG = require('../config/gameworld')
@@ -52,12 +54,28 @@ module.exports = class {
 
             timeLeft -= 1
             this.io.emit(gameEvents.countdown, { d: [timeLeft] })
-            if (timeLeft <= 0) {
-                clearInterval(this.countDownInterval)
-                this.io.emit(gameEvents.finishCountdown)
-                this.setState(GAME_STATE.INGAME)
-            }
+            if (timeLeft <= 0) this.prepareStartGame()
         }, this.config.countdownInterval)
+    }
+
+    prepareStartGame() {
+        clearInterval(this.countDownInterval)
+        this.io.emit(gameEvents.finishCountdown)
+        this.setState(GAME_STATE.INGAME)
+
+        let p = _.map(this.players, player => {
+            return player.socket.userID
+        })
+
+        axios.post(API.MATCH, {
+            players: p
+        })
+        .then((res) => {
+            console.log(res.data)
+        })
+        .catch((err) => {
+            console.error(err)
+        })
     }
 
     createGameInterval() {

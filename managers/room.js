@@ -30,7 +30,7 @@ module.exports = class {
         axios.get(API.USER + '/me', {
             "headers": { "access-token": this.socket.token }
         }).then((res) => {
-            this.socket.userID = res.data.id
+            player.userID = res.data.id
             player.username = res.data.username
         })
     }

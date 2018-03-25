@@ -64,7 +64,7 @@ module.exports = class {
         this.setState(GAME_STATE.INGAME)
 
         let p = _.map(this.players, player => {
-            return player.socket.userID
+            return player.userID
         })
 
         axios.post(API.MATCH, {
@@ -146,6 +146,21 @@ module.exports = class {
             this.safeArea.setState(SAFE_AREA_STATE.WAITING)
             this.duration = 0
         }, this.config.restrictTime)
+    }
+
+    onPlayerKill(player, victim) {
+        axios.post(API.KILL, {
+            playerID: player.userID,
+            victimID: victim.userID,
+            victimPos: victim.position,
+            weaponUsed: player.currentEquipment
+        })
+        .then((res) => {
+            console.log(res.data)
+        })
+        .catch((err) => {
+            console.error(err)
+        })
     }
 
     getUpdateWeaponInMap() {

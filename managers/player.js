@@ -7,6 +7,7 @@ module.exports = class {
     constructor(socket, playerID, username) {
         this.socket = socket
         this.playerID = playerID
+        this.userID = null
         this.username = username
         this.position = { x: null, y: null, z: null }
         this.rotate = { x: null, y: null }
@@ -123,14 +124,17 @@ module.exports = class {
     checkShootHit(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
-        let targetId, dmg
-        targetId = jsonData[0]
-        dmg = jsonData[1]
+        let targetId = jsonData[0]
+        let damage = jsonData[1]
 
         let targetEnemy = GameManager.getPlayer(targetId)
 
         if (targetEnemy) {
-            targetEnemy.hp -= dmg
+            targetEnemy.hp -= damage
+            if (targetEnemy.hp <= 0) {
+                this.currentRoom.gameWorld.onPlayerKill(this, targetEnemy)
+            }
+
             let sendToOther = { "d": [targetId, this.playerID, targetEnemy.hp] }
             this.currentRoom.gameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
 

@@ -71,7 +71,7 @@ module.exports = class {
             players: p
         })
         .then((res) => {
-            console.log(res.data)
+            this.matchID = res.data.id
         })
         .catch((err) => {
             console.error(err)
@@ -150,6 +150,7 @@ module.exports = class {
 
     onPlayerKill(player, victim) {
         axios.post(API.KILL, {
+            matchID: this.matchID,
             playerID: player.userID,
             victimID: victim.userID,
             victimPos: victim.position,

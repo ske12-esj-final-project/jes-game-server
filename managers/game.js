@@ -34,7 +34,7 @@ module.exports = {
     },
 
     addRoom(room) {
-        this.getInstance().rooms[room.roomID] = room
+        this.getInstance().rooms[room.id] = room
     },
 
     removePlayer(playerID) {

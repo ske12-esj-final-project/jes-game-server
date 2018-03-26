@@ -16,6 +16,7 @@ module.exports = class {
     socketHandler(socket) {
         socket.on(gameEvents.playerJoinGame, this.onPlayerConnect.bind(this))
         socket.on(gameEvents.playerJoinRoom, this.onPlayerJoinRoom.bind(this))
+        socket.on(gameEvents.updateRoom, this.onUpdateRoomInfo.bind(this))
     }
 
     onPlayerConnect(data) {
@@ -46,6 +47,11 @@ module.exports = class {
             return this.socket.emit(gameEvents.playerJoinFullRoom, { d: ['Room is full'] })
         }
 
+        addPlayerToRoom(player, room, roomID)
+    }
+
+    addPlayerToRoom(player, room, roomID)
+    {
         player.currentRoom = room
         room.addPlayer(player)
         this.socket.join(roomID)
@@ -55,6 +61,26 @@ module.exports = class {
             room.gameWorld.setState(GAME_STATE.COUNTDOWN)
             room.gameWorld.onCountdown()
         }
+
+        onUpdateRoomInfo()
+    }
+
+    onUpdateRoomInfo() {
+        let sendData = []
+        _.map(GameManager.getRooms(), room => {
+            let data = [
+                room.id,
+                room.name,
+                _.size(room.getPlayers()),
+                room.gameWorld.getMaxPlayers(),
+                room.gameWorld.getState()
+            ]
+
+            sendData.push(data)
+        })
+
+        this.socket.emit(gameEvents.updateRoom, { d: sendData });
+        this.socket.broadcast.emit(gameEvents.updateRoom, { d: sendData });
     }
 
     addRoom(room) {

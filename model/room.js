@@ -6,11 +6,11 @@ const GameWorld = require('../managers/gameworld')
 const GAME_STATE = require('../constants/gamestate')
 
 module.exports = class {
-    constructor(io, name, roomID) {
+    constructor(io, name, id) {
         this.io = io
         this.name = name
-        this.roomID = roomID
-        this.gameWorld = new GameWorld(this.io.to(this.roomID), DEFAULT_CONFIG)
+        this.id = id
+        this.gameWorld = new GameWorld(this.io.to(this.id), DEFAULT_CONFIG)
     }
 
     addPlayer(player) {

@@ -24,5 +24,6 @@ module.exports = {
     "moveSafeArea": "u",
     "warnSafeArea": "t",
     "playerOutSafeArea": "s",
-    "playerBackInSafeArea": "r"
+    "playerBackInSafeArea": "r",
+    "updateRoom": "q"
 }

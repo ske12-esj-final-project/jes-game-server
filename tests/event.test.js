@@ -14,7 +14,7 @@ const server = require('../app')
 const GameManager = require('../managers/game')
 const gameEvents = require('../constants/events')
 const DEFAULT_CONFIG = require('../config/gameworld')
-const API = require('../constants/API')
+const API = require('../constants/api')
 const GAME_STATE = require('../constants/gamestate')
 
 let options = {

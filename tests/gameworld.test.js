@@ -1,17 +1,17 @@
 const _ = require('lodash')
 const chai = require('chai')
 const sinon = require('sinon')
-chai.use(require('sinon-chai'))
 const expect = chai.expect
 
 const io = require('socket.io-client')
-const GameManager = require('../managers/game')
 const GameWorld = require(`../managers/gameworld`)
-const Room = require('../model/room')
 const Player = require('../managers/player')
 const DEFAULT_CONFIG = require('../config/gameworld')
+const API = require('../constants/api')
 const GAME_STATE = require('../constants/gamestate')
 const SAFE_AREA_STATE = require('../constants/safestate')
+
+chai.use(require('sinon-chai'))
 
 let options = {
     transports: ['websocket'],
@@ -115,7 +115,7 @@ describe('Gameworld', () => {
             let player1 = new Player(null, 'p1', 'Player_1')
             player1.position = { x: -100, y: 25, z: 20 }
             gameWorld.players[player1.playerID] = player1
-            
+
             this.clock.tick((gameWorld.config.triggerTime + gameWorld.config.restrictTime) * 7)
             expect(gameWorld.safeArea.scale).to.deep.equal({ x: 0, y: 40, z: 0 })
         })
@@ -132,10 +132,6 @@ describe('Gameworld', () => {
             gameWorld.reset()
             expect(gameWorld.itemList).to.deep.equal(expectedItemList)
         })
-
-        // it('should not be called if game state is not END', () => {
-        //     gameWorld.reset()
-        // })
 
         it('should reset duration back', () => {
             gameWorld.reset()

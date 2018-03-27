@@ -1,4 +1,6 @@
 const _ = require('lodash')
+const axios = require('axios')
+const MockAdapter = require('axios-mock-adapter')
 const chai = require('chai')
 const sinon = require('sinon')
 chai.use(require('sinon-chai'))
@@ -12,7 +14,7 @@ const server = require('../app')
 const GameManager = require('../managers/game')
 const gameEvents = require('../constants/events')
 const DEFAULT_CONFIG = require('../config/gameworld')
-
+const API = require('../constants/API')
 const GAME_STATE = require('../constants/gamestate')
 
 let options = {
@@ -21,7 +23,18 @@ let options = {
     reconnection: false
 }
 
+let axiosMock = new MockAdapter(axios)
+
 describe('Events', () => {
+
+    beforeEach(() => {
+        axiosMock.onGet(API.USER + '/me', {
+            "headers": { "access-token": 'abcd' }
+            }).reply(200, {
+                id: 'user_id',
+                username: '1234'
+            })
+    })
 
     afterEach(() => {
         GameManager.instance = null
@@ -140,7 +153,7 @@ describe('Events', () => {
         })
     })
 
-    
+
     describe('Player leaves the room', () => {
         it('should reset gameWorld when last player leaves', (done) => {
             let client, playerID, gameWorld, room

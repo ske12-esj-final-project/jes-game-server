@@ -56,7 +56,7 @@ module.exports = class {
             }
 
             timeLeft -= 1
-            this.io.emit(gameEvents.countdown, { d: [timeLeft] })
+            this.io.to(this.id).emit(gameEvents.countdown, { d: [timeLeft] })
             if (timeLeft <= 0) this.prepareStartGame()
         }, this.gameWorld.config.countdownInterval)
     }
@@ -75,7 +75,7 @@ module.exports = class {
             players: p
         })
         .then((res) => {
-            this.gameWorld.matchID = res.data.id
+            this.gameWorld.matchID = res.data.matchID
         })
         .catch((err) => {
             console.error(err)

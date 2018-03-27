@@ -67,7 +67,7 @@ module.exports = class {
         this.gameWorld.setState(GAME_STATE.INGAME)
         this.onUpdateRoomInfo()
 
-        let p = _.map(this.players, player => {
+        let p = _.map(this.getPlayers(), player => {
             return player.userID
         })
 

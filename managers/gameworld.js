@@ -45,39 +45,6 @@ module.exports = class {
 
     }
 
-    onCountdown() {
-        let timeLeft = 10
-        this.countDownInterval = setInterval(() => {
-            if (!this.isCountdown()) {
-                clearInterval(this.countDownInterval)
-            }
-
-            timeLeft -= 1
-            this.io.emit(gameEvents.countdown, { d: [timeLeft] })
-            if (timeLeft <= 0) this.prepareStartGame()
-        }, this.config.countdownInterval)
-    }
-
-    prepareStartGame() {
-        clearInterval(this.countDownInterval)
-        this.io.emit(gameEvents.finishCountdown)
-        this.setState(GAME_STATE.INGAME)
-
-        let p = _.map(this.players, player => {
-            return player.userID
-        })
-
-        axios.post(API.MATCH, {
-            players: p
-        })
-        .then((res) => {
-            this.matchID = res.data.id
-        })
-        .catch((err) => {
-            console.error(err)
-        })
-    }
-
     createGameInterval() {
         return setInterval(() => {
             this.update()

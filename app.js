@@ -26,12 +26,9 @@ io.on('connection', (socket) => {
     roomManager.addRoom(roomB)
     socket.playerID = shortid.generate()
 
-    socket.on('disconnecting', (reason) => {
-        let currentRoom = GameManager.getPlayer(socket.playerID).currentRoom
-        if (currentRoom) {
-            currentRoom.removePlayer(socket.playerID)
-        }
-    });
+    socket.on('disconnecting', () => {
+        GameManager.getPlayer(socket.playerID).leaveCurrentRoom()
+    })
 
     socket.on('disconnect', () => {
         roomManager.onPlayerDisconnect()

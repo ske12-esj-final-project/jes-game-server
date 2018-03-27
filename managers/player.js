@@ -205,6 +205,7 @@ module.exports = class {
     leaveCurrentRoom() {
         if (this.currentRoom) {
             this.currentRoom.removePlayer(this.playerID)
+            GameManager.getPlayer(this.playerID).currentRoom.onUpdateRoomInfo()
             this.currentRoom = null
         }
     }

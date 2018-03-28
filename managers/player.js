@@ -126,21 +126,26 @@ module.exports = class {
         let targetId = jsonData[0]
         let damage = jsonData[1]
 
-        let targetEnemy = GameManager.getPlayer(targetId)
+        let victim = GameManager.getPlayer(targetId)
 
-        if (targetEnemy) {
-            targetEnemy.hp -= damage
-            if (targetEnemy.hp <= 0) {
-                this.socket.emit(gameEvents.updatePlayerKill, {  })
-                this.currentRoom.gameWorld.onPlayerKill(this, targetEnemy)
+        if (victim) {
+            victim.hp -= damage
+            if (victim.hp <= 0) {
+                this.socket.emit(gameEvents.playerDie,
+                    { d: this.getPlayerDieSendData(victim) })
+                this.currentRoom.gameWorld.onPlayerKill(this, victim)
             }
 
-            let sendToOther = { "d": [targetId, this.playerID, targetEnemy.hp] }
+            let sendToOther = { "d": [targetId, this.playerID, victim.hp] }
             this.currentRoom.gameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
 
         } else {
-            console.log('no enemy shooted in this game')
+            console.log('no enemy shot in this game')
         }
+    }
+
+    getPlayerDieSendData(victim) {
+        return [victim.playerID, this.username, victim.username, this.currentEquipment]
     }
 
     updateCurrentEquipment(data) {

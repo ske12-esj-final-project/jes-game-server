@@ -1,7 +1,6 @@
 const _ = require('lodash')
 const gameEvents = require('../constants/events')
 const GameManager = require('./game')
-const WEAPON = require('../data/equipments')
 
 module.exports = class {
     constructor(socket, playerID, username) {
@@ -13,7 +12,7 @@ module.exports = class {
         this.rotate = { x: null, y: null }
         this.hp = 100
         this.currentRoom = null
-        this.currentEquipment = 0
+        this.currentEquipment = ""
         this.damageInterval = null
         this.socketHandler(socket)
     }

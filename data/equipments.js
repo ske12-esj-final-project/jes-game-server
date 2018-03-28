@@ -1,9 +1,9 @@
 module.exports = {
-    ARM: {
+    0: {
         "Index": 0,
         "Damage": 5,
     },
-    GLICK: {
+    1: {
         "Index": 1,
         "Prefab": "Handgun 2",
         "Tag": "Handgun 1",

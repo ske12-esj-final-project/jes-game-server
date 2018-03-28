@@ -6,6 +6,7 @@ const gameEvents = require('../constants/events')
 const GameManager = require('../managers/game')
 const SafeArea = require('../model/safearea')
 const Utils = require('../utils')
+const WEAPON = require('../data/equipments')
 const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
 const API = require('../constants/api')
 const GAME_STATE = require('../constants/gamestate')
@@ -122,7 +123,7 @@ module.exports = class {
             playerID: player.userID,
             victimID: victim.userID,
             victimPos: victim.position,
-            weaponUsed: player.currentEquipment
+            weaponUsed: WEAPON[player.currentEquipment]["Game name"]
         })
             .then((res) => {
                 console.log(res.data)

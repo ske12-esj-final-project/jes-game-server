@@ -25,5 +25,7 @@ module.exports = {
     "warnSafeArea": "t",
     "playerOutSafeArea": "s",
     "playerBackInSafeArea": "r",
-    "updateRoom": "q"
+    "updateRoom": "q",
+    "playerDie": "p",
+    "updatePlayerKill": "o",
 }

@@ -132,6 +132,7 @@ module.exports = class {
         if (targetEnemy) {
             targetEnemy.hp -= damage
             if (targetEnemy.hp <= 0) {
+                this.socket.emit(gameEvents.updatePlayerKill, {  })
                 this.currentRoom.gameWorld.onPlayerKill(this, targetEnemy)
             }
 

@@ -116,6 +116,7 @@ module.exports = class {
     }
 
     onPlayerKill(player, victim) {
+        this.io.emit(gameEvents.playerDie, { d: this.getPlayerDieSendData(player, victim) })
         axios.post(API.KILL, {
             matchID: this.matchID,
             playerID: player.userID,
@@ -123,12 +124,16 @@ module.exports = class {
             victimPos: victim.position,
             weaponUsed: player.currentEquipment
         })
-        .then((res) => {
-            console.log(res.data)
-        })
-        .catch((err) => {
-            console.error(err)
-        })
+            .then((res) => {
+                console.log(res.data)
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+    }
+
+    getPlayerDieSendData(player, victim) {
+        return [victim.playerID, player.username, victim.username, player.currentEquipment]
     }
 
     getUpdateWeaponInMap() {

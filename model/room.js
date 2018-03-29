@@ -60,9 +60,10 @@ module.exports = class {
             if (timeLeft <= 0) this.prepareStartGame()
         }, this.gameWorld.config.countdownInterval)
     }
-    UpdateNumberOfAlivePlayer(){
+
+    UpdateNumberOfAlivePlayer() {
         console.log('start check #alive')
-        let players = GameManager.getPlayers()
+        let players = this.getPlayers()
         let currentPlayers = _.pickBy(players, (value, playerId) => {
             return value['hp'] > 0
         })
@@ -89,12 +90,12 @@ module.exports = class {
         axios.post(API.MATCH, {
             players: p
         })
-        .then((res) => {
-            this.gameWorld.matchID = res.data.matchID
-        })
-        .catch((err) => {
-            console.error(err)
-        })
+            .then((res) => {
+                this.gameWorld.matchID = res.data.matchID
+            })
+            .catch((err) => {
+                console.error(err)
+            })
     }
 
     onUpdateRoomInfo() {

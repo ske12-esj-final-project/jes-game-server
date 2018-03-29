@@ -117,6 +117,7 @@ module.exports = class {
     }
 
     onPlayerKill(player, victim) {
+        player.numberOfKill++
         axios.post(API.KILL, {
             matchID: this.matchID,
             playerID: player.userID,

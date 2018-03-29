@@ -60,11 +60,26 @@ module.exports = class {
             if (timeLeft <= 0) this.prepareStartGame()
         }, this.gameWorld.config.countdownInterval)
     }
+    UpdateNumberOfAlivePlayer(){
+        console.log('start check #alive')
+        let players = GameManager.getPlayers()
+        let currentPlayers = _.pickBy(players, (value, playerId) => {
+            return value['hp'] > 0
+        })
+        let aliveNumber = _.size(currentPlayers) || 0
+        console.log('#currentPlayers alive', _.size(currentPlayers))
+        // emit boardcast #alive
+        let sendToOther = { "d": [aliveNumber] }
+        this.gameWorld.io.emit(gameEvents.updateNumberOfAlivePlayer, sendToOther)
+    }
 
     prepareStartGame() {
         clearInterval(this.countDownInterval)
         this.io.to(this.id).emit(gameEvents.finishCountdown)
         this.gameWorld.setState(GAME_STATE.INGAME)
+
+        console.log(this.gameWorld.getState())
+
         this.onUpdateRoomInfo()
 
         let p = _.map(this.getPlayers(), player => {

@@ -49,8 +49,6 @@ module.exports = class {
     }
 
     startGame(data) {
-        data['d'] = data['d'].replace(/@/g, "\"")
-        let jsonData = JSON.parse(data["d"])
         this.position = {
             x: this.randomInt(-250, 250),
             y: 500,

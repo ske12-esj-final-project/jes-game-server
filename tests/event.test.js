@@ -55,13 +55,15 @@ describe('Events', () => {
     })
 
     describe('Player join game', () => {
-
-        it('should add player to the list', (done) => {
-            let client = io.connect(SOCKET_URL, options)
+        let client
+        beforeEach(() => {
+            client = io.connect(SOCKET_URL, options)
             client.on('connect', (data) => {
                 client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
             })
+        })
 
+        it('should add player to the list', (done) => {
             client.on(gameEvents.playerJoinGame, (data) => {
                 let player = GameManager.getPlayer(data.d[0])
                 expect(player).to.not.be.undefined
@@ -71,11 +73,6 @@ describe('Events', () => {
         })
 
         it('should add player with client username', (done) => {
-            let client = io.connect(SOCKET_URL, options)
-            client.on('connect', (data) => {
-                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
-            })
-
             client.on(gameEvents.playerJoinGame, (data) => {
                 let player = GameManager.getPlayer(data.d[0])
                 expect(player.username).to.equal('1234')
@@ -86,16 +83,18 @@ describe('Events', () => {
     })
 
     describe('Player join room', () => {
+        let client, playerID, gameWorld, room
 
-        it('should add player to room', (done) => {
-            let client, playerID, gameWorld, room
+        beforeEach(() => {
             client = io.connect(SOCKET_URL, options)
             client.on('connect', (data) => {
                 room = GameManager.getRoom('0')
                 gameWorld = room.gameWorld
                 client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
             })
+        })
 
+        it('should add player to room', (done) => {
             client.on(gameEvents.playerJoinGame, (data) => {
                 playerID = data.d[0]
                 gameWorld.setMaxPlayers(1)
@@ -105,23 +104,15 @@ describe('Events', () => {
             client.on(gameEvents.playerJoinRoom, (data) => {
                 let player = room.getPlayer(playerID)
                 expect(playerID).to.not.be.undefined
-                client.disconnect()
                 gameWorld.setDefaultConfig()
+                client.disconnect()
                 done()
             })
         })
 
         it('should not add player if room is full', (done) => {
-            let client, room, gameWorld
-            client = io.connect(SOCKET_URL, options)
-            client.on('connect', (data) => {
-                room = GameManager.getRoom('0')
-                gameWorld = room.gameWorld
-                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
-            })
-
             client.on(gameEvents.playerJoinGame, (data) => {
-                let playerID = data.d[0]
+                playerID = data.d[0]
                 gameWorld.setMaxPlayers(0)
                 client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
             })
@@ -130,13 +121,13 @@ describe('Events', () => {
                 let playersInRoom = room.getPlayers()
                 expect(_.size(playersInRoom)).to.equal(0)
                 gameWorld.setDefaultConfig()
+                client.disconnect()
                 done()
             })
         })
     })
 
     describe('Player enters safe area', () => {
-
         it('should decrease player hp when out of safe area', (done) => {
             let client, playerID, gameWorld, room
             client = io.connect(SOCKET_URL, options)
@@ -169,7 +160,6 @@ describe('Events', () => {
     })
 
     describe('Player leaves the room', () => {
-
         it('should reset gameWorld when last player leaves', (done) => {
             let client, playerID, gameWorld, room
             client = io.connect(SOCKET_URL, options)

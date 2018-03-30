@@ -11,23 +11,32 @@ const Room = require('../model/room')
 const API = require('../constants/api')
 const GAME_STATE = require('../constants/gamestate')
 
+let axiosMock 
+
 describe('Room model', () => {
     io.emit = () => { return }
     io.to = () => { return io }
     io.to('test').emit = () => { return }
 
+    beforeEach(() => {
+        let userID = 'user'
+        axiosMock = new MockAdapter(axios)
+        axiosMock.onPost(API.MATCH, { players: [userID] }).replyOnce(200, {
+            matchID: 'some_match_id'
+        })
+    })
+
+    afterEach(() => {
+        axiosMock.reset()
+    })
+
     describe('onCountdown', () => {
         let room
         beforeEach(() => {
             this.clock = sinon.useFakeTimers()
-            let userID = 'user'
-            let axiosMock = new MockAdapter(axios)
-            axiosMock.onPost(API.MATCH, { players: [userID] }).reply(200, {
-                matchID: 'some_match_id'
-            })
 
             let player = new Player(null, 'player', 'Player')
-            player.userID = userID
+            player.userID = 'user'
 
             room = new Room(io, 'Test Room', 'test')
             room.addPlayer(player)
@@ -43,7 +52,7 @@ describe('Room model', () => {
         it('should create match via API when finish countdown', () => {
             setTimeout(() => {
                 expect(room.gameWorld.matchID).to.equal('some_match_id')
-             }, 0)
+            }, 0)
         })
 
         it('should change game state to INGAME', () => {

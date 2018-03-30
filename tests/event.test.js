@@ -41,12 +41,6 @@ describe('Events', () => {
             id: 'user_id_2',
             username: '5678'
         })
-
-        axiosMock.onPost(API.MATCH, {
-            players: ['user_id_1', 'user_id_2']
-        }).replyOnce(200, {
-            matchID: 'some_match_id'
-        })
     })
 
     afterEach(() => {

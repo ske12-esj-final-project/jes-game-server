@@ -50,9 +50,9 @@ module.exports = class {
 
     onCountdown() {
         let timeLeft = 10
-        this.countDownInterval = setInterval(() => {
+        this.countdownInterval = setInterval(() => {
             if (!this.gameWorld.isCountdown()) {
-                clearInterval(this.countDownInterval)
+                clearInterval(this.countdownInterval)
             }
 
             timeLeft -= 1
@@ -62,7 +62,7 @@ module.exports = class {
     }
 
     prepareStartGame() {
-        clearInterval(this.countDownInterval)
+        clearInterval(this.countdownInterval)
         this.gameWorld.io.emit(gameEvents.finishCountdown)
         this.gameWorld.setState(GAME_STATE.INGAME)
         this.onUpdateRoomInfo()

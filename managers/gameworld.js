@@ -117,30 +117,28 @@ module.exports = class {
     }
 
     updateNumberOfAlivePlayer() {
-        console.log('start check #alive')
         let alivePlayers = _.pickBy(this.players, (value, playerId) => {
             return value['hp'] > 0
         })
         let aliveNumber = _.size(alivePlayers) || 0
-        console.log('#currentPlayers alive', _.size(alivePlayers))
         this.io.emit(gameEvents.updateNumberOfAlivePlayer, { "d": [aliveNumber] })
     }
 
     onPlayerKill(player, victim) {
         player.numberOfKill++
-        axios.post(API.KILL, {
-            matchID: this.matchID,
-            playerID: player.userID,
-            victimID: victim.userID,
-            victimPos: victim.position,
-            weaponUsed: WEAPON[player.currentEquipment]["Game name"]
-        })
-            .then((res) => {
-                console.log(res.data)
-            })
-            .catch((err) => {
-                console.error(err)
-            })
+        // axios.post(API.KILL, {
+        //     matchID: this.matchID,
+        //     playerID: player.userID,
+        //     victimID: victim.userID,
+        //     victimPos: victim.position,
+        //     weaponUsed: WEAPON[player.currentEquipment.toString()]["Game name"]
+        // })
+        //     .then((res) => {
+        //         console.log(res.data)
+        //     })
+        //     .catch((err) => {
+        //         console.error(err)
+        //     })
     }
 
     getUpdateWeaponInMap() {

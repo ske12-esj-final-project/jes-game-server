@@ -12,7 +12,7 @@ module.exports = class {
         this.rotate = { x: null, y: null }
         this.hp = 100
         this.currentRoom = null
-        this.currentEquipment = ""
+        this.currentEquipment = 0
         this.numberOfKill = 0
         this.damageInterval = null
         this.socketHandler(socket)
@@ -142,8 +142,6 @@ module.exports = class {
 
             let sendToOther = { "d": [targetId, this.playerID, victim.hp] }
             this.currentRoom.gameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
-
-            console.log(`${this.playerID} numberOfKill :`,this.numberOfKill)
             this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
 
         } else {
@@ -217,7 +215,7 @@ module.exports = class {
     leaveCurrentRoom() {
         if (this.currentRoom) {
             this.currentRoom.removePlayer(this.playerID)
-            GameManager.getPlayer(this.playerID).currentRoom.onUpdateRoomInfo()
+            this.currentRoom.onUpdateRoomInfo()
             this.currentRoom = null
         }
     }

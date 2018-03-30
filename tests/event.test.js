@@ -30,13 +30,27 @@ describe('Events', () => {
     beforeEach(() => {
         axiosMock.onGet(API.USER + '/me', {
             "headers": { "access-token": 'abcd' }
-            }).reply(200, {
-                id: 'user_id',
-                username: '1234'
-            })
+        }).replyOnce(200, {
+            id: 'user_id_1',
+            username: '1234'
+        })
+
+        axiosMock.onGet(API.USER + '/me', {
+            "headers": { "access-token": 'defg' }
+        }).replyOnce(200, {
+            id: 'user_id_2',
+            username: '5678'
+        })
+
+        axiosMock.onPost(API.MATCH, {
+            players: ['user_id_1', 'user_id_2']
+        }).replyOnce(200, {
+            matchID: 'some_match_id'
+        })
     })
 
     afterEach(() => {
+        axiosMock.reset()
         GameManager.instance = null
     })
 
@@ -122,6 +136,7 @@ describe('Events', () => {
     })
 
     describe('Player enters safe area', () => {
+
         it('should decrease player hp when out of safe area', (done) => {
             let client, playerID, gameWorld, room
             client = io.connect(SOCKET_URL, options)
@@ -129,7 +144,7 @@ describe('Events', () => {
                 room = GameManager.getRoom('0')
                 gameWorld = room.gameWorld
                 gameWorld.setDamageInterval(0)
-                gameWorld.setMaxPlayers(10)
+                gameWorld.setMaxPlayers(2)
                 client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
             })
 
@@ -140,12 +155,12 @@ describe('Events', () => {
 
             client.on(gameEvents.playerJoinRoom, (data) => {
                 client.emit(gameEvents.playerOutSafeArea)
-                GameManager.getPlayer(playerID).onPlayerBackSafeArea()
             })
 
             client.on(gameEvents.updatePlayersStatus, (data) => {
                 let playerHealth = parseInt(data.d[2])
                 expect(playerHealth).to.equal(95)
+                GameManager.getPlayer(playerID).onPlayerBackSafeArea()
                 gameWorld.setDefaultConfig()
                 client.disconnect()
                 done()
@@ -153,8 +168,8 @@ describe('Events', () => {
         })
     })
 
-
     describe('Player leaves the room', () => {
+
         it('should reset gameWorld when last player leaves', (done) => {
             let client, playerID, gameWorld, room
             client = io.connect(SOCKET_URL, options)
@@ -176,6 +191,86 @@ describe('Events', () => {
                 expect(gameWorld.reset).to.have.been.calledOnce
                 gameWorld.setDefaultConfig()
                 client.disconnect()
+                done()
+            })
+        })
+    })
+
+    describe('Players kill each other', () => {
+        let player, victim, playerID, victimID, gameWorld, room, expectedIndex
+
+        beforeEach(() => {
+            room = GameManager.getRoom('0')
+            gameWorld = room.gameWorld
+            gameWorld.setMaxPlayers(10)
+
+            player = io.connect(SOCKET_URL, options)
+            player.on('connect', (data) => {
+                player.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
+            })
+
+            player.on(gameEvents.playerJoinGame, (data) => {
+                playerID = data.d[0]
+                player.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
+            })
+
+            victim = io.connect(SOCKET_URL, options)
+            victim.on('connect', (data) => {
+                victim.emit(gameEvents.playerJoinGame, { d: '[@5678@,@defg@]' })
+            })
+
+            victim.on(gameEvents.playerJoinGame, (data) => {
+                victimID = data.d[0]
+                victim.emit(gameEvents.playerJoinRoom, { d: `[@${victimID}@,0]` })
+            })
+
+            victim.on(gameEvents.playerJoinRoom, (data) => {
+                expectedIndex = 4
+                room.getPlayer(playerID).currentEquipment = expectedIndex
+                let damage = 100
+                player.emit(gameEvents.checkShootHit, { d: `[@${victimID}@,${damage}]` })
+            })
+        })
+
+        it('should send back kill information correctly', (done) => {
+            player.on(gameEvents.playerDie, (data) => {
+                expect(data.d[0]).to.equal(victimID)
+                expect(data.d[1]).to.equal('1234')
+                expect(data.d[2]).to.equal('5678')
+                expect(data.d[3]).to.equal(expectedIndex)
+                player.disconnect()
+                victim.disconnect()
+                done()
+            })
+        })
+
+        it('should increase number player kill by 1', (done) => {
+            player.on(gameEvents.playerDie, (data) => {
+                expect(room.getPlayer(playerID).numberOfKill).to.equal(1)
+                player.disconnect()
+                victim.disconnect()
+                done()
+            })
+        })
+
+        it('should reduce number of players alive by 1', (done) => {
+            player.on(gameEvents.updateNumberOfAlivePlayer, (data) => {
+                expect(data.d[0]).to.equal(1)
+                player.disconnect()
+                victim.disconnect()
+                done()
+            })
+        })
+
+        it('should everyone in the room knows this player dies', (done) => {
+            player.on(gameEvents.updatePlayersStatus, (data) => {
+                expect(data.d[2]).to.equal(0)
+            })
+
+            victim.on(gameEvents.updatePlayersStatus, (data) => {
+                expect(data.d[2]).to.equal(0)
+                player.disconnect()
+                victim.disconnect()
                 done()
             })
         })

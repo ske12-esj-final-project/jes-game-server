@@ -50,4 +50,30 @@ describe('Room model', () => {
             expect(room.gameWorld.getState()).to.equal(GAME_STATE.INGAME)
         })
     })
+
+    describe('onUpdateRoomInfo', () => {
+        it('should call when someone leaves room', () => {
+            let player = new Player(null, 'player', 'Player')
+
+            room = new Room(io, 'Test Room', 'test')
+            player.currentRoom = room
+            room.addPlayer(player)
+
+            room.onUpdateRoomInfo = sinon.spy()
+
+            player.leaveCurrentRoom()
+            expect(room.onUpdateRoomInfo).to.have.been.calledOnce
+        })
+
+        it('should not call when player doesnt join any rooms', () => {
+            let player = new Player(null, 'player', 'Player')
+
+            room = new Room(io, 'Test Room', 'test')
+
+            room.onUpdateRoomInfo = sinon.spy()
+
+            player.leaveCurrentRoom()
+            expect(room.onUpdateRoomInfo).to.not.have.been.called
+        })
+    })
 })

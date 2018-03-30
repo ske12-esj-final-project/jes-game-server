@@ -116,6 +116,16 @@ module.exports = class {
         }, this.config.restrictTime)
     }
 
+    updateNumberOfAlivePlayer() {
+        console.log('start check #alive')
+        let alivePlayers = _.pickBy(this.players, (value, playerId) => {
+            return value['hp'] > 0
+        })
+        let aliveNumber = _.size(alivePlayers) || 0
+        console.log('#currentPlayers alive', _.size(alivePlayers))
+        this.io.emit(gameEvents.updateNumberOfAlivePlayer, { "d": [aliveNumber] })
+    }
+
     onPlayerKill(player, victim) {
         player.numberOfKill++
         axios.post(API.KILL, {

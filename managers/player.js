@@ -45,7 +45,7 @@ module.exports = class {
         this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
         this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
 
-        this.currentRoom.UpdateNumberOfAlivePlayer()
+        this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
     }
 
     startGame(data) {
@@ -62,7 +62,7 @@ module.exports = class {
         this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
         let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
         this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
-        this.currentRoom.UpdateNumberOfAlivePlayer()
+        this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
     }
 
     removeEquipmentInClient(data) {
@@ -144,7 +144,7 @@ module.exports = class {
             this.currentRoom.gameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
 
             console.log(`${this.playerID} numberOfKill :`,this.numberOfKill)
-            this.currentRoom.UpdateNumberOfAlivePlayer()
+            this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
 
         } else {
             console.log('no enemy shot in this game')

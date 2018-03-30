@@ -17,31 +17,37 @@ describe('Room model', () => {
     io.to('test').emit = () => { return }
 
     describe('onCountdown', () => {
+        let room
         beforeEach(() => {
             this.clock = sinon.useFakeTimers()
+            let userID = 'user'
+            let axiosMock = new MockAdapter(axios)
+            axiosMock.onPost(API.MATCH, { players: [userID] }).reply(200, {
+                matchID: 'some_match_id'
+            })
+
+            let player = new Player(null, 'player', 'Player')
+            player.userID = userID
+
+            room = new Room(io, 'Test Room', 'test')
+            room.addPlayer(player)
+            room.gameWorld.setState(GAME_STATE.COUNTDOWN)
+            room.onCountdown()
+            this.clock.tick(10000)
         })
 
         afterEach(() => {
             this.clock.restore()
         })
 
-        it('should create match via API when finish', () => {
-            let player = new Player(null, 'player', 'Player')
-            player.userID = 'user'
-            let axiosMock = new MockAdapter(axios)
-            axiosMock.onPost(API.MATCH, { players: [player.userID] }).reply(200, {
-                matchID: 'some_match_id'
-            })
-
-            let room = new Room(io, 'Test Room', 'test')
-            room.addPlayer(player)
-            room.gameWorld.setState(GAME_STATE.COUNTDOWN)
-            room.onCountdown()
-            this.clock.tick(10000)
-            
+        it('should create match via API when finish countdown', () => {
             setTimeout(() => {
                 expect(room.gameWorld.matchID).to.equal('some_match_id')
              }, 0)
+        })
+
+        it('should change game state to INGAME', () => {
+            expect(room.gameWorld.getState()).to.equal(GAME_STATE.INGAME)
         })
     })
 })

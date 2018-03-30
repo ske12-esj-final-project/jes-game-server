@@ -14,7 +14,6 @@ module.exports = class {
         this.currentRoom = null
         this.currentEquipment = 0
         this.numberOfKill = 0
-        this.damageInterval = null
         this.socketHandler(socket)
     }
 
@@ -30,22 +29,14 @@ module.exports = class {
         socket.on(gameEvents.getEquipment, this.getEquipment.bind(this))
         socket.on(gameEvents.playerOutSafeArea, this.onPlayerOutSafeArea.bind(this))
         socket.on(gameEvents.playerBackInSafeArea, this.onPlayerBackSafeArea.bind(this))
+        socket.on(gameEvents.getPlayerDeadInfo, this.getPlayerDeadInfo.bind(this))
     }
 
     setupPlayer(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
-        this.position = {
-            x: 0,
-            y: 0,
-            z: 0
-        }
-        let currentPlayerData = this.getPlayerInitData(this)
-        let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
-        this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
-        this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
-
-        this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
+        this.position = { x: 0, y: 0, z: 0 }
+        this.sendPlayersDataCreateCharacter()
     }
 
     startGame(data) {
@@ -54,12 +45,16 @@ module.exports = class {
             y: 500,
             z: this.randomInt(-250, 200)
         }
+        this.sendPlayersDataCreateCharacter()
+        let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
+        this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
+    }
+
+    sendPlayersDataCreateCharacter() {
         let currentPlayerData = this.getPlayerInitData(this)
         let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
         this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
         this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
-        let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
-        this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
         this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
     }
 
@@ -141,8 +136,8 @@ module.exports = class {
     hitPlayer(victim, damage) {
         victim.hp -= damage
         if (victim.hp <= 0) {
-            this.socket.emit(gameEvents.playerDie,
-                { d: this.getPlayerDieSendData(victim) })
+            this.socket.emit(gameEvents.playerDie, { d: this.getKillData(victim) })
+            victim.socket.emit(gameEvents.getPlayerDeadInfo, { d: this.getDeadData(victim) })
             this.currentRoom.gameWorld.onPlayerKill(this, victim)
         }
 
@@ -151,8 +146,17 @@ module.exports = class {
         this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
     }
 
-    getPlayerDieSendData(victim) {
+    getKillData(victim) {
         return [victim.playerID, this.username, victim.username, this.currentEquipment]
+    }
+
+    getDeadData(victim) {
+        let alivePlayers = _.pickBy(this.players, (value, playerId) => {
+            return value['hp'] > 0
+        })
+        let aliveNumber = _.size(alivePlayers) || 0
+
+        return [victim.username, aliveNumber, victim.numberOfKill, 0]
     }
 
     updateCurrentEquipment(data) {

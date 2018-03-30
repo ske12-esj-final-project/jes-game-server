@@ -28,5 +28,6 @@ module.exports = {
     "updateRoom": "q",
     "playerDie": "p",
     "updatePlayerKill": "o",
+    "getPlayerDeadInfo": "n",
     "updateNumberOfAlivePlayer": "e",
 }

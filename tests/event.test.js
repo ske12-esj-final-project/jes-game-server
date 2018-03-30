@@ -23,11 +23,12 @@ let options = {
     reconnection: false
 }
 
-let axiosMock = new MockAdapter(axios)
+let axiosMock
 
 describe('Events', () => {
 
     beforeEach(() => {
+        axiosMock = new MockAdapter(axios)
         axiosMock.onGet(API.USER + '/me', {
             "headers": { "access-token": 'abcd' }
         }).replyOnce(200, {

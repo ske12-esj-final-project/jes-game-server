@@ -5,7 +5,6 @@ const { sumList,getRandomInt } = require("./")
 
 const createItemList = (numberOfItem, itemData) => {
     const weightList = _.map(itemData, m => m.weight)
-    console.log(weightList)
     let targetList =  _.map(itemData, w => {
 let total = sumList(weightList)
     return Object.assign(w, {

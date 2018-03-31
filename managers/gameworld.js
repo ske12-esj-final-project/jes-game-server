@@ -43,7 +43,7 @@ module.exports = class {
     }
 
     sendRemoveWeapon(weaponID) {
-
+        this.io.emit(gameEvents.getEquipment, { d: [weaponID] })
     }
 
     createGameInterval() {

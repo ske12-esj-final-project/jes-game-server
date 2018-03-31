@@ -70,7 +70,6 @@ module.exports = class {
             let room = this.currentRoom
             _.remove(room.gameWorld.equipments, item => item.uid === weaponID)
             room.gameWorld.sendRemoveWeapon(weaponID)
-            this.socket.emit(gameEvents.getEquipment, { d: [weaponID] })
         }
         else {
             console.error('[error]-checkShootHit wrong data pattern', data)

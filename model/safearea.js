@@ -9,8 +9,7 @@ module.exports = class {
     }
 
     getSendData() {
-        return _.concat(Object.values(this.position),
-            Object.values(this.scale))
+        return [this.position.x, this.position.y, this.position.z, this.scale.x, this.scale.y]
     }
 
     setState(newState) {

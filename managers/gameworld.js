@@ -148,13 +148,19 @@ module.exports = class {
     reset() {
         this.players = {}
         let item = { uid: "", weaponIndex: 1, position: {} }
-        let aSize = new Array(50)
+        let aSize = new Array(this.config.NumberOfItems)
         
         this.itemList = _.map(aSize,()=>{
             return _.clone(item)
         })
 
         this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
+        /* */
+        // weaponIndex 10 is sniper
+        let easterItem = { uid: shortid.generate(), weaponIndex: 10, position: 
+        {"x":-81.63,"y":41.25,"z":-165.34} }
+        /* */
+        this.equipments.push(easterItem)
         this.safeArea = new SafeArea()
 
         this.duration = 0

@@ -5,5 +5,6 @@ module.exports = {
     triggerTime: 30000, // duration required until server warn users about safe area (ms)
     restrictTime: 10000, // duration required safe area to re-position and re-scale (ms)
     damageInterval: 1000,
-    countdownInterval: 1000
+    countdownInterval: 1000,
+    NumberOfItems:50
 }

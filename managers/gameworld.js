@@ -17,15 +17,10 @@ module.exports = class {
     constructor(io, config) {
         this.io = io
         this.config = config
-        let item = { uid: "", weaponIndex: 1, position: {} }
-        this.players = {}
-        this.itemList = [_.clone(item), _.clone(item)]
-        this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
-        this.safeArea = new SafeArea()
-
-        this.duration = 0
-        this.setState(GAME_STATE.OPEN)
+        this.reset()
         this.createGameInterval()
+        
+        
     }
 
     assignRandomPositions(items, spawnPoints) {
@@ -153,7 +148,12 @@ module.exports = class {
     reset() {
         this.players = {}
         let item = { uid: "", weaponIndex: 1, position: {} }
-        this.itemList = [_.clone(item), _.clone(item)]
+        let aSize = new Array(50)
+        
+        this.itemList = _.map(aSize,()=>{
+            return _.clone(item)
+        })
+
         this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
         this.safeArea = new SafeArea()
 

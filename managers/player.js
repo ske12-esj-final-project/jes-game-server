@@ -155,7 +155,7 @@ module.exports = class {
     }
 
     getVictimData(victim) {
-        let alivePlayers = _.pickBy(this.players, (value, playerId) => {
+        let alivePlayers = _.pickBy(this.currentRoom.getPlayers(), (value, playerId) => {
             return value['hp'] > 0
         })
 

@@ -151,7 +151,7 @@ module.exports = class {
     reset() {
         this.players = {}
         let itemSize = this.config.NumberOfItems
-        let itemList = createWeaponItemList(itemSize, equitmentData)
+        this.itemList = createWeaponItemList(itemSize, equitmentData)
 
         this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
         /* */

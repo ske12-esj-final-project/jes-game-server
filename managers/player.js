@@ -159,7 +159,7 @@ module.exports = class {
             return value['hp'] > 0
         })
 
-        let aliveNumber = _.size(alivePlayers) || 0
+        let aliveNumber = _.size(this.currentRoom.getPlayers()) + 1 || 0
         return [victim.username, aliveNumber, victim.numberOfKill, 0]
     }
 

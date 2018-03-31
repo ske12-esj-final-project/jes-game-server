@@ -123,8 +123,9 @@ describe('Events', () => {
     })
 
     describe('Player enters safe area', () => {
-        it('should decrease player hp when out of safe area', (done) => {
-            let client, playerID, gameWorld, room
+        let client, playerID, gameWorld, room
+
+        beforeEach(() => {
             client = io.connect(SOCKET_URL, options)
             client.on('connect', (data) => {
                 room = GameManager.getRoom('0')
@@ -138,7 +139,9 @@ describe('Events', () => {
                 playerID = data.d[0]
                 client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
             })
+        })
 
+        it('should decrease player hp when out of safe area', (done) => {
             client.on(gameEvents.playerJoinRoom, (data) => {
                 client.emit(gameEvents.playerOutSafeArea)
             })
@@ -147,6 +150,23 @@ describe('Events', () => {
                 let playerHealth = parseInt(data.d[2])
                 expect(playerHealth).to.equal(95)
                 GameManager.getPlayer(playerID).onPlayerBackSafeArea()
+                gameWorld.setDefaultConfig()
+                client.disconnect()
+                done()
+            })
+        })
+
+        it('should send data when player cannot escape safe area correctly', (done) => {
+            client.on(gameEvents.playerJoinRoom, (data) => {
+                GameManager.getPlayer(playerID).hp = 5
+                client.emit(gameEvents.playerOutSafeArea)
+            })
+
+            client.on(gameEvents.getVictimData, (data) => {
+                GameManager.getPlayer(playerID).onPlayerBackSafeArea()
+                expect(data.d[0]).to.equal('1234')
+                expect(data.d[1]).to.equal(0)
+                expect(data.d[2]).to.equal(0)
                 gameWorld.setDefaultConfig()
                 client.disconnect()
                 done()
@@ -223,6 +243,7 @@ describe('Events', () => {
                 expect(data.d[1]).to.equal('1234')
                 expect(data.d[2]).to.equal('5678')
                 expect(data.d[3]).to.equal(expectedIndex)
+                gameWorld.setDefaultConfig()
                 player.disconnect()
                 victim.disconnect()
                 done()
@@ -241,6 +262,7 @@ describe('Events', () => {
         it('should reduce number of players alive by 1', (done) => {
             player.on(gameEvents.updateNumberOfAlivePlayer, (data) => {
                 expect(data.d[0]).to.equal(1)
+                gameWorld.setDefaultConfig()
                 player.disconnect()
                 victim.disconnect()
                 done()

@@ -29,7 +29,6 @@ module.exports = class {
         socket.on(gameEvents.getEquipment, this.getEquipment.bind(this))
         socket.on(gameEvents.playerOutSafeArea, this.onPlayerOutSafeArea.bind(this))
         socket.on(gameEvents.playerBackInSafeArea, this.onPlayerBackSafeArea.bind(this))
-        socket.on(gameEvents.getPlayerDeadInfo, this.getPlayerDeadInfo.bind(this))
     }
 
     setupPlayer(data) {
@@ -90,6 +89,11 @@ module.exports = class {
         let currentGameWorld = this.currentRoom.gameWorld
         return setInterval(() => {
             this.hp -= damage
+            if (this.hp <= 0) {
+                this.socket.broadcast.emit(gameEvents.playerDie, { d: this.getKillData(this) })
+                this.socket.emit(gameEvents.getVictimData, { d: this.getVictimData(this) })
+            }
+
             let sendToOther = { "d": [this.playerID, null, this.hp] }
             currentGameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
         }, currentGameWorld.config.damageInterval)
@@ -136,8 +140,8 @@ module.exports = class {
     hitPlayer(victim, damage) {
         victim.hp -= damage
         if (victim.hp <= 0) {
-            this.socket.emit(gameEvents.playerDie, { d: this.getKillData(victim) })
-            victim.socket.emit(gameEvents.getPlayerDeadInfo, { d: this.getDeadData(victim) })
+            victim.socket.broadcast.emit(gameEvents.playerDie, { d: this.getKillData(victim) })
+            victim.socket.emit(gameEvents.getVictimData, { d: this.getVictimData(victim) })
             this.currentRoom.gameWorld.onPlayerKill(this, victim)
         }
 
@@ -150,12 +154,12 @@ module.exports = class {
         return [victim.playerID, this.username, victim.username, this.currentEquipment]
     }
 
-    getDeadData(victim) {
+    getVictimData(victim) {
         let alivePlayers = _.pickBy(this.players, (value, playerId) => {
             return value['hp'] > 0
         })
-        let aliveNumber = _.size(alivePlayers) || 0
 
+        let aliveNumber = _.size(alivePlayers) || 0
         return [victim.username, aliveNumber, victim.numberOfKill, 0]
     }
 

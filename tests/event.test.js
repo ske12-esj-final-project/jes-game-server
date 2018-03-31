@@ -239,6 +239,7 @@ describe('Events', () => {
 
         it('should send back kill information correctly', (done) => {
             player.on(gameEvents.playerDie, (data) => {
+                console.log(data.d)
                 expect(data.d[0]).to.equal(victimID)
                 expect(data.d[1]).to.equal('1234')
                 expect(data.d[2]).to.equal('5678')

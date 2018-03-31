@@ -205,12 +205,11 @@ describe('Events', () => {
         let player, victim, playerID, victimID, gameWorld, room, expectedIndex
 
         beforeEach(() => {
-            room = GameManager.getRoom('0')
-            gameWorld = room.gameWorld
-            gameWorld.setMaxPlayers(10)
-
             player = io.connect(SOCKET_URL, options)
             player.on('connect', (data) => {
+                room = GameManager.getRoom('0')
+                gameWorld = room.gameWorld
+                gameWorld.setMaxPlayers(10)
                 player.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
             })
 
@@ -239,7 +238,6 @@ describe('Events', () => {
 
         it('should send back kill information correctly', (done) => {
             player.on(gameEvents.playerDie, (data) => {
-                console.log(data.d)
                 expect(data.d[0]).to.equal(victimID)
                 expect(data.d[1]).to.equal('1234')
                 expect(data.d[2]).to.equal('5678')

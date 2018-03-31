@@ -19,7 +19,7 @@
     "nodemon": "^1.13.3"
   },
   "scripts": {
-    "test": "mocha ./tests/*.js --exit",
+    "test": "mocha ./tests/*.test.js --exit",
     "start": "nodemon app.js"
   },
   "keywords": [],

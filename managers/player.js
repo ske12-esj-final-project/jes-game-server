@@ -29,6 +29,7 @@ module.exports = class {
         socket.on(gameEvents.getEquipment, this.getEquipment.bind(this))
         socket.on(gameEvents.playerOutSafeArea, this.onPlayerOutSafeArea.bind(this))
         socket.on(gameEvents.playerBackInSafeArea, this.onPlayerBackSafeArea.bind(this))
+        socket.on(gameEvents.playerLeaveRoom, this.leaveCurrentRoom.bind(this))
     }
 
     setupPlayer(data) {
@@ -53,7 +54,7 @@ module.exports = class {
         let currentPlayerData = this.getPlayerInitData(this)
         let getAllEnemiesData = this.getAllPlayerSendData(this.getAllEnemies())
         this.socket.emit(gameEvents.playerCreated, { d: [currentPlayerData, getAllEnemiesData] })
-        this.socket.broadcast.emit(gameEvents.playerEnemyCreated, { d: currentPlayerData })
+        this.broadcastRoom(gameEvents.playerEnemyCreated, { d: currentPlayerData })
         this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
     }
 
@@ -90,7 +91,7 @@ module.exports = class {
         return setInterval(() => {
             this.hp -= damage
             if (this.hp <= 0) {
-                this.socket.broadcast.emit(gameEvents.playerDie, { d: this.getKillData(this) })
+                this.broadcastRoom(gameEvents.playerDie, { d: this.getKillData(this) })
                 this.socket.emit(gameEvents.getVictimData, { d: this.getVictimData(this) })
             }
 
@@ -118,7 +119,7 @@ module.exports = class {
                 this.playerID
             ]
         }
-        this.socket.broadcast.emit(gameEvents.enemyShoot, sendToOther)
+        this.broadcastRoom(gameEvents.enemyShoot, sendToOther)
     }
 
     checkShootHit(data) {
@@ -140,7 +141,7 @@ module.exports = class {
     hitPlayer(victim, damage) {
         victim.hp -= damage
         if (victim.hp <= 0) {
-            victim.socket.broadcast.emit(gameEvents.playerDie, { d: this.getKillData(victim) })
+            victim.broadcastRoom(gameEvents.playerDie, { d: this.getKillData(victim) })
             victim.socket.emit(gameEvents.getVictimData, { d: this.getVictimData(victim) })
             this.currentRoom.gameWorld.onPlayerKill(this, victim)
         }
@@ -169,7 +170,7 @@ module.exports = class {
         let playerID = jsonData[0]
         let weaponIndex = jsonData[1]
         this.currentEquipment = weaponIndex
-        let sendToOther = this.socket.broadcast.emit(
+        let sendToOther = this.broadcastRoom(
             gameEvents.updateCurrentEquipment,
             { d: this.getCurrentEquipment(this) })
     }
@@ -201,7 +202,7 @@ module.exports = class {
         ]
         this.socket.emit(gameEvents.playerUpdatePosition, { d: sendToPlayer })
 
-        this.socket.broadcast.emit(gameEvents.playerEnemyUpdatePosition, { d: sendToOther })
+        this.broadcastRoom(gameEvents.playerEnemyUpdatePosition, { d: sendToOther })
     }
 
     updateRotationToClient() {
@@ -218,7 +219,7 @@ module.exports = class {
             this.rotation.x,
             this.rotation.y
         ]
-        this.socket.broadcast.emit(gameEvents.playerUpdateRotation, { d: sendToOther })
+        this.broadcastRoom(gameEvents.playerUpdateRotation, { d: sendToOther })
     }
 
     leaveCurrentRoom() {
@@ -227,6 +228,10 @@ module.exports = class {
             this.currentRoom.onUpdateRoomInfo()
             this.currentRoom = null
         }
+    }
+
+    broadcastRoom(event, data) {
+        this.socket.broadcast.to(this.currentRoom.id).emit(event, data)
     }
 
     getAllPlayerSendData(players) {

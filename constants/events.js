@@ -29,5 +29,6 @@ module.exports = {
     "playerDie": "p",
     "updatePlayerKill": "o",
     "getVictimData": "n",
+    "playerLeaveRoom": "m",
     "updateNumberOfAlivePlayer": "e",
 }

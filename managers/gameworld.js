@@ -13,14 +13,17 @@ const GAME_STATE = require('../constants/gamestate')
 const SAFE_AREA_STATE = require('../constants/safestate')
 const DEFAULT_CONFIG = require('../config/gameworld')
 
+const equitmentData = require('../data/equipments')
+const {createWeaponItemList} = require('../utils/createEquitmentItemList')
+
 module.exports = class {
     constructor(io, config) {
         this.io = io
         this.config = config
         this.reset()
-        this.createGameInterval()
-        
-        
+        if(this.io){
+            this.createGameInterval()
+        }        
     }
 
     assignRandomPositions(items, spawnPoints) {
@@ -147,12 +150,8 @@ module.exports = class {
 
     reset() {
         this.players = {}
-        let item = { uid: "", weaponIndex: 1, position: {} }
-        let aSize = new Array(this.config.NumberOfItems)
-        
-        this.itemList = _.map(aSize,()=>{
-            return _.clone(item)
-        })
+        let itemSize = this.config.NumberOfItems
+        let itemList = createWeaponItemList(itemSize, equitmentData)
 
         this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
         /* */

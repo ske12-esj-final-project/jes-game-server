@@ -92,6 +92,7 @@ module.exports = class {
             if (this.hp <= 0) {
                 this.broadcastRoom(gameEvents.playerDie, { d: this.getKillData(this) })
                 this.socket.emit(gameEvents.getVictimData, { d: this.getVictimData(this) })
+                clearInterval(this.damageInterval)
             }
 
             let sendToOther = { "d": [this.playerID, null, this.hp] }

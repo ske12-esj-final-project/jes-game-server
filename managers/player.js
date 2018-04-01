@@ -41,9 +41,9 @@ module.exports = class {
 
     startGame(data) {
         this.position = {
-            x: this.randomInt(-250, 250),
+            x: this.randomInt(-150, 150),
             y: 500,
-            z: this.randomInt(-250, 200)
+            z: this.randomInt(-150, 150)
         }
         this.sendPlayersDataCreateCharacter()
         let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()

@@ -12,7 +12,8 @@ module.exports = {
         "Damage": 25,
         "Capacity": 20,
         "Fire rate": "n/a",
-        "Recoil": "Low"
+        "Recoil": "Low",
+        "weight":20
     },
     2: {
         "Index": 2,
@@ -23,7 +24,8 @@ module.exports = {
         "Damage": 35,
         "Capacity": 15,
         "Fire rate": "n/a",
-        "Recoil": "Medium"
+        "Recoil": "Medium",
+        "weight":30
     },
     3: {
         "Index": 3,
@@ -34,7 +36,8 @@ module.exports = {
         "Damage": 50,
         "Capacity": 6,
         "Fire rate": "n/a",
-        "Recoil": "High"
+        "Recoil": "High",
+        "weight":20
     },
     4: {
         "Index": 4,
@@ -45,7 +48,8 @@ module.exports = {
         "Damage": 120,
         "Capacity": 10,
         "Fire rate": "n/a",
-        "Recoil": "High"
+        "Recoil": "High",
+        "weight":20
     },
     5: {
         "Index": 5,
@@ -56,7 +60,8 @@ module.exports = {
         "Damage": 35,
         "Capacity": 25,
         "Fire rate": 9,
-        "Recoil": "Low"
+        "Recoil": "Low",
+        "weight":20
     },
     6: {
         "Index": 6,
@@ -67,7 +72,8 @@ module.exports = {
         "Damage": 30,
         "Capacity": 30,
         "Fire rate": 15,
-        "Recoil": "High"
+        "Recoil": "High",
+        "weight":20
     },
     7: {
         "Index": 7,
@@ -78,7 +84,8 @@ module.exports = {
         "Damage": 32,
         "Capacity": 30,
         "Fire rate": 12,
-        "Recoil": "Medium"
+        "Recoil": "Medium",
+        "weight":10
     },
     8: {
         "Index": 8,
@@ -89,7 +96,8 @@ module.exports = {
         "Damage": 38,
         "Capacity": 30,
         "Fire rate": 10,
-        "Recoil": "High"
+        "Recoil": "High",
+        "weight":30
     },
     9: {
         "Index": 9,
@@ -100,7 +108,8 @@ module.exports = {
         "Damage": 35,
         "Capacity": 30,
         "Fire rate": 10,
-        "Recoil": "Medium"
+        "Recoil": "Medium",
+        "weight":10
     },
     10: {
         "Index": 10,
@@ -111,6 +120,7 @@ module.exports = {
         "Damage": 100,
         "Capacity": 6,
         "Fire rate": "n/a",
-        "Recoil": "High"
+        "Recoil": "High",
+        "weight":10
     }
 }

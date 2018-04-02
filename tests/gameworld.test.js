@@ -130,7 +130,7 @@ describe('Gameworld', () => {
         it('should set equipments back to default', () => {
             let expectedItemList = gameWorld.itemList
             gameWorld.reset()
-            expect(gameWorld.itemList).to.deep.equal(expectedItemList)
+            expect(_.size(gameWorld.itemList)).to.equal(_.size(expectedItemList))
         })
 
         it('should reset duration back', () => {

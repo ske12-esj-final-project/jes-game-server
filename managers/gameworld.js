@@ -14,16 +14,16 @@ const SAFE_AREA_STATE = require('../constants/safestate')
 const DEFAULT_CONFIG = require('../config/gameworld')
 
 const equitmentData = require('../data/equipments')
-const {createWeaponItemList} = require('../utils/createEquitmentItemList')
+const { createWeaponItemList } = require('../utils/createEquitmentItemList')
 
 module.exports = class {
     constructor(io, config) {
         this.io = io
         this.config = config
         this.reset()
-        if(this.io){
+        if (this.io) {
             this.createGameInterval()
-        }        
+        }
     }
 
     assignRandomPositions(items, spawnPoints) {
@@ -156,8 +156,10 @@ module.exports = class {
         this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
         /* */
         // weaponIndex 10 is sniper
-        let easterItem = { uid: shortid.generate(), weaponIndex: 10, position: 
-        {"x":-81.63,"y":41.25,"z":-165.34} }
+        let easterItem = {
+            uid: shortid.generate(), weaponIndex: 10, position:
+                { "x": -81.63, "y": 41.25, "z": -165.34 }
+        }
         /* */
         this.equipments.push(easterItem)
         this.safeArea = new SafeArea()

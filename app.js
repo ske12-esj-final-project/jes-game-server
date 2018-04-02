@@ -27,7 +27,8 @@ io.on('connection', (socket) => {
     socket.playerID = shortid.generate()
 
     socket.on('disconnecting', () => {
-        GameManager.getPlayer(socket.playerID).leaveCurrentRoom()
+        let player = GameManager.getPlayer(socket.playerID)
+        if (player) player.leaveCurrentRoom()
     })
 
     socket.on('disconnect', () => {

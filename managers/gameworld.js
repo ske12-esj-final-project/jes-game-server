@@ -150,6 +150,7 @@ module.exports = class {
 
     reset() {
         this.players = {}
+        this.playerReadyCounter = 0
         let itemSize = this.config.NumberOfItems
         this.itemList = createWeaponItemList(itemSize, equitmentData)
 

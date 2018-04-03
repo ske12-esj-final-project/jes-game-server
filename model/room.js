@@ -61,6 +61,15 @@ module.exports = class {
         }, this.gameWorld.config.countdownInterval)
     }
 
+    onPlayerInRoomLoadFinnish() {
+        // playerLoadFinish
+        let NumberOfPlayer = _.size(this.gameWorld.players)
+        this.gameWorld.playerReadyCounter++
+        if (this.gameWorld.playerReadyCounter >= NumberOfPlayer) {
+            this.gameWorld.io.emit(gameEvents.playerLoadFinish, { d: 1 })
+        }
+    }
+
     prepareStartGame() {
         clearInterval(this.countdownInterval)
         this.gameWorld.io.emit(gameEvents.finishCountdown)

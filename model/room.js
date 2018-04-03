@@ -13,7 +13,7 @@ module.exports = class {
         this.io = io
         this.name = name
         this.id = id
-        this.gameWorld = new GameWorld(this.io.to(this.id), DEFAULT_CONFIG)
+        this.gameWorld = new GameWorld(this.io, DEFAULT_CONFIG,this.id)
     }
 
     addPlayer(player) {

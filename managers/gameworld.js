@@ -17,9 +17,10 @@ const equitmentData = require('../data/equipments')
 const { createWeaponItemList } = require('../utils/createEquitmentItemList')
 
 module.exports = class {
-    constructor(io, config) {
+    constructor(io, config,roomID) {
         this.io = io
         this.config = config
+        this.roomID = roomID
         this.reset()
         if (this.io) {
             this.createGameInterval()
@@ -41,7 +42,7 @@ module.exports = class {
     }
 
     sendRemoveWeapon(weaponID) {
-        this.io.emit(gameEvents.getEquipment, { d: [weaponID] })
+        this.io.to(this.roomID).emit(gameEvents.getEquipment, { d: [weaponID] })
     }
 
     createGameInterval() {
@@ -102,11 +103,11 @@ module.exports = class {
 
     onWarningSafeArea() {
         this.calculateSafeArea()
-        this.io.emit(gameEvents.warnSafeArea, { d: this.safeArea.position })
+        this.io.to(this.roomID).emit(gameEvents.warnSafeArea, { d: this.safeArea.position })
     }
 
     onMoveSafeArea() {
-        this.io.emit(gameEvents.moveSafeArea, { d: this.safeArea.getSendData() })
+        this.io.to(this.roomID).emit(gameEvents.moveSafeArea, { d: this.safeArea.getSendData() })
 
         setTimeout(() => {
             this.safeArea.setState(SAFE_AREA_STATE.WAITING)
@@ -119,7 +120,7 @@ module.exports = class {
             return value['hp'] > 0
         })
         let aliveNumber = _.size(alivePlayers) || 0
-        this.io.emit(gameEvents.updateNumberOfAlivePlayer, { "d": [aliveNumber] })
+        this.io.to(this.roomID).emit(gameEvents.updateNumberOfAlivePlayer, { "d": [aliveNumber] })
     }
 
     onPlayerKill(player, victim) {

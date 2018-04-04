@@ -125,7 +125,7 @@ module.exports = class {
         if (aliveNumber == 1 && this.isInGame()) {
             this.setState(GAME_STATE.END)
             let winner = Object.values(alivePlayers)[0]
-            winner.socket.emit(gameEvents.playerWin, { d: [ winner.numberOfKill ] })
+            winner.socket.emit(gameEvents.playerWin, { d: [ winner.username, winner.numberOfKill ] })
         }
     }
 

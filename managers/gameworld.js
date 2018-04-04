@@ -124,7 +124,7 @@ module.exports = class {
         this.io.to(this.roomID).emit(gameEvents.updateNumberOfAlivePlayer, { "d": [aliveNumber] })
         if (aliveNumber == 1 && this.isInGame()) {
             this.setState(GAME_STATE.END)
-            let winner = alivePlayers[0]
+            let winner = Object.values(alivePlayers)[0]
             winner.socket.emit(gameEvents.playerWin, { d: [ winner.numberOfKill ] })
         }
     }

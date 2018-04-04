@@ -119,8 +119,14 @@ module.exports = class {
         let alivePlayers = _.pickBy(this.players, (value, playerId) => {
             return value['hp'] > 0
         })
+
         let aliveNumber = _.size(alivePlayers) || 0
         this.io.to(this.roomID).emit(gameEvents.updateNumberOfAlivePlayer, { "d": [aliveNumber] })
+        if (aliveNumber == 1 && this.isInGame()) {
+            this.setState(GAME_STATE.END)
+            let winner = alivePlayers[0]
+            winner.socket.emit(gameEvents.playerWin, { d: [ winner.numberOfKill ] })
+        }
     }
 
     onPlayerKill(player, victim) {
@@ -208,5 +214,9 @@ module.exports = class {
 
     isInGame() {
         return this.currentState === GAME_STATE.INGAME
+    }
+
+    isEnd() {
+        return this.currentState === GAME_STATE.END
     }
 }

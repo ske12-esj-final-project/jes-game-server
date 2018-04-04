@@ -160,7 +160,7 @@ module.exports = class {
             return value['hp'] > 0
         })
 
-        let aliveNumber = _.size(this.currentRoom.getPlayers()) + 1 || 0
+        let aliveNumber = _.size(alivePlayers) + 1 || 0
         return [victim.username, aliveNumber, victim.numberOfKill, 0]
     }
 
@@ -226,6 +226,7 @@ module.exports = class {
         if (this.currentRoom) {
             this.currentRoom.removePlayer(this.playerID)
             this.currentRoom.onUpdateRoomInfo()
+            this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
             this.currentRoom = null
         }
     }

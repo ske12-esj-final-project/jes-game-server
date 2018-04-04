@@ -31,5 +31,6 @@ module.exports = {
     "getVictimData": "n",
     "playerLeaveRoom": "m",
     "updateNumberOfAlivePlayer": "e",
-    "playerLoadFinish": "l"
+    "playerLoadFinish": "l",
+    "playerWin": "k"
 }

@@ -13,7 +13,7 @@ module.exports = class {
         this.io = io
         this.name = name
         this.id = id
-        this.gameWorld = new GameWorld(this.io.to(this.id), DEFAULT_CONFIG)
+        this.gameWorld = new GameWorld(this.io, DEFAULT_CONFIG,this.id)
     }
 
     addPlayer(player) {
@@ -59,6 +59,15 @@ module.exports = class {
             this.gameWorld.io.emit(gameEvents.countdown, { d: [timeLeft] })
             if (timeLeft <= 0) this.prepareStartGame()
         }, this.gameWorld.config.countdownInterval)
+    }
+
+    onPlayerInRoomLoadFinnish() {
+        // playerLoadFinish
+        let NumberOfPlayer = _.size(this.gameWorld.players)
+        this.gameWorld.playerReadyCounter++
+        if (this.gameWorld.playerReadyCounter >= NumberOfPlayer) {
+            this.gameWorld.io.emit(gameEvents.playerLoadFinish, { d: 1 })
+        }
     }
 
     prepareStartGame() {

@@ -33,8 +33,6 @@ module.exports = class {
     }
 
     setupPlayer(data) {
-        data['d'] = data['d'].replace(/@/g, "\"")
-        let jsonData = JSON.parse(data["d"])
         this.position = { x: 0, y: 0, z: 0 }
         this.sendPlayersDataCreateCharacter()
     }
@@ -225,6 +223,7 @@ module.exports = class {
     leaveCurrentRoom() {
         if (this.currentRoom) {
             this.currentRoom.removePlayer(this.playerID)
+            this.socket.leave(this.currentRoom.id)
             this.currentRoom.onUpdateRoomInfo()
             this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
             this.currentRoom = null

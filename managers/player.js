@@ -222,10 +222,10 @@ module.exports = class {
 
     leaveCurrentRoom() {
         if (this.currentRoom) {
-            this.currentRoom.removePlayer(this.playerID)
-            this.socket.leave(this.currentRoom.id)
             this.currentRoom.onUpdateRoomInfo()
             this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
+            this.currentRoom.removePlayer(this.playerID)
+            this.socket.leave(this.currentRoom.id)
             this.currentRoom = null
         }
     }

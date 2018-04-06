@@ -51,6 +51,7 @@ module.exports = class {
     }
 
     addPlayerToRoom(player, room, roomID) {
+        if (!player) return
         player.currentRoom = room
         room.addPlayer(player)
         this.socket.join(roomID)

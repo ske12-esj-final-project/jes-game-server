@@ -14,7 +14,7 @@ const SAFE_AREA_STATE = require('../constants/safestate')
 const DEFAULT_CONFIG = require('../config/gameworld')
 
 const equitmentData = require('../data/equipments')
-const { createWeaponItemList ,assignRandomPositions} = require('../utils/createEquitmentItemList')
+const { createWeaponItemList ,assignRandomPositions,createBulletList} = require('../utils/createEquitmentItemList')
 
 module.exports = class {
     constructor(io, config, roomID) {

@@ -154,12 +154,8 @@ module.exports = class {
     }
 
     getVictimData(victim) {
-        let alivePlayers = _.pickBy(this.currentRoom.getPlayers(), (value, playerId) => {
-            return value['hp'] > 0
-        })
-
-        let aliveNumber = _.size(alivePlayers) + 1 || 0
-        return [victim.username, aliveNumber, victim.numberOfKill, 0]
+        let aliveNumber = victim.currentRoom.gameWorld.getNumberOfAlivePlayers()
+        return [victim.username, aliveNumber, victim.numberOfKill, this.calculateScore(victim)]
     }
 
     updateCurrentEquipment(data) {
@@ -228,6 +224,11 @@ module.exports = class {
             this.socket.leave(this.currentRoom.id)
             this.currentRoom = null
         }
+    }
+
+    calculateScore(player) {
+        let world = player.currentRoom.gameWorld
+        return (50 * player.numberOfKill) + 10 * (world.getMaxPlayers() - world.getNumberOfAlivePlayers())
     }
 
     broadcastRoom(event, data) {

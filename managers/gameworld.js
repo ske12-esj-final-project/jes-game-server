@@ -17,7 +17,7 @@ const equitmentData = require('../data/equipments')
 const { createWeaponItemList } = require('../utils/createEquitmentItemList')
 
 module.exports = class {
-    constructor(io, config,roomID) {
+    constructor(io, config, roomID) {
         this.io = io
         this.config = config
         this.roomID = roomID
@@ -116,17 +116,25 @@ module.exports = class {
     }
 
     updateNumberOfAlivePlayer() {
-        let alivePlayers = _.pickBy(this.players, (value, playerId) => {
-            return value['hp'] > 0
-        })
-
+        let alivePlayers = this.getAlivePlayers()
         let aliveNumber = _.size(alivePlayers) || 0
+
         this.io.to(this.roomID).emit(gameEvents.updateNumberOfAlivePlayer, { "d": [aliveNumber] })
         if (aliveNumber == 1 && this.isInGame()) {
             this.setState(GAME_STATE.END)
             let winner = Object.values(alivePlayers)[0]
-            winner.socket.emit(gameEvents.playerWin, { d: [ winner.username, winner.numberOfKill ] })
+            winner.socket.emit(gameEvents.playerWin, { d: [winner.username, winner.numberOfKill] })
         }
+    }
+
+    getAlivePlayers() {
+        return _.pickBy(this.players, (value, playerId) => {
+            return value['hp'] > 0
+        })
+    }
+
+    getNumberOfAlivePlayers() {
+        return _.size(this.getAlivePlayers()) || 0
     }
 
     onPlayerKill(player, victim) {

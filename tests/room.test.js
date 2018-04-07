@@ -62,7 +62,10 @@ describe('Room model', () => {
 
     describe('onUpdateRoomInfo', () => {
         it('should call when someone leaves room', () => {
-            let player = new Player(null, 'player', 'Player')
+            let socket = {}
+            socket.on = () => { return }
+            socket.leave = () => { return }
+            let player = new Player(socket, 'player', 'Player')
 
             room = new Room(io, 'Test Room', 'test')
             player.currentRoom = room

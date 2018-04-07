@@ -34,6 +34,44 @@ const createWeaponItemList = (numberOfItem, itemData) => {
         ({ uid: shortid.generate(), weaponIndex: m.Index, position: {} }))
 }
 
+const assignRandomPositions = (items, spawnPoints) =>{
+    items = items.map(i => _.clone(i))
+    let t_points = spawnPoints.map(i => _.clone(i))
+
+    return items.map((item) => {
+        let index = getRandomInt(t_points.length)
+        item.position = _.clone(t_points[index])
+        item.uid = shortid.generate()
+        let o = t_points[index]
+        t_points = _.filter(t_points, target => target !== o)
+        return item
+    })
+}
+const createBulletList = (equitments)=>{
+    return _.map(equitments,e=>{
+        let {x,y,z} = e.position
+        // console.log(x,y)
+        const getRandomVal = (n)=>{
+            const fixed2Dec = (n)=> Math.round(n * 100)/100;
+            const range = fixed2Dec(getRandomInt(2)*.1)
+            const rand_sign = getRandomInt(2)?1:-1
+            return  fixed2Dec(n+ (rand_sign*range))
+        }
+        y = getRandomVal(y)
+        x = getRandomVal(x)
+        z = getRandomVal(x)
+        
+        return {
+            uid:shortid.generate(),
+            x:x,
+            y:y,
+            z:z
+        }
+    })
+}
+
 module.exports = {
-    createWeaponItemList
+    createWeaponItemList,
+    assignRandomPositions,
+    createBulletList
 }

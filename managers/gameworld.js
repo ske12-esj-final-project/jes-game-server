@@ -14,7 +14,7 @@ const SAFE_AREA_STATE = require('../constants/safestate')
 const DEFAULT_CONFIG = require('../config/gameworld')
 
 const equitmentData = require('../data/equipments')
-const { createWeaponItemList } = require('../utils/createEquitmentItemList')
+const { createWeaponItemList ,assignRandomPositions} = require('../utils/createEquitmentItemList')
 
 module.exports = class {
     constructor(io, config, roomID) {
@@ -27,19 +27,6 @@ module.exports = class {
         }
     }
 
-    assignRandomPositions(items, spawnPoints) {
-        items = items.map(i => _.clone(i))
-        let t_points = spawnPoints.map(i => _.clone(i))
-
-        return items.map((item) => {
-            let index = Utils.getRandomInt(t_points.length)
-            item.position = _.clone(t_points[index])
-            item.uid = shortid.generate()
-            let o = t_points[index]
-            t_points = _.filter(t_points, target => target !== o)
-            return item
-        })
-    }
 
     sendRemoveWeapon(weaponID) {
         this.io.to(this.roomID).emit(gameEvents.getEquipment, { d: [weaponID] })
@@ -153,7 +140,12 @@ module.exports = class {
         //         console.error(err)
         //     })
     }
-
+    getUpdateBulletInMap(){
+        let sendData = []
+        _.map(this.bulletList,bullet=>{
+            let data = [bullet.uid,bullet.x,bullet.y,bullet.z]
+        })
+    }
     getUpdateWeaponInMap() {
         let sendData = []
         _.map(this.equipments, item => {
@@ -169,7 +161,9 @@ module.exports = class {
         let itemSize = this.config.NumberOfItems
         this.itemList = createWeaponItemList(itemSize, equitmentData)
 
-        this.equipments = this.assignRandomPositions(this.itemList, SPAWNPOINTS)
+        this.equipments = assignRandomPositions(this.itemList, SPAWNPOINTS)
+
+        this.bulletList = createBulletList(this.equipments)
         /* */
         // weaponIndex 10 is sniper
         let easterItem = {

@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = require('../config/gameworld')
 const API = require('../constants/api')
 const GAME_STATE = require('../constants/gamestate')
 const SAFE_AREA_STATE = require('../constants/safestate')
-
+const {assignRandomPositions} = require('../utils/createEquitmentItemList')
 chai.use(require('sinon-chai'))
 
 let options = {
@@ -49,7 +49,7 @@ describe('Gameworld', () => {
                 items.push(t)
             }
 
-            let resultList = gameWorld.assignRandomPositions(items, spawnPoints)
+            let resultList = assignRandomPositions(items, spawnPoints)
             let setResult = {}
             _.map(resultList, (item) => {
                 _.set(setResult, JSON.stringify(item.position), {})

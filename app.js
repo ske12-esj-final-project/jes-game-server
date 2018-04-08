@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
         if (player) player.leaveCurrentRoom()
         roomManager.onPlayerDisconnect()
         io.emit(gameEvents.playerDisconnect, { d: socket.playerID })
-        console.log('remain # players',_.size(GameManager.getPlayers()))
+        console.log('remain # players', _.size(GameManager.getPlayers()))
     })
 })
 
@@ -103,5 +103,15 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '/index.html'))
 })
 
+
+app.get('/p', (req, res) => {
+    let ps = _.map(GameManager.getPlayers(), p => {
+        return {
+            "userID": p.userID,
+            "username": p.username
+        }
+    })
+    res.send(JSON.parse(ps))
+})
 
 module.exports = server

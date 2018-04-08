@@ -45,7 +45,7 @@ module.exports = class {
         let jsonData = JSON.parse(data["d"])
         const acessToken = jsonData[1]
         const username = jsonData[0]
-
+        const playerID = this.socket.playerID
 
 
 
@@ -66,7 +66,6 @@ module.exports = class {
             }
 
             this.socket.token = acessToken
-            let playerID = this.socket.playerID
             let player = new Player(this.socket, playerID, username)
             GameManager.addPlayer(playerID, player)
         })

@@ -86,10 +86,10 @@ app.post('/login', (req, res) => {
 
             let err = checkUserID(userID)
             if (err) {
-                return res.status(500).send({ message: err.message })
+                res.status(500).send({ message: err.message })
             }
 
-            return res.send({ auth: true, token: token })
+            res.send({ auth: true, token: token })
         })
     }).catch(err => {
         console.log('error', err)

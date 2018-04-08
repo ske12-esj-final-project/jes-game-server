@@ -69,30 +69,34 @@ const checkUserID = (userID) => {
     return null
 }
 app.post('/login', (req, res) => {
-    console.log('login',req.body.username)
+    console.log('login', req.body.username)
     let token = ""
 
     let payload = {
         username: req.body.username,
         password: req.body.password,
     }
-    axios.post(API.USER + "/login",payload).then(login_response => {
+    axios.post(API.USER + "/login", payload).then(login_response => {
         token = login_response.data.token
-        console.log('token',token)
-        axios.get(API.USER + '/me', {
+        console.log('token', token)
+        return token
+    }).then(token => {
+        return axios.get(API.USER + '/me', {
             "headers": { "access-token": token }
         }).then((me_response) => {
             let userID = me_response.data.id
-            
+
             let err = checkUserID(userID)
-            if (err){
-                res.status(500).send({message:err.message})
+            if (err) {
+                res.status(500).send({ message: err.message })
             }
 
-            res.send({auth:true,token:token}) 
+            res.send({ auth: true, token: token })
+        }).catch(err=>{
+            return err
         })
     }).catch(err => {
-        console.log('error',err)
+        console.log('error', err)
         res.status(500).send(err)
     })
 })

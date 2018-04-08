@@ -59,13 +59,13 @@ module.exports = class {
             player.username = res.data.username
 
             let err = this.checkUserID(userID)
-            console.log('onPlayerConnect-', userID, new Date())
+            console.log(err)
             if (err) {
                 console.log('err', err.message)
                 this.socket.emit("loginError", { message: err.message })
                 return
             }
-
+            console.log('onPlayerConnect-', userID, new Date())
             GameManager.addPlayer(playerID, player)
         })
     }

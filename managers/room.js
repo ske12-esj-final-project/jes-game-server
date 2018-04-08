@@ -115,6 +115,7 @@ module.exports = class {
     }
 
     onPlayerDisconnect() {
+        console.log('playerid discon',this.socket.playerID)
         _.unset(GameManager.getPlayers(), this.socket.playerID)
         console.log('onDisconect #player',_.size(GameManager.getPlayers()))
     }

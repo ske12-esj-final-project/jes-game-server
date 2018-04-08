@@ -108,7 +108,8 @@ app.get('/p', (req, res) => {
     let ps = _.map(GameManager.getPlayers(), p => {
         return {
             "userID": p.userID,
-            "username": p.username
+            "username": p.username,
+            "playerID":p.playerID
         }
     })
     res.json(ps)

@@ -90,7 +90,8 @@ module.exports = class {
 
     onWarningSafeArea() {
         this.calculateSafeArea()
-        this.io.to(this.roomID).emit(gameEvents.warnSafeArea, { d: this.safeArea.position })
+        let sendData = [this.safeArea.position.x,this.safeArea.position.y,this.safeArea.position.z]
+        this.io.to(this.roomID).emit(gameEvents.warnSafeArea, { d:  sendData})
     }
 
     onMoveSafeArea() {

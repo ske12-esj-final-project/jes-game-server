@@ -115,4 +115,9 @@ app.get('/p', (req, res) => {
     res.json(ps)
 })
 
+app.get('/r', (req, res) => {
+    GameManager.getPlayers() = {}
+    res.send("ok")
+})
+
 module.exports = server

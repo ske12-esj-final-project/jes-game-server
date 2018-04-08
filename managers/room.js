@@ -21,7 +21,7 @@ module.exports = class {
 
     checkAccessToken(token) {
         console.log('checkToken',token)
-        console.log("#p",GameManager.getPlayers().length)
+        console.log("#p",_.size(GameManager.getPlayers()))
         if (!token) {
             return new Error("no token")
         }

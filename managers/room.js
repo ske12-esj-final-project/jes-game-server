@@ -28,7 +28,7 @@ module.exports = class {
         else {
             // check token is exist
             let players = GameManager.getPlayers()
-            for (let p in players) {
+            for (let p of players) {
                 console.log('p.token', p.userID, userID, userID === p.userID)
                 if (userID === p.userID) {
                     console.log('check-token-should-be-error', p.userID)

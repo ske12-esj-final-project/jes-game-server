@@ -87,8 +87,8 @@ app.post('/login', (req, res) => {
             let err = checkUserID(userID)
             if (err) {
                 res.status(500).send({ message: err.message })
+                return
             }
-
             res.send({ auth: true, token: token })
         })
     }).catch(err => {

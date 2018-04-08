@@ -40,6 +40,7 @@ io.on('connection', (socket) => {
         if (player) player.leaveCurrentRoom()
         roomManager.onPlayerDisconnect()
         io.emit(gameEvents.playerDisconnect, { d: socket.playerID })
+        console.log('remain # players',_.size(GameManager.getPlayers()))
     })
 })
 

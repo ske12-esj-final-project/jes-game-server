@@ -23,7 +23,7 @@ module.exports = class {
         console.log('checkuserID', userID)
         console.log("#p", _.size(GameManager.getPlayers()))
         if (!userID) {
-            return new Error("no userID")
+            return {message:"no userID"}
         }
         else {
             // check token is exist
@@ -32,7 +32,7 @@ module.exports = class {
                 console.log('p.token', p.userID, userID, userID === p.userID)
                 if (p.userID === userID) {
                     console.log('check-token-should-be-error', p.userID)
-                    return new Error("userID is existed")
+                    return {message:"userID is existed"}
                 }
             })
 

@@ -28,6 +28,7 @@ module.exports = class {
             let players = GameManager.getPlayers()
             _.map(players, p => {
                 if (p.socket.token === token) {
+                    console.log('check-token',p.socket.token)
                     return new Error("token is existed")
                 }
             })

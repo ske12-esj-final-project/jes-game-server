@@ -46,7 +46,7 @@ module.exports = class {
         const acessToken = jsonData[1]
         const username = jsonData[0]
         const playerID = this.socket.playerID
-
+        this.socket.token = acessToken
 
 
         axios.get(API.USER + '/me', {
@@ -54,6 +54,7 @@ module.exports = class {
         }).then((res) => {
             this.socket.emit(gameEvents.playerJoinGame, { d: [playerID] })
             let userID = res.data.id
+            let player = new Player(this.socket, playerID, username)
             player.userID = userID
             player.username = res.data.username
 
@@ -65,8 +66,6 @@ module.exports = class {
                 return
             }
 
-            this.socket.token = acessToken
-            let player = new Player(this.socket, playerID, username)
             GameManager.addPlayer(playerID, player)
         })
     }

@@ -20,18 +20,18 @@ module.exports = class {
     }
 
     checkAccessToken(token) {
-        console.log('checkToken',token)
-        console.log("#p",_.size(GameManager.getPlayers()))
+        console.log('checkToken', token)
+        console.log("#p", _.size(GameManager.getPlayers()))
         if (!token) {
             return new Error("no token")
         }
-        else{
+        else {
             // check token is exist
             let players = GameManager.getPlayers()
             _.map(players, p => {
-                console.log('p.token',p.socket.token,token,token==p.socket.token)
+                console.log('p.token', p.socket.token, token, token == p.socket.token)
                 if (p.socket.token === token) {
-                    console.log('check-token',p.socket.token)
+                    console.log('check-token', p.socket.token)
                     return new Error("token is existed")
                 }
             })
@@ -45,22 +45,22 @@ module.exports = class {
         let jsonData = JSON.parse(data["d"])
         const acessToken = jsonData[1]
         let err = this.checkAccessToken(acessToken)
-        console.log('onPlayerConnect-',acessToken,new Date())
+        console.log('onPlayerConnect-', acessToken, new Date())
 
         if (err) {
-            console.log('err',err.message)
-            this.socket.emit("loginError",{message:err.message})
+            console.log('err', err.message)
+            this.socket.emit("loginError", { message: err.message })
             return
         }
 
         this.socket.token = acessToken
+        const username = jsonData[0]
+        let playerID = this.socket.playerID
+        let player = new Player(this.socket, playerID, username)
+        GameManager.addPlayer(playerID, player)
         axios.get(API.USER + '/me', {
             "headers": { "access-token": acessToken }
         }).then((res) => {
-            const username = jsonData[0]
-            let playerID = this.socket.playerID
-            let player = new Player(this.socket, playerID, username)
-            GameManager.addPlayer(playerID, player)
             this.socket.emit(gameEvents.playerJoinGame, { d: [playerID] })
 
             player.userID = res.data.id

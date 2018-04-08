@@ -69,7 +69,6 @@ const checkUserID = (userID) => {
     return null
 }
 app.post('/login', (req, res) => {
-    console.log('login', req.body.username)
     let token = ""
 
     let payload = {
@@ -78,22 +77,19 @@ app.post('/login', (req, res) => {
     }
     axios.post(API.USER + "/login", payload).then(login_response => {
         token = login_response.data.token
-        console.log('token', token)
         return token
     }).then(token => {
-        return axios.get(API.USER + '/me', {
+        axios.get(API.USER + '/me', {
             "headers": { "access-token": token }
         }).then((me_response) => {
             let userID = me_response.data.id
 
             let err = checkUserID(userID)
             if (err) {
-                res.status(500).send({ message: err.message })
+                return res.status(500).send({ message: err.message })
             }
 
-            res.send({ auth: true, token: token })
-        }).catch(err=>{
-            res.status(500).send(err)
+            return res.send({ auth: true, token: token })
         })
     }).catch(err => {
         console.log('error', err)

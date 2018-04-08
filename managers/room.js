@@ -19,25 +19,6 @@ module.exports = class {
         socket.on(gameEvents.updateRoom, this.onUpdateRoomInfo.bind(this))
     }
 
-    checkUserID(userID) {
-        console.log('checkuserID', userID)
-        console.log("#p", _.size(GameManager.getPlayers()))
-        if (!userID) {
-            return new Error("no userID")
-        }
-        else {
-            // check token is exist
-            let players = GameManager.getPlayers()
-            for (let key in players) {
-                let p = players[key]
-                if (userID === p.userID) {
-                    return new Error("userID is exited")
-                }
-            }
-
-        }
-        return null
-    }
 
     onPlayerConnect(data) {
         data['d'] = data['d'].replace(/@/g, "\"")

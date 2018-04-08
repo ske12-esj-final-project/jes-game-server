@@ -20,10 +20,11 @@ module.exports = class {
     }
 
     checkAccessToken(token) {
+        console.log('checkToken',token)
         if (!token) {
             return new Error("no token")
         }
-        if (token) {
+        else{
             // check token is exist
             let players = GameManager.getPlayers()
             _.map(players, p => {
@@ -41,16 +42,16 @@ module.exports = class {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
         const acessToken = jsonData[1]
-        this.socket.token = acessToken
-        
         let err = this.checkAccessToken(acessToken)
         console.log('onPlayerConnect-',acessToken,new Date())
+
         if (err) {
             console.log('err',err.message)
             this.socket.emit("loginError",{message:err.message})
             return
         }
 
+        this.socket.token = acessToken
         axios.get(API.USER + '/me', {
             "headers": { "access-token": acessToken }
         }).then((res) => {

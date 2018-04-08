@@ -111,7 +111,7 @@ app.get('/p', (req, res) => {
             "username": p.username
         }
     })
-    res.send(JSON.parse(ps))
+    res.send(ps)
 })
 
 module.exports = server

@@ -46,6 +46,8 @@ module.exports = class {
         const username = jsonData[0]
         const playerID = this.socket.playerID
         this.socket.token = acessToken
+        let player = new Player(this.socket, playerID, username)
+        GameManager.addPlayer(playerID, player)
 
 
         axios.get(API.USER + '/me', {
@@ -53,19 +55,11 @@ module.exports = class {
         }).then((res) => {
             this.socket.emit(gameEvents.playerJoinGame, { d: [playerID] })
             let userID = res.data.id
-            let player = new Player(this.socket, playerID, username)
             player.userID = userID
             player.username = res.data.username
 
-            let err = this.checkUserID(userID)
-            console.log(err)
-            if (err) {
-                console.log('err', err.message)
-                this.socket.emit("loginError", { message: err.message })
-                return
-            }
+            this.socket.userID = userID
             console.log('onPlayerConnect - ', userID, new Date())
-            GameManager.addPlayer(playerID, player)
         })
     }
 
@@ -121,7 +115,7 @@ module.exports = class {
     }
 
     onPlayerDisconnect() {
-        _.unset(GameManager.getPlayers(),this.socket.playerID)
+        _.unset(GameManager.getPlayers(), player => player.userID === this.socket.userID)
         console.log('onDisconect #player',_.size(GameManager.getPlayers()))
     }
 }

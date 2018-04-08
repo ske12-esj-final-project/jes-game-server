@@ -19,18 +19,43 @@ module.exports = class {
         socket.on(gameEvents.updateRoom, this.onUpdateRoomInfo.bind(this))
     }
 
+    checkAccessToken(token) {
+        if (!token) {
+            return new Error("no token")
+        }
+        if (token) {
+            // check token is exist
+            let players = GameManager.getPlayers()
+            _.map(players, p => {
+                if (p.socket.token === token) {
+                    return new Error("token is existed")
+                }
+            })
+
+        }
+        return
+    }
+
     onPlayerConnect(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
-        let username = jsonData[0]
-        this.socket.token = jsonData[1]
-        let playerID = this.socket.playerID
-        let player = new Player(this.socket, playerID, username)
-        GameManager.addPlayer(playerID, player)
-        this.socket.emit(gameEvents.playerJoinGame, { d: [playerID] })
+        const acessToken = jsonData[1]
+        this.socket.token = acessToken
+        
+        let err = this.checkAccessToken(acessToken)
+        if (err) {
+            this.socket.emit("loginError",{message:err.message})
+        }
+
         axios.get(API.USER + '/me', {
-            "headers": { "access-token": this.socket.token }
+            "headers": { "access-token": acessToken }
         }).then((res) => {
+            const username = jsonData[0]
+            let playerID = this.socket.playerID
+            let player = new Player(this.socket, playerID, username)
+            GameManager.addPlayer(playerID, player)
+            this.socket.emit(gameEvents.playerJoinGame, { d: [playerID] })
+
             player.userID = res.data.id
             player.username = res.data.username
         })

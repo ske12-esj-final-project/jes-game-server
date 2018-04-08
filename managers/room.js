@@ -30,9 +30,7 @@ module.exports = class {
             let players = GameManager.getPlayers()
             for (let key in players) {
                 let p = players[key]
-                console.log('p.token', p.userID, userID, userID === p.userID,p)
                 if (userID === p.userID) {
-                    console.log('check-token-should-be-error', p.userID)
                     return new Error("userID is exited")
                 }
             }
@@ -66,7 +64,7 @@ module.exports = class {
                 this.socket.emit("loginError", { message: err.message })
                 return
             }
-            console.log('onPlayerConnect-', userID, new Date())
+            console.log('onPlayerConnect - ', userID, new Date())
             GameManager.addPlayer(playerID, player)
         })
     }

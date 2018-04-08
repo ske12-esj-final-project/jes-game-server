@@ -28,12 +28,13 @@ module.exports = class {
         else {
             // check token is exist
             let players = GameManager.getPlayers()
-            for (let p in players) {
+            for (let key in players) {
+                let p = players[key]
                 console.log('p.token', p.userID, userID, userID === p.userID,p)
-                // if (userID === p.userID) {
-                //     console.log('check-token-should-be-error', p.userID)
-                //     return new Error("userID is exited")
-                // }
+                if (userID === p.userID) {
+                    console.log('check-token-should-be-error', p.userID)
+                    return new Error("userID is exited")
+                }
             }
 
         }

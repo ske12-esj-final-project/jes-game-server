@@ -93,7 +93,7 @@ app.post('/login', (req, res) => {
 
             res.send({ auth: true, token: token })
         }).catch(err=>{
-            return err
+            res.status(500).send(err)
         })
     }).catch(err => {
         console.log('error', err)

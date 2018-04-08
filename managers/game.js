@@ -13,6 +13,10 @@ module.exports = {
         return instance
     },
 
+    resetPlayer(){
+        instance.players = {}
+    },
+
     getRooms() {
         return this.getInstance().rooms
     },

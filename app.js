@@ -116,7 +116,7 @@ app.get('/p', (req, res) => {
 })
 
 app.get('/r', (req, res) => {
-    GameManager.getPlayers() = {}
+    GameManager.resetPlayer()
     res.send("ok")
 })
 

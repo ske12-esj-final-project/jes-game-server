@@ -33,7 +33,7 @@ jobs:
         
       # run tests!
       - run: yarn
-      - run: yarn test
+      # - run: yarn test
       - run: echo $KNOWN_HOST>> ~/.ssh/known_hosts
       - run:
           name: Deploy to Server

@@ -122,5 +122,6 @@ module.exports = class {
 
     onPlayerDisconnect() {
         _.remove(GameManager.getPlayers(), player => player.playerID === this.socket.playerID)
+        console.log('onDisconect #player',_.size(GameManager.getPlayers()))
     }
 }

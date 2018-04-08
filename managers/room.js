@@ -45,6 +45,7 @@ module.exports = class {
         let err = this.checkAccessToken(acessToken)
         if (err) {
             this.socket.emit("loginError",{message:err.message})
+            return
         }
 
         axios.get(API.USER + '/me', {

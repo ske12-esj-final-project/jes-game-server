@@ -43,7 +43,9 @@ module.exports = class {
         this.socket.token = acessToken
         
         let err = this.checkAccessToken(acessToken)
+        console.log('onPlayerConnect-',acessToken,new Date())
         if (err) {
+            console.log('err',err.message)
             this.socket.emit("loginError",{message:err.message})
             return
         }

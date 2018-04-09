@@ -14,7 +14,7 @@ const SAFE_AREA_STATE = require('../constants/safestate')
 const DEFAULT_CONFIG = require('../config/gameworld')
 
 const equitmentData = require('../data/equipments')
-const { createWeaponItemList ,assignRandomPositions,createBulletList} = require('../utils/createEquitmentItemList')
+const { createWeaponItemList, assignRandomPositions, createBulletList } = require('../utils/createEquitmentItemList')
 
 module.exports = class {
     constructor(io, config, roomID) {
@@ -90,7 +90,7 @@ module.exports = class {
 
     onWarningSafeArea() {
         this.calculateSafeArea()
-        this.io.to(this.roomID).emit(gameEvents.warnSafeArea, { d:  this.safeArea.getSendData() })
+        this.io.to(this.roomID).emit(gameEvents.warnSafeArea, { d: this.safeArea.getSendData() })
     }
 
     onMoveSafeArea() {
@@ -110,7 +110,8 @@ module.exports = class {
         if (aliveNumber == 1 && this.isInGame()) {
             this.setState(GAME_STATE.END)
             let winner = Object.values(alivePlayers)[0]
-            winner.socket.emit(gameEvents.playerWin, { d: [winner.username, winner.numberOfKill] })
+            let score = Utils.calculateScore(winner)
+            winner.socket.emit(gameEvents.playerWin, { d: [winner.username, winner.numberOfKill, score] })
             //
             this.reset()
         }
@@ -142,10 +143,11 @@ module.exports = class {
         //         console.error(err)
         //     })
     }
-    getUpdateBulletInMap(){
+
+    getUpdateBulletInMap() {
         let sendData = []
-        _.map(this.bulletList,bullet=>{
-            let data = [bullet.uid,bullet.x,bullet.y,bullet.z]
+        _.map(this.bulletList, bullet => {
+            let data = [bullet.uid, bullet.x, bullet.y, bullet.z]
         })
     }
     getUpdateWeaponInMap() {

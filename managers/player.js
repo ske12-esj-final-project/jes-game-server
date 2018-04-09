@@ -1,6 +1,7 @@
 const _ = require('lodash')
 const gameEvents = require('../constants/events')
 const GameManager = require('./game')
+const Utils = require('../utils')
 
 module.exports = class {
     constructor(socket, playerID, username) {
@@ -155,7 +156,7 @@ module.exports = class {
 
     getVictimData(victim) {
         let aliveNumber = victim.currentRoom.gameWorld.getNumberOfAlivePlayers()
-        return [victim.username, aliveNumber, victim.numberOfKill, this.calculateScore(victim)]
+        return [victim.username, aliveNumber, victim.numberOfKill, Utils.calculateScore(victim)]
     }
 
     updateCurrentEquipment(data) {
@@ -224,11 +225,6 @@ module.exports = class {
             this.socket.leave(this.currentRoom.id)
             this.currentRoom = null
         }
-    }
-
-    calculateScore(player) {
-        let world = player.currentRoom.gameWorld
-        return (50 * player.numberOfKill) + 10 * (world.getMaxPlayers() - world.getNumberOfAlivePlayers())
     }
 
     broadcastRoom(event, data) {

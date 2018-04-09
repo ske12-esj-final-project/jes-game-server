@@ -25,6 +25,7 @@ module.exports = class {
         if (this.io) {
             this.createGameInterval()
         }
+        this.ioRoom = this.io.to(this.roomID)
     }
 
 

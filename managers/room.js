@@ -95,9 +95,9 @@ module.exports = class {
         GameManager.addRoom(room)
     }
 
-    onPlayerDisconnect() {
-        console.log('playerid discon',this.socket.playerID)
-        _.unset(GameManager.getPlayers(), this.socket.playerID)
+    onPlayerDisconnect(playerID) {
+        console.log('playerid discon',playerID)
+        _.unset(GameManager.getPlayers(), playerID)
         console.log('onDisconect #player',_.size(GameManager.getPlayers()))
     }
 }

@@ -271,7 +271,7 @@ module.exports = class {
     }
 
     getAllEnemies() {
-        return _.pickBy(GameManager.getPlayers(), (value, key) => {
+        return _.pickBy(this.currentRoom.getPlayers(), (value, key) => {
             return key != this.playerID
         })
     }

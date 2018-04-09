@@ -63,7 +63,7 @@ const checkUserID = (userID) => {
         for (let key in players) {
             let p = players[key]
             if (userID === p.userID) {
-                return new Error("userID is exited")
+                return new Error("userID is existed")
             }
         }
 

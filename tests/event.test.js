@@ -165,7 +165,7 @@ describe('Events', () => {
             client.on(gameEvents.getVictimData, (data) => {
                 GameManager.getPlayer(playerID).onPlayerBackSafeArea()
                 expect(data.d[0]).to.equal('1234')
-                expect(data.d[1]).to.equal(0)
+                expect(data.d[1]).to.equal(1)
                 expect(data.d[2]).to.equal(0)
                 gameWorld.setDefaultConfig()
                 client.disconnect()

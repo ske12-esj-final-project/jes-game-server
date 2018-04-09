@@ -103,9 +103,8 @@ module.exports = class {
     }
 
     updateNumberOfAlivePlayer() {
-        let alivePlayers = this.getAlivePlayers()
-        let aliveNumber = _.size(alivePlayers) || 0
-
+        let aliveNumber = this.getNumberOfAlivePlayers()
+        console.log(aliveNumber)
         this.io.to(this.roomID).emit(gameEvents.updateNumberOfAlivePlayer, { "d": [aliveNumber] })
         if (aliveNumber == 1 && this.isInGame()) {
             this.setState(GAME_STATE.END)

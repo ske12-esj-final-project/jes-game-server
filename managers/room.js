@@ -19,7 +19,6 @@ module.exports = class {
         socket.on(gameEvents.updateRoom, this.onUpdateRoomInfo.bind(this))
     }
 
-
     onPlayerConnect(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
@@ -52,6 +51,7 @@ module.exports = class {
         let room = GameManager.getRoom(roomID)
 
         if (room.isFull()) {
+            console.log('Room is full')
             return this.socket.emit(gameEvents.playerJoinFullRoom, { d: ['Room is full'] })
         }
 

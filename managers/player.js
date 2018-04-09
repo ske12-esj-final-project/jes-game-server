@@ -144,7 +144,7 @@ module.exports = class {
             this.currentRoom.gameWorld.onPlayerKill(this, victim)
         }
 
-        let sendToOther = { "d": [victim.playerID, this.playerID, victim.hp,this.position.x,this.position.y,this.position.z] }
+        let sendToOther = { "d": [victim.playerID, this.playerID, victim.hp, this.position.x, this.position.y, this.position.z] }
         this.currentRoom.gameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
         this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
     }

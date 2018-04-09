@@ -112,7 +112,6 @@ module.exports = class {
             let winner = Object.values(alivePlayers)[0]
             let score = Utils.calculateScore(winner)
             winner.socket.emit(gameEvents.playerWin, { d: [winner.username, winner.numberOfKill, score] })
-            //
             this.reset()
         }
     }

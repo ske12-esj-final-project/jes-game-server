@@ -155,7 +155,7 @@ module.exports = class {
     }
 
     getVictimData(victim) {
-        let aliveNumber = victim.currentRoom.gameWorld.getNumberOfAlivePlayers()
+        let aliveNumber = victim.currentRoom.gameWorld.getNumberOfAlivePlayers() + 1
         return [victim.username, aliveNumber, victim.numberOfKill, Utils.calculateScore(victim)]
     }
 

@@ -53,7 +53,7 @@ const createBulletList = (equitments)=>{
         // console.log(x,y)
         const getRandomVal = (n)=>{
             const fixed2Dec = (n)=> Math.round(n * 100)/100;
-            const range = fixed2Dec(getRandomInt(2)*.1)
+            const range = fixed2Dec(getRandomInt(2)*.01)
             const rand_sign = getRandomInt(2)?1:-1
             return  fixed2Dec(n+ (rand_sign*range))
         }

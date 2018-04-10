@@ -31,6 +31,9 @@ module.exports = class {
         socket.on(gameEvents.playerOutSafeArea, this.onPlayerOutSafeArea.bind(this))
         socket.on(gameEvents.playerBackInSafeArea, this.onPlayerBackSafeArea.bind(this))
         socket.on(gameEvents.playerLeaveRoom, this.leaveCurrentRoom.bind(this))
+
+        socket.on(gameEvents.getBullet, this.getBullet.bind(this))
+
     }
 
     setupPlayer(data) {
@@ -76,6 +79,21 @@ module.exports = class {
         else {
             console.error('[error]-checkShootHit wrong data pattern', data)
         }
+    }
+
+    getBullet(data){
+        data['d'] = data['d'].replace(/@/g, "\"")
+        let jsonData = JSON.parse(data["d"])
+        if (jsonData.length >= 1) {
+            let bulletID = jsonData[0]
+            let room = this.currentRoom
+            _.remove(room.gameWorld.bulletList, item => item.uid === bulletID)
+            room.gameWorld.sendRemoveBullet(bulletID)
+        }
+        else {
+            console.error('[error]-check get bullet wrong data pattern', data)
+        }
+
     }
 
     onPlayerOutSafeArea(data) {

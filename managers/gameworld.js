@@ -31,6 +31,9 @@ module.exports = class {
     sendRemoveWeapon(weaponID) {
         this.io.to(this.roomID).emit(gameEvents.getEquipment, { d: [weaponID] })
     }
+    sendRemoveBullet(bulletID){
+        this.io.to(this.roomID).emit(gameEvents.getBullet, { d: [bulletID] })
+    }
 
     createGameInterval() {
         return setInterval(() => {

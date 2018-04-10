@@ -16,6 +16,7 @@ module.exports = {
     "getEquipment": "d",
 
     "setupBullet":"h",
+    "getBullet":"g",
     
     "playerJoinGame": "z",
     "playerJoinRoom": "y",

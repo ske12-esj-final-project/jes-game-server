@@ -143,7 +143,9 @@ module.exports = class {
         let sendData = []
         _.map(this.bulletList, bullet => {
             let data = [bullet.uid, bullet.x, bullet.y, bullet.z]
+            sendData.push(data)
         })
+        return sendData
     }
     getUpdateWeaponInMap() {
         let sendData = []

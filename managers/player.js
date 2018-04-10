@@ -47,6 +47,9 @@ module.exports = class {
         this.sendPlayersDataCreateCharacter()
         let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
         this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
+
+        let bulletInMap = this.currentRoom.gameWorld.getUpdateBulletInMap()
+        this.socket.emit(gameEvents.setupBullet, { d: bulletInMap })
     }
 
     sendPlayersDataCreateCharacter() {

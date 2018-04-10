@@ -57,7 +57,7 @@ const createBulletList = (equitments)=>{
             const rand_sign = getRandomInt(2)?1:-1
             return  fixed2Dec(n+ (rand_sign*range))
         }
-        y = getRandomVal(y)
+        // y = getRandomVal(y)
         x = getRandomVal(x)
         z = getRandomVal(x)
         

@@ -10,7 +10,7 @@ const sumList = (list) => {
 
 const calculateScore = (player) => {
     let world = player.currentRoom.gameWorld
-    return (50 * player.numberOfKill) + 10 * (world.getMaxPlayers() - world.getNumberOfAlivePlayers())
+    return (50 * player.numberOfKill) + 10 * (world.getMaxPlayers() - _.size(world.getAlivePlayers()))
 }
 
 module.exports = {

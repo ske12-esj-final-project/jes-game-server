@@ -39,6 +39,7 @@ module.exports = class {
     setupPlayer(data) {
         this.position = { x: 0, y: 0, z: 0 }
         this.sendPlayersDataCreateCharacter()
+        console.log('setup-player',this.socket.playerID,this.socket.userID)
     }
 
     startGame(data) {

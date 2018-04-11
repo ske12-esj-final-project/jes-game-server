@@ -26,6 +26,7 @@ const gameWorldConfig1v1 = require('./config/gameworld1v1')
 let roomA = new Room(io, 'Room A', '0')
 let roomB = new Room(io, 'Room B', '1')
 let room1v1 = new Room(io,'Room 1-1','2',gameWorldConfig1v1)
+let roomhod = new Room(io,'Room โหดจังครับ','2',gameWorldConfig1v1)
 let roomManager
 
 const cors = require('cors')
@@ -35,9 +36,12 @@ app.use(bodyParser.json())
 
 io.on('connection', (socket) => {
     roomManager = new RoomManager(socket)
+    
     roomManager.addRoom(roomA)
     roomManager.addRoom(roomB)
     roomManager.addRoom(room1v1)
+    roomManager.addRoom(roomhod)
+
     socket.playerID = shortid.generate()
 
     socket.on('disconnect', () => {

@@ -115,7 +115,7 @@ module.exports = class {
                 clearInterval(this.damageInterval)
             }
 
-            let sendToOther = { "d": [this.playerID, null, this.hp] }
+            let sendToOther = { "d": [this.playerID, this.playerID, this.hp] }
             currentGameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
         }, currentGameWorld.config.damageInterval)
     }

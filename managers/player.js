@@ -245,7 +245,6 @@ module.exports = class {
             this.currentRoom.removePlayer(this.playerID)
             this.currentRoom.onUpdateRoomInfo()
             this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
-            if(this.currentRoom.isEmpty()) this.currentRoom.gameWorld.reset()
             this.socket.leave(this.currentRoom.id)
             this.currentRoom = null
         }

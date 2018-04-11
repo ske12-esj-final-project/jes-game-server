@@ -110,12 +110,11 @@ module.exports = class {
         let aliveNumber = _.size(alivePlayers)
         console.log('aliveNumber ', aliveNumber)
         this.io.to(this.roomID).emit(gameEvents.updateNumberOfAlivePlayer, { "d": [aliveNumber] })
-        if (aliveNumber == 1 && this.isInGame()) {
+        if (aliveNumber === 1 && this.isInGame()) {
             this.setState(GAME_STATE.END)
             let winner = Object.values(alivePlayers)[0]
             let score = Utils.calculateScore(winner)
             winner.socket.emit(gameEvents.playerWin, { d: [winner.username, winner.numberOfKill, score] })
-            this.reset()
         }
     }
 

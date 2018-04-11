@@ -168,7 +168,7 @@ module.exports = class {
         }
 
         let sendToOther = { "d": [victim.playerID, this.playerID, victim.hp, this.position.x, this.position.y, this.position.z] }
-        this.currentRoom.gameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
+        victim.socket.emit(gameEvents.updatePlayersStatus, sendToOther)
         this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
     }
 
@@ -244,6 +244,7 @@ module.exports = class {
             this.currentRoom.removePlayer(this.playerID)
             this.currentRoom.onUpdateRoomInfo()
             this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
+            if(this.currentRoom.isEmpty()) this.currentRoom.gameWorld.reset()
             this.socket.leave(this.currentRoom.id)
             this.currentRoom = null
         }

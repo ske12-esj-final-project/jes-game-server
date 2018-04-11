@@ -49,7 +49,6 @@ module.exports = class {
         let player = GameManager.getPlayer(jsonData[0])
         let roomID = jsonData[1]
         let room = GameManager.getRoom(roomID)
-
         if (room.isFull()) {
             console.log('Room is full')
             return this.socket.emit(gameEvents.playerJoinFullRoom, { d: ['Room is full'] })
@@ -64,6 +63,7 @@ module.exports = class {
         room.addPlayer(player)
         this.socket.join(roomID)
         this.socket.emit(gameEvents.playerJoinRoom, { d: [player.playerID] })
+        console.log('emit add playerjoin room',this.socket.playerID)
         let maxPlayer = room.gameWorld.getMaxPlayers()
         let numberOfplayerInRoom = _.size(room.gameWorld.players)
         let morethan_80 = numberOfplayerInRoom >= Math.floor(0.8 * (maxPlayer))

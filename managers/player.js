@@ -7,16 +7,14 @@ module.exports = class {
     constructor(socket, playerID, username) {
         this.socket = socket
         this.playerID = playerID
-        this.userID = null
         this.username = username
-        this.position = { x: null, y: null, z: null }
-        this.rotation = { x: null, y: null }
-        this.hp = 100
+        this.userID = null
         this.currentRoom = null
-        this.currentEquipment = 0
-        this.numberOfKill = 0
+        this.reset()
         this.socketHandler(socket)
     }
+
+
 
     socketHandler(socket) {
         if (!socket) return
@@ -36,10 +34,18 @@ module.exports = class {
 
     }
 
+    reset() {
+        this.position = { x: null, y: null, z: null }
+        this.rotation = { x: null, y: null }
+        this.hp = 100
+        this.currentEquipment = 0
+        this.numberOfKill = 0
+    }
     setupPlayer(data) {
-        this.position = { x: 0, y: 0, z: 0 }
+        this.reset()
+        this.position = { x: 0, y: 20, z: 0 }
         this.sendPlayersDataCreateCharacter()
-        console.log('setup-player',this.socket.playerID,this.socket.userID)
+        console.log('setup-player', this.socket.playerID, this.socket.userID)
     }
 
     startGame(data) {
@@ -82,7 +88,7 @@ module.exports = class {
         }
     }
 
-    getBullet(data){
+    getBullet(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
         if (jsonData.length >= 1) {
@@ -165,7 +171,7 @@ module.exports = class {
             this.currentRoom.gameWorld.onPlayerKill(this, victim)
             victim.broadcastRoom(gameEvents.playerDie, { d: this.getKillData(victim) })
             victim.socket.emit(gameEvents.getVictimData, { d: this.getVictimData(victim) })
-            this.socket.emit(gameEvents.updatePlayerKill, {d : [this.numberOfKill]})
+            this.socket.emit(gameEvents.updatePlayerKill, { d: [this.numberOfKill] })
         }
 
         let sendToOther = { "d": [victim.playerID, this.playerID, victim.hp, this.position.x, this.position.y, this.position.z] }
@@ -242,12 +248,22 @@ module.exports = class {
 
     leaveCurrentRoom() {
         if (this.currentRoom) {
-            this.currentRoom.removePlayer(this.playerID)
-            this.currentRoom.onUpdateRoomInfo()
-            this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
-            if(this.currentRoom.isEmpty()) this.currentRoom.gameWorld.reset()
-            this.socket.leave(this.currentRoom.id)
-            this.currentRoom = null
+
+            const perform = () => {
+                this.currentRoom.removePlayer(this.playerID)
+                this.currentRoom.onUpdateRoomInfo()
+                this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
+                this.socket.leave(this.currentRoom.id)
+                this.currentRoom = null
+            }
+
+            if (this.socket.broadcast != undefined) {
+                this.broadcastRoom(gameEvents.playerLeaveRoom, { d: [this.playerID] })
+                perform()
+            }
+            else {
+                perform()
+            }
         }
     }
 

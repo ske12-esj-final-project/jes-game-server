@@ -9,11 +9,11 @@ const GameManager = require('../managers/game')
 const GameWorld = require('../managers/gameworld')
 
 module.exports = class {
-    constructor(io, name, id) {
+    constructor(io, name, id,config=DEFAULT_CONFIG) {
         this.io = io
         this.name = name
         this.id = id
-        this.gameWorld = new GameWorld(this.io, DEFAULT_CONFIG,this.id)
+        this.gameWorld = new GameWorld(this.io, config,this.id)
     }
 
     addPlayer(player) {

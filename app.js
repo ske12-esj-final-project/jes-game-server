@@ -14,14 +14,18 @@ const RoomManager = require('./managers/room')
 
 const gameEvents = require('./constants/events')
 
+
 const APP_CONFIG = require('./config.json')
 
 const API = require('./constants/api')
 
 console.log('GAME-SERVER VERSION :: ', APP_CONFIG.GAME_VERSION)
 
+const gameWorldConfig1v1 = require('./config/gameworld1v1')
+
 let roomA = new Room(io, 'Room A', '0')
 let roomB = new Room(io, 'Room B', '1')
+let room1v1 = new Room(io,'Room 1-1','1-1',gameWorldConfig1v1)
 let roomManager
 
 const cors = require('cors')
@@ -33,6 +37,7 @@ io.on('connection', (socket) => {
     roomManager = new RoomManager(socket)
     roomManager.addRoom(roomA)
     roomManager.addRoom(roomB)
+    roomManager.addRoom(room1v1)
     socket.playerID = shortid.generate()
 
     socket.on('disconnect', () => {

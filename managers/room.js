@@ -66,10 +66,9 @@ module.exports = class {
         this.socket.emit(gameEvents.playerJoinRoom, { d: [player.playerID] })
         let maxPlayer = room.gameWorld.getMaxPlayers()
         let numberOfplayerInRoom = _.size(room.gameWorld.players)
-        let p = Math.floor(maxPlayer)
-        let morethan_80 = (numberOfplayerInRoom/maxPlayer) >= p
-        let startCondition = (morethan_80 || room.isFull()) && room.gameWorld.getState()=== GAME_STATE.OPEN 
-        console.log(numberOfplayerInRoom,(numberOfplayerInRoom/maxPlayer) ,morethan_80,p,'startCondition',startCondition)
+        let morethan_80 = numberOfplayerInRoom >= Math.floor(0.8 * (maxPlayer))
+        let startCondition = (morethan_80 || room.isFull()) && room.gameWorld.getState() === GAME_STATE.OPEN
+        console.log(numberOfplayerInRoom, (numberOfplayerInRoom / maxPlayer), morethan_80, p, 'startCondition', startCondition)
         if (startCondition) {
             room.gameWorld.setState(GAME_STATE.COUNTDOWN)
             room.onCountdown()
@@ -101,8 +100,8 @@ module.exports = class {
     }
 
     onPlayerDisconnect(playerID) {
-        console.log('playerid discon',playerID)
+        console.log('playerid discon', playerID)
         _.unset(GameManager.getPlayers(), playerID)
-        console.log('onDisconect #player',_.size(GameManager.getPlayers()))
+        console.log('onDisconect #player', _.size(GameManager.getPlayers()))
     }
 }

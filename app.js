@@ -25,7 +25,7 @@ const gameWorldConfig1v1 = require('./config/gameworld1v1')
 
 let roomA = new Room(io, 'Room A', '0')
 let roomB = new Room(io, 'Room B', '1')
-let room1v1 = new Room(io,'Room 1-1','1-1',gameWorldConfig1v1)
+let room1v1 = new Room(io,'Room 1-1','2',gameWorldConfig1v1)
 let roomManager
 
 const cors = require('cors')

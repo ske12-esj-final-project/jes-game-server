@@ -23,8 +23,8 @@ console.log('GAME-SERVER VERSION :: ', APP_CONFIG.GAME_VERSION)
 
 const gameWorldConfig1v1 = require('./config/gameworld1v1')
 
-let roomA = new Room(io, 'Room A', '0')
-let roomB = new Room(io, 'Room B', '1')
+let roomA = new Room(io, 'Room สอนหน่อยๆ', '0')
+let roomB = new Room(io, 'Room หยุดที', '1')
 let room1v1 = new Room(io,'Room 1-1','2',gameWorldConfig1v1)
 let roomhod = new Room(io,'Room โหดจังครับ','3',gameWorldConfig1v1)
 let roomManager

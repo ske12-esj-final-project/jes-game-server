@@ -64,8 +64,11 @@ module.exports = class {
         room.addPlayer(player)
         this.socket.join(roomID)
         this.socket.emit(gameEvents.playerJoinRoom, { d: [player.playerID] })
-
-        if (room.isFull()) {
+        let maxPlayer = room.gameWorld.getMaxPlayers()
+        let numberOfplayerInRoom = _.size(room.gameWorld.players)
+        let p = math.floor(numberOfplayerInRoom/maxPlayer)
+        let morethan_80 = p>=.8
+        if ((morethan_80 || room.isFull()) && room.gameWorld.getState()=== GAME_STATE.OPEN ) {
             room.gameWorld.setState(GAME_STATE.COUNTDOWN)
             room.onCountdown()
         }

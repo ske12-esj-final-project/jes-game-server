@@ -162,9 +162,10 @@ module.exports = class {
     hitPlayer(victim, damage) {
         victim.hp -= damage
         if (victim.hp <= 0) {
+            this.currentRoom.gameWorld.onPlayerKill(this, victim)
             victim.broadcastRoom(gameEvents.playerDie, { d: this.getKillData(victim) })
             victim.socket.emit(gameEvents.getVictimData, { d: this.getVictimData(victim) })
-            this.currentRoom.gameWorld.onPlayerKill(this, victim)
+            this.socket.emit(gameEvents.updatePlayerKill, {d : [this.numberOfKill]})
         }
 
         let sendToOther = { "d": [victim.playerID, this.playerID, victim.hp, this.position.x, this.position.y, this.position.z] }

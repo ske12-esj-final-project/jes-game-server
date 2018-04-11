@@ -1,5 +1,5 @@
 module.exports = {
-    maxPlayers: 4, // maximum players available in the room
+    maxPlayers: 5, // maximum players available in the room
     tickRate: 60, // how often the server updates per second
     warningTime: 25000, // duration required until server warn users about safe area (ms)
     triggerTime: 30000, // duration required until server warn users about safe area (ms)

@@ -68,7 +68,9 @@ module.exports = class {
         let numberOfplayerInRoom = _.size(room.gameWorld.players)
         let p = Math.floor(numberOfplayerInRoom/maxPlayer)
         let morethan_80 = p>=.8
-        if ((morethan_80 || room.isFull()) && room.gameWorld.getState()=== GAME_STATE.OPEN ) {
+        let startCondition = (morethan_80 || room.isFull()) && room.gameWorld.getState()=== GAME_STATE.OPEN 
+        console.log(numberOfplayerInRoom,morethan_80,p,'startCondition',startCondition)
+        if (startCondition) {
             room.gameWorld.setState(GAME_STATE.COUNTDOWN)
             room.onCountdown()
         }

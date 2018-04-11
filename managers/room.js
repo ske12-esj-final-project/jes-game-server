@@ -66,8 +66,8 @@ module.exports = class {
         this.socket.emit(gameEvents.playerJoinRoom, { d: [player.playerID] })
         let maxPlayer = room.gameWorld.getMaxPlayers()
         let numberOfplayerInRoom = _.size(room.gameWorld.players)
-        let p = Math.floor(numberOfplayerInRoom/maxPlayer)
-        let morethan_80 = p>=.8
+        let p = Math.floor( (numberOfplayerInRoom/maxPlayer)*100 )
+        let morethan_80 = p>=80
         let startCondition = (morethan_80 || room.isFull()) && room.gameWorld.getState()=== GAME_STATE.OPEN 
         console.log(numberOfplayerInRoom,morethan_80,p,'startCondition',startCondition)
         if (startCondition) {

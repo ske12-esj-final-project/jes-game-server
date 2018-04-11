@@ -22,11 +22,13 @@ const API = require('./constants/api')
 console.log('GAME-SERVER VERSION :: ', APP_CONFIG.GAME_VERSION)
 
 const gameWorldConfig1v1 = require('./config/gameworld1v1')
+const gameWorldConfig3v3 = require('./config/gameworld3v3')
 
 let roomA = new Room(io, 'Room สอนหน่อยๆ', '0')
 let roomB = new Room(io, 'Room หยุดที', '1')
 let room1v1 = new Room(io,'Room 1-1','2',gameWorldConfig1v1)
 let roomhod = new Room(io,'Room โหดจังครับ','3',gameWorldConfig1v1)
+let roomCookLab = new Room(io, 'Room คุกLab', '4',gameWorldConfig3v3)
 let roomManager
 
 const cors = require('cors')
@@ -41,6 +43,7 @@ io.on('connection', (socket) => {
     roomManager.addRoom(roomB)
     roomManager.addRoom(room1v1)
     roomManager.addRoom(roomhod)
+    roomManager.addRoom(roomCookLab)
 
     socket.playerID = shortid.generate()
 

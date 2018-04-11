@@ -13,7 +13,7 @@ const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
 // console.log(mockWeightPercentList)
 // console.log(_.size(mockWeightPercentList), itemSize)
 
-let itemSize = 50
+let itemSize = 100
 this.itemList = createWeaponItemList(itemSize, equitmentData)
 
 this.equipments = assignRandomPositions(this.itemList, SPAWNPOINTS)

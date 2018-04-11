@@ -117,7 +117,7 @@ module.exports = class {
             }
 
             let sendToOther = { "d": [this.playerID, this.playerID, this.hp] }
-            currentGameWorld.io.emit(gameEvents.updatePlayersStatus, sendToOther)
+            this.socket.emit(gameEvents.updatePlayersStatus, sendToOther)
         }, currentGameWorld.config.damageInterval)
     }
 

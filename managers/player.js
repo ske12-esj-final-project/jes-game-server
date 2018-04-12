@@ -29,6 +29,8 @@ module.exports = class {
         socket.on(gameEvents.playerOutSafeArea, this.onPlayerOutSafeArea.bind(this))
         socket.on(gameEvents.playerBackInSafeArea, this.onPlayerBackSafeArea.bind(this))
         socket.on(gameEvents.playerLeaveRoom, this.leaveCurrentRoom.bind(this))
+        
+        socket.on(gameEvents.discardEquitment, this.discardEquitment.bind(this))
 
         socket.on(gameEvents.getBullet, this.getBullet.bind(this))
 

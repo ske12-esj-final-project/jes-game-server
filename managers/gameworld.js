@@ -31,7 +31,7 @@ module.exports = class {
     sendRemoveWeapon(weaponID) {
         this.io.to(this.roomID).emit(gameEvents.getEquipment, { d: [weaponID] })
     }
-    sendRemoveBullet(bulletID){
+    sendRemoveBullet(bulletID) {
         this.io.to(this.roomID).emit(gameEvents.getBullet, { d: [bulletID] })
     }
 
@@ -126,19 +126,19 @@ module.exports = class {
 
     onPlayerKill(player, victim) {
         player.numberOfKill++
-        // axios.post(API.KILL, {
-        //     matchID: this.matchID,
-        //     playerID: player.userID,
-        //     victimID: victim.userID,
-        //     victimPos: victim.position,
-        //     weaponUsed: WEAPON[player.currentEquipment.toString()]["Game name"]
-        // })
-        //     .then((res) => {
-        //         console.log(res.data)
-        //     })
-        //     .catch((err) => {
-        //         console.error(err)
-        //     })
+        axios.post(API.KILL, {
+            matchID: this.matchID,
+            playerID: player.userID,
+            victimID: victim.userID,
+            victimPos: victim.position,
+            weaponUsed: WEAPON[player.currentEquipment.toString()]["Game name"]
+        })
+            .then((res) => {
+                console.log(res.data)
+            })
+            .catch((err) => {
+                console.error(err)
+            })
     }
 
     getUpdateBulletInMap() {

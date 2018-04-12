@@ -55,11 +55,16 @@ module.exports = class {
             z: this.randomInt(-150, 150)
         }
         this.sendPlayersDataCreateCharacter()
-        let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
-        this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
 
+        this.setupEquipment()
+        
         let bulletInMap = this.currentRoom.gameWorld.getUpdateBulletInMap()
         this.socket.emit(gameEvents.setupBullet, { d: bulletInMap })
+    }
+
+    setupEquipment(){
+        let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
+        this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
     }
 
     sendPlayersDataCreateCharacter() {
@@ -97,10 +102,12 @@ module.exports = class {
         }
 
         discardItem.capacity = currentAmmo
-
-
         room.gameWorld.equipments.push(gottenItem)
-        room.io.to(room.id).emit(gameEvents.discardEquitment, { d: [weaponID,currentAmmo,posX,posY,posZ] })
+        
+
+        let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
+        room.gameWorld.io.to(room.gameWorld.roomID).emit(gameEvents.setupEquipment, { d: weaponsInMap })
+
     }
 
     getEquipment(data) {

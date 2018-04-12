@@ -49,7 +49,7 @@ module.exports = class {
         let player = GameManager.getPlayer(jsonData[0])
         let roomID = jsonData[1]
         let room = GameManager.getRoom(roomID)
-        if (room.isFull() || room.gameWorld.isInGame() || room.gameWorld.isEnd()) {
+        if (room.isFull() || room.gameWorld.isInGame()) {
             console.log('Cannot join room')
             return this.socket.emit(gameEvents.playerCannotJoinRoom, { d: ['Cannot join room'] })
         }

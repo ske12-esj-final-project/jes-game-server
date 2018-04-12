@@ -186,7 +186,7 @@ describe('Events', () => {
         })
     })
 
-    describe('Players kill each other', () => {
+    /*describe('Players kill each other', () => {
         let player, victim, playerID, victimID, gameWorld, room, expectedIndex
 
         beforeEach(() => {
@@ -255,7 +255,7 @@ describe('Events', () => {
                 done()
             })
         })
-    })
+    })*/
 
     describe('Player leaves the room', () => {
         it('should reset gameWorld when last player leaves', (done) => {

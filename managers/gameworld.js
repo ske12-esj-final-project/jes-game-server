@@ -44,7 +44,7 @@ module.exports = class {
     update() {
         this.updateAllPlayersMovement()
         if (this.isInGame()) {
-            this.duration += 1000 / this.config.tickRate
+            this.safeAreaDuration += 1000 / this.config.tickRate
             this.updateSafeArea()
         }
     }
@@ -57,12 +57,12 @@ module.exports = class {
     }
 
     updateSafeArea() {
-        if (this.duration >= this.config.warningTime && this.safeArea.isWaiting()) {
+        if (this.safeAreaDuration >= this.config.warningTime && this.safeArea.isWaiting()) {
             this.safeArea.setState(SAFE_AREA_STATE.WARNING)
             this.onWarningSafeArea()
         }
 
-        if (this.duration >= this.config.triggerTime && this.safeArea.isWarning()) {
+        if (this.safeAreaDuration >= this.config.triggerTime && this.safeArea.isWarning()) {
             this.safeArea.setState(SAFE_AREA_STATE.TRIGGERING)
             this.onMoveSafeArea()
         }
@@ -101,7 +101,7 @@ module.exports = class {
 
         setTimeout(() => {
             this.safeArea.setState(SAFE_AREA_STATE.WAITING)
-            this.duration = 0
+            this.safeAreaDuration = 0
         }, this.config.restrictTime)
     }
 
@@ -111,10 +111,10 @@ module.exports = class {
         console.log('aliveNumber ', aliveNumber)
         this.io.to(this.roomID).emit(gameEvents.updateNumberOfAlivePlayer, { "d": [aliveNumber] })
         if (aliveNumber === 1 && this.isInGame()) {
-            this.setState(GAME_STATE.END)
             let winner = Object.values(alivePlayers)[0]
             let score = Utils.calculateScore(winner)
             winner.socket.emit(gameEvents.playerWin, { d: [winner.username, winner.numberOfKill, score] })
+            this.reset()
         }
     }
 
@@ -177,7 +177,7 @@ module.exports = class {
         this.equipments.push(easterItem)
         this.safeArea = new SafeArea()
 
-        this.duration = 0
+        this.safeAreaDuration = 0
         this.setState(GAME_STATE.OPEN)
     }
 
@@ -219,9 +219,5 @@ module.exports = class {
 
     isInGame() {
         return this.currentState === GAME_STATE.INGAME
-    }
-
-    isEnd() {
-        return this.currentState === GAME_STATE.END
     }
 }

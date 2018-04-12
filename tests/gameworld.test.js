@@ -96,14 +96,14 @@ describe('Gameworld', () => {
             this.clock.restore()
         })
 
-        it(`should warn safe area all players when duration ${DEFAULT_CONFIG.warningTime} ms`, () => {
+        it(`should warn safe area all players when safeAreaDuration ${DEFAULT_CONFIG.warningTime} ms`, () => {
             gameWorld.onWarningSafeArea = sinon.spy()
             this.clock.tick(DEFAULT_CONFIG.warningTime)
             expect(gameWorld.safeArea.isWarning()).to.be.true
             expect(gameWorld.onWarningSafeArea).to.have.been.calledOnce
         })
 
-        it(`should trigger safe area all players when duration ${DEFAULT_CONFIG.triggerTime} ms`, () => {
+        it(`should trigger safe area all players when safeAreaDuration ${DEFAULT_CONFIG.triggerTime} ms`, () => {
             gameWorld.onMoveSafeArea = sinon.spy()
             gameWorld.safeArea.setState(SAFE_AREA_STATE.WARNING)
             this.clock.tick(DEFAULT_CONFIG.triggerTime)
@@ -133,9 +133,9 @@ describe('Gameworld', () => {
             expect(_.size(gameWorld.itemList)).to.equal(_.size(expectedItemList))
         })
 
-        it('should reset duration back', () => {
+        it('should reset safeAreaDuration back', () => {
             gameWorld.reset()
-            expect(gameWorld.duration).to.equal(0)
+            expect(gameWorld.safeAreaDuration).to.equal(0)
         })
 
         it('should set GAME_STATE back to OPEN', () => {

@@ -173,7 +173,8 @@ module.exports = class {
         // weaponIndex 10 is sniper
         let easterItem = {
             uid: shortid.generate(), weaponIndex: 10, position:
-                { "x": -81.63, "y": 41.25, "z": -165.34 }
+                { "x": -81.63, "y": 41.25, "z": -165.34 },
+                capacity:6
         }
         /* */
         this.equipments.push(easterItem)

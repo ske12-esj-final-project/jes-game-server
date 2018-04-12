@@ -108,11 +108,12 @@ module.exports = class {
 
         discardItem.capacity = currentAmmo
         room.gameWorld.equipments.push(discardItem)
-        console.log('discard - item ',discardItem)
 
         let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
-        room.gameWorld.io.to(room.gameWorld.roomID).emit(gameEvents.setupEquipment, { d: weaponsInMap })
+        this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
+        this.broadcastRoom(gameEvents.setupEquipment, { d: weaponsInMap })
         console.log('weaponInMap',weaponsInMap)
+        console.log('discard - item ',discardItem)
 
     }
 

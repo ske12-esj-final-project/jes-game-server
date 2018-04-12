@@ -90,6 +90,7 @@ module.exports = class {
         let room = this.currentRoom
 
         let discardItem = _.clone(_.find(room.gameWorld.gotttenEquitmensList, item => item.uid === weaponID))
+        if(!discardItem) return
         _.remove(room.gameWorld.gotttenEquitmensList, item => item.uid === weaponID)
 
         let currentAmmo = parseInt(jsonData[1])
@@ -111,6 +112,7 @@ module.exports = class {
 
         let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
         room.gameWorld.io.to(room.gameWorld.roomID).emit(gameEvents.setupEquipment, { d: weaponsInMap })
+        console.log('weaponInMap',weaponsInMap)
 
     }
 

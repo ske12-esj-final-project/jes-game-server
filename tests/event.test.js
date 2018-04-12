@@ -112,7 +112,7 @@ describe('Events', () => {
                 client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
             })
 
-            client.on(gameEvents.playerJoinFullRoom, (data) => {
+            client.on(gameEvents.playerCannotJoinRoom, (data) => {
                 let playersInRoom = room.getPlayers()
                 expect(_.size(playersInRoom)).to.equal(0)
                 gameWorld.setDefaultConfig()

@@ -29,7 +29,7 @@ module.exports = class {
         socket.on(gameEvents.playerOutSafeArea, this.onPlayerOutSafeArea.bind(this))
         socket.on(gameEvents.playerBackInSafeArea, this.onPlayerBackSafeArea.bind(this))
         socket.on(gameEvents.playerLeaveRoom, this.leaveCurrentRoom.bind(this))
-        
+
         socket.on(gameEvents.discardEquitment, this.discardEquitment.bind(this))
 
         socket.on(gameEvents.getBullet, this.getBullet.bind(this))
@@ -82,7 +82,9 @@ module.exports = class {
     }
 
     discardEquitment(data){
+        console.log('d-discardEquitment0',data)
         data['d'] = data['d'].replace(/@/g, "\"")
+        console.log('d-discardEquitment1',data)
         let jsonData = JSON.parse(data["d"])
         let weaponID = jsonData[0]
         let room = this.currentRoom

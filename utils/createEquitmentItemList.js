@@ -31,7 +31,7 @@ const createWeaponItemList = (numberOfItem, itemData) => {
     let equitmentDataExceptHand = _.filter(itemData, e => e.Index !== 0)
     let itemWeightPercentList = createItemList(numberOfItem, equitmentDataExceptHand)
     return _.map(itemWeightPercentList, m =>
-        ({ uid: shortid.generate(), weaponIndex: m.Index, position: {} }))
+        ({ uid: shortid.generate(), weaponIndex: m.Index, position: {},capacity:m.Capacity }))
 }
 
 const assignRandomPositions = (items, spawnPoints) =>{

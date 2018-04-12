@@ -15,8 +15,8 @@ const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
 
 let itemSize = 100
 this.itemList = createWeaponItemList(itemSize, equitmentData)
-
+console.log(this.itemList)
 this.equipments = assignRandomPositions(this.itemList, SPAWNPOINTS)
 
 this.bulletList = createBulletList(this.equipments)
-console.log(this.bulletList)
+// console.log(this.bulletList)

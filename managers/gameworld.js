@@ -152,7 +152,7 @@ module.exports = class {
     getUpdateWeaponInMap() {
         let sendData = []
         _.map(this.equipments, item => {
-            let data = [item.uid, item.weaponIndex, item.position.x, item.position.y, item.position.z]
+            let data = [item.uid, item.weaponIndex, item.position.x, item.position.y, item.position.z, item.capacity]
             sendData.push(data)
         })
         return sendData

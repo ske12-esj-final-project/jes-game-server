@@ -112,7 +112,7 @@ module.exports = class {
         let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
         this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
         this.broadcastRoom(gameEvents.setupEquipment, { d: weaponsInMap })
-        console.log('weaponInMap',weaponsInMap)
+        // console.log('weaponInMap',weaponsInMap)
         console.log('discard - item ',discardItem)
 
     }

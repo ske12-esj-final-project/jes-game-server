@@ -166,6 +166,8 @@ module.exports = class {
 
         this.equipments = assignRandomPositions(this.itemList, SPAWNPOINTS)
 
+        this.gotttenEquitmensList = []
+
         this.bulletList = createBulletList(this.equipments)
         /* */
         // weaponIndex 10 is sniper

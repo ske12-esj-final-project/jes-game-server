@@ -17,6 +17,7 @@ module.exports = {
 
     "setupBullet":"h",
     "getBullet":"g",
+    "discardEquitment":"i",
     
     "playerJoinGame": "z",
     "playerJoinRoom": "y",

@@ -74,12 +74,45 @@ module.exports = class {
 
     }
 
+    discardEquitment(data){
+        data['d'] = data['d'].replace(/@/g, "\"")
+        let jsonData = JSON.parse(data["d"])
+        let weaponID = jsonData[0]
+        let room = this.currentRoom
+
+        let discardItem = _.clone(_.find(room.gameWorld.gotttenEquitmensList, item => item.uid === weaponID))
+        _.remove(room.gameWorld.gotttenEquitmensList, item => item.uid === weaponID)
+
+        let currentAmmo = parseInt(jsonData[1])
+        let posX = jsonData[2] ||0
+        let posY = jsonData[3] ||0
+        let posZ = jsonData[4] ||0
+
+        // update data of discardItem
+
+        discardItem.position = {
+            x:posX,
+            y:posY,
+            z:posZ
+        }
+
+        discardItem.capacity = currentAmmo
+
+
+        room.gameWorld.equipments.push(gottenItem)
+        room.io.to(room.id).emit(gameEvents.discardEquitment, { d: [weaponID,currentAmmo,posX,posY,posZ] })
+    }
+
     getEquipment(data) {
         data['d'] = data['d'].replace(/@/g, "\"")
         let jsonData = JSON.parse(data["d"])
         if (jsonData.length >= 1) {
             let weaponID = jsonData[0]
             let room = this.currentRoom
+
+            let gottenItem = _.clone(_.find(room.gameWorld.equipments, item => item.uid === weaponID))
+            room.gameWorld.gotttenEquitmensList.push(gottenItem)
+
             _.remove(room.gameWorld.equipments, item => item.uid === weaponID)
             room.gameWorld.sendRemoveWeapon(weaponID)
         }

@@ -223,19 +223,6 @@ describe('Events', () => {
             })
         })
 
-        it('should send back kill information correctly', (done) => {
-            player.on(gameEvents.playerDie, (data) => {
-                expect(data.d[0]).to.equal(victimID)
-                expect(data.d[1]).to.equal('1234')
-                expect(data.d[2]).to.equal('5678')
-                expect(data.d[3]).to.equal(expectedIndex)
-                gameWorld.setDefaultConfig()
-                player.disconnect()
-                victim.disconnect()
-                done()
-            })
-        })
-
         it('should increase number player kill by 1', (done) => {
             player.on(gameEvents.playerDie, (data) => {
                 expect(room.getPlayer(playerID).numberOfKill).to.equal(1)

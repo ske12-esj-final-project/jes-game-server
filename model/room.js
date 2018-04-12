@@ -52,6 +52,7 @@ module.exports = class {
         let timeLeft = 10
         this.countdownInterval = setInterval(() => {
             if (!this.gameWorld.isCountdown()) {
+                // this.gameWorld.onInterruptCountdown()
                 clearInterval(this.countdownInterval)
             }
 

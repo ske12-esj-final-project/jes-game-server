@@ -42,6 +42,14 @@ describe('Events', () => {
             id: 'user_id_2',
             username: '5678'
         })
+
+        axiosMock.onPost(API.KILL, {
+            matchID: "some_match_id",
+            playerID: "user_id_1",
+            victimID: "user_id_2",
+            victimPos: { x: null, y: null, z: null },
+            weaponUsed: "Shotgun"
+        }).replyOnce(200, "Killfeed created")
     })
 
     afterEach(() => {
@@ -99,6 +107,7 @@ describe('Events', () => {
             client.on(gameEvents.playerJoinRoom, (data) => {
                 let player = room.getPlayer(playerID)
                 expect(playerID).to.not.be.undefined
+                gameWorld.reset()
                 gameWorld.setDefaultConfig()
                 client.disconnect()
                 done()
@@ -115,6 +124,7 @@ describe('Events', () => {
             client.on(gameEvents.playerCannotJoinRoom, (data) => {
                 let playersInRoom = room.getPlayers()
                 expect(_.size(playersInRoom)).to.equal(0)
+                gameWorld.reset()
                 gameWorld.setDefaultConfig()
                 client.disconnect()
                 done()
@@ -150,6 +160,7 @@ describe('Events', () => {
                 let playerHealth = parseInt(data.d[2])
                 expect(playerHealth).to.equal(95)
                 GameManager.getPlayer(playerID).onPlayerBackSafeArea()
+                gameWorld.reset()
                 gameWorld.setDefaultConfig()
                 client.disconnect()
                 done()
@@ -167,33 +178,7 @@ describe('Events', () => {
                 expect(data.d[0]).to.equal('1234')
                 expect(data.d[1]).to.equal(1)
                 expect(data.d[2]).to.equal(0)
-                gameWorld.setDefaultConfig()
-                client.disconnect()
-                done()
-            })
-        })
-    })
-
-    describe('Player leaves the room', () => {
-        it('should reset gameWorld when last player leaves', (done) => {
-            let client, playerID, gameWorld, room
-            client = io.connect(SOCKET_URL, options)
-            client.on('connect', (data) => {
-                room = GameManager.getRoom('0')
-                gameWorld = room.gameWorld
-                gameWorld.setMaxPlayers(1)
-                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
-            })
-
-            client.on(gameEvents.playerJoinGame, (data) => {
-                playerID = data.d[0]
-                client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
-            })
-
-            client.on(gameEvents.playerJoinRoom, (data) => {
-                gameWorld.reset = sinon.spy()
-                GameManager.getPlayer(playerID).leaveCurrentRoom()
-                expect(gameWorld.reset).to.have.been.calledOnce
+                gameWorld.reset()
                 gameWorld.setDefaultConfig()
                 client.disconnect()
                 done()
@@ -232,22 +217,24 @@ describe('Events', () => {
                 expectedIndex = 4
                 room.getPlayer(playerID).currentEquipment = expectedIndex
                 let damage = 100
+                gameWorld.setState(GAME_STATE.INGAME)
+                gameWorld.matchID = "some_match_id"
                 player.emit(gameEvents.checkShootHit, { d: `[@${victimID}@,${damage}]` })
             })
         })
 
-        // it('should send back kill information correctly', (done) => {
-        //     player.on(gameEvents.playerDie, (data) => {
-        //         expect(data.d[0]).to.equal(victimID)
-        //         expect(data.d[1]).to.equal('1234')
-        //         expect(data.d[2]).to.equal('5678')
-        //         expect(data.d[3]).to.equal(expectedIndex)
-        //         gameWorld.setDefaultConfig()
-        //         player.disconnect()
-        //         victim.disconnect()
-        //         done()
-        //     })
-        // })
+        it('should send back kill information correctly', (done) => {
+            player.on(gameEvents.playerDie, (data) => {
+                expect(data.d[0]).to.equal(victimID)
+                expect(data.d[1]).to.equal('1234')
+                expect(data.d[2]).to.equal('5678')
+                expect(data.d[3]).to.equal(expectedIndex)
+                gameWorld.setDefaultConfig()
+                player.disconnect()
+                victim.disconnect()
+                done()
+            })
+        })
 
         it('should increase number player kill by 1', (done) => {
             player.on(gameEvents.playerDie, (data) => {
@@ -261,6 +248,7 @@ describe('Events', () => {
         it('should reduce number of players alive by 1', (done) => {
             player.on(gameEvents.updateNumberOfAlivePlayer, (data) => {
                 expect(data.d[0]).to.equal(1)
+                gameWorld.reset()
                 gameWorld.setDefaultConfig()
                 player.disconnect()
                 victim.disconnect()
@@ -277,6 +265,33 @@ describe('Events', () => {
                 expect(data.d[2]).to.equal(0)
                 player.disconnect()
                 victim.disconnect()
+                done()
+            })
+        })
+    })
+
+    describe('Player leaves the room', () => {
+        it('should reset gameWorld when last player leaves', (done) => {
+            let client, playerID, gameWorld, room
+            client = io.connect(SOCKET_URL, options)
+            client.on('connect', (data) => {
+                room = GameManager.getRoom('0')
+                gameWorld = room.gameWorld
+                gameWorld.setMaxPlayers(1)
+                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
+            })
+
+            client.on(gameEvents.playerJoinGame, (data) => {
+                playerID = data.d[0]
+                client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
+            })
+
+            client.on(gameEvents.playerJoinRoom, (data) => {
+                gameWorld.reset = sinon.spy()
+                GameManager.getPlayer(playerID).leaveCurrentRoom()
+                expect(gameWorld.reset).to.have.been.calledOnce
+                gameWorld.setDefaultConfig()
+                client.disconnect()
                 done()
             })
         })

@@ -166,7 +166,7 @@ module.exports = class {
     }
 
     hitPlayer(victim, damage) {
-        victim.hp -= damage
+        victim.hp -= this.currentRoom.gameWorld.isInGame() ? damage : 0
         if (victim.hp <= 0) {
             this.currentRoom.gameWorld.onPlayerKill(this, victim)
             victim.broadcastRoom(gameEvents.playerDie, { d: this.getKillData(victim) })

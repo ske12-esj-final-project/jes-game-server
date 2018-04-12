@@ -19,10 +19,10 @@ describe('Room model', () => {
     io.to('test').emit = () => { return }
 
     beforeEach(() => {
-        let userID = 'user'
+        let userID = "user"
         axiosMock = new MockAdapter(axios)
         axiosMock.onPost(API.MATCH, { players: [userID] }).replyOnce(200, {
-            matchID: 'some_match_id'
+            matchID: "some_match_id"
         })
     })
 

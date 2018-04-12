@@ -63,18 +63,22 @@ module.exports = class {
         room.addPlayer(player)
         this.socket.join(roomID)
         this.socket.emit(gameEvents.playerJoinRoom, { d: [player.playerID] })
-        console.log('emit add playerjoin room',this.socket.playerID)
-        let maxPlayer = room.gameWorld.getMaxPlayers()
-        let numberOfplayerInRoom = _.size(room.gameWorld.players)
-        let morethan_80 = numberOfplayerInRoom >= Math.floor(0.8 * (maxPlayer))
-        let startCondition = ( morethan_80 && numberOfplayerInRoom>=2 || room.isFull()) && room.gameWorld.getState() === GAME_STATE.OPEN
-        console.log(numberOfplayerInRoom, (numberOfplayerInRoom / maxPlayer), morethan_80, 'startCondition', startCondition, room.gameWorld.getState())
-        if (startCondition) {
+        console.log('emit add player join room', this.socket.playerID)
+
+        if (this.canStartMatch(room)) {
             room.gameWorld.setState(GAME_STATE.COUNTDOWN)
             room.onCountdown()
         }
 
         this.onUpdateRoomInfo()
+    }
+
+    canStartMatch(room) {
+        let maxPlayer = room.gameWorld.getMaxPlayers()
+        let numberOfplayerInRoom = _.size(room.gameWorld.players)
+        let morethan_80 = numberOfplayerInRoom >= Math.floor(0.8 * (maxPlayer))
+        return (morethan_80 && numberOfplayerInRoom >= 2 || room.isFull()) 
+        && room.gameWorld.getState() === GAME_STATE.OPEN
     }
 
     onUpdateRoomInfo() {

@@ -101,17 +101,17 @@ module.exports = class {
     }
 
     createWarnSafeAreaInterval() {
-        let t = 0
+        let t = this.config.triggerTime
         return setInterval(() => {
-            if (t >= this.config.triggerTime) {
+            if (t <= 0) {
                 this.safeArea.setState(SAFE_AREA_STATE.TRIGGERING)
                 this.onMoveSafeArea()
                 clearInterval(this.warnSafeAreaInterval)
             }
 
             else {
-                t += 1000
-                this.io.to(this.roomID).emit(gameEvents.warnSafeAreaTime, { d: [t] })
+                t -= 1000
+                this.io.to(this.roomID).emit(gameEvents.warnSafeAreaTime, { d: [t / 1000] })
             }
 
         }, 1000)
@@ -178,7 +178,7 @@ module.exports = class {
         this.itemList = createWeaponItemList(itemSize, equitmentData)
         this.equipments = assignRandomPositions(this.itemList, SPAWNPOINTS)
         this.gottenEquitmentList = []
-        this.warnSafeAreaInterval = null
+        clearInterval(this.warnSafeAreaInterval)
         this.bulletList = createBulletList(this.equipments)
 
         let easterItem = {

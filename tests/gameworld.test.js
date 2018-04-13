@@ -106,7 +106,6 @@ describe('Gameworld', () => {
         it(`should trigger safe area all players when safeAreaDuration ${DEFAULT_CONFIG.triggerTime} ms`, () => {
             gameWorld.onMoveSafeArea = sinon.spy()
             this.clock.tick(DEFAULT_CONFIG.triggerTime + 2000)
-            console.log('@@@@@@', gameWorld.safeArea.getState())
             expect(gameWorld.safeArea.isTriggering()).to.be.true
             expect(gameWorld.onMoveSafeArea).to.have.been.calledOnce
         })

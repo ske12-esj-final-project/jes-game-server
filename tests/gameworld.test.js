@@ -98,15 +98,14 @@ describe('Gameworld', () => {
 
         it(`should warn safe area all players when safeAreaDuration ${DEFAULT_CONFIG.warningTime} ms`, () => {
             gameWorld.onWarningSafeArea = sinon.spy()
-            this.clock.tick(DEFAULT_CONFIG.warningTime)
+            this.clock.tick(DEFAULT_CONFIG.warningTime + 1000)
             expect(gameWorld.safeArea.isWarning()).to.be.true
             expect(gameWorld.onWarningSafeArea).to.have.been.calledOnce
         })
 
         it(`should trigger safe area all players when safeAreaDuration ${DEFAULT_CONFIG.triggerTime} ms`, () => {
             gameWorld.onMoveSafeArea = sinon.spy()
-            gameWorld.safeArea.setState(SAFE_AREA_STATE.WARNING)
-            this.clock.tick(DEFAULT_CONFIG.triggerTime)
+            this.clock.tick(DEFAULT_CONFIG.triggerTime + 2000)
             expect(gameWorld.safeArea.isTriggering()).to.be.true
             expect(gameWorld.onMoveSafeArea).to.have.been.calledOnce
         })
@@ -115,7 +114,6 @@ describe('Gameworld', () => {
             let player1 = new Player(null, 'p1', 'Player_1')
             player1.position = { x: -100, y: 25, z: 20 }
             gameWorld.players[player1.playerID] = player1
-
             this.clock.tick((gameWorld.config.triggerTime + gameWorld.config.restrictTime) * 7)
             expect(gameWorld.safeArea.scale).to.deep.equal({ x: 0, y: 40, z: 0 })
         })

@@ -27,7 +27,6 @@ module.exports = class {
         }
     }
 
-
     sendRemoveWeapon(weaponID) {
         this.io.to(this.roomID).emit(gameEvents.getEquipment, { d: [weaponID] })
     }
@@ -58,14 +57,9 @@ module.exports = class {
     }
 
     updateSafeArea() {
-        if (this.safeAreaDuration >= this.config.warningTime && this.safeArea.isWaiting()) {
+        if (this.safeArea.isWaiting()) {
             this.safeArea.setState(SAFE_AREA_STATE.WARNING)
             this.onWarningSafeArea()
-        }
-
-        if (this.safeAreaDuration >= this.config.triggerTime && this.safeArea.isWarning()) {
-            this.safeArea.setState(SAFE_AREA_STATE.TRIGGERING)
-            this.onMoveSafeArea()
         }
     }
 
@@ -95,6 +89,7 @@ module.exports = class {
     onWarningSafeArea() {
         this.calculateSafeArea()
         this.io.to(this.roomID).emit(gameEvents.warnSafeArea, { d: this.safeArea.getSendData() })
+        this.warnSafeAreaInterval = this.createWarnSafeAreaInterval()
     }
 
     onMoveSafeArea() {
@@ -106,10 +101,27 @@ module.exports = class {
         }, this.config.restrictTime)
     }
 
+    createWarnSafeAreaInterval() {
+        let t = this.config.triggerTime
+        return setInterval(() => {
+            if (t <= 0) {
+                this.safeArea.setState(SAFE_AREA_STATE.TRIGGERING)
+                this.onMoveSafeArea()
+                clearInterval(this.warnSafeAreaInterval)
+            }
+
+            else {
+                t -= 1000
+                this.io.to(this.roomID).emit(gameEvents.warnSafeAreaTime, { d: [t / 1000] })
+            }
+
+        }, 1000)
+    }
+
     updateNumberOfAlivePlayer() {
         let alivePlayers = this.getAlivePlayers()
         let aliveNumber = _.size(alivePlayers)
-        console.log('aliveNumber ', aliveNumber)
+        console.log('aliveNumber', aliveNumber)
         this.io.to(this.roomID).emit(gameEvents.updateNumberOfAlivePlayer, { "d": [aliveNumber] })
         if (aliveNumber === 1 && this.isInGame()) {
             let winner = Object.values(alivePlayers)[0]
@@ -164,6 +176,7 @@ module.exports = class {
         })
         return sendData
     }
+
     getUpdateWeaponInMap() {
         let sendData = []
         _.map(this.equipments, item => {
@@ -178,20 +191,17 @@ module.exports = class {
         this.playerReadyCounter = 0
         let itemSize = this.config.NumberOfItems
         this.itemList = createWeaponItemList(itemSize, equitmentData)
-
         this.equipments = assignRandomPositions(this.itemList, SPAWNPOINTS)
-
-        this.gotttenEquitmensList = []
-
+        this.gottenEquitmentList = []
+        clearInterval(this.warnSafeAreaInterval)
         this.bulletList = createBulletList(this.equipments)
-        /* */
-        // weaponIndex 10 is sniper
+
         let easterItem = {
             uid: shortid.generate(), weaponIndex: 10, position:
                 { "x": -81.63, "y": 41.25, "z": -165.34 },
             capacity: 6
         }
-        /* */
+
         this.equipments.push(easterItem)
         this.safeArea = new SafeArea()
 

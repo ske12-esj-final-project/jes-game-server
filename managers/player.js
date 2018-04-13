@@ -2,7 +2,8 @@ const _ = require('lodash')
 const gameEvents = require('../constants/events')
 const GameManager = require('./game')
 const Utils = require('../utils')
-
+const axios = require('axios')
+const API = require('../constants/api')
 module.exports = class {
     constructor(socket, playerID, username) {
         this.socket = socket
@@ -34,6 +35,23 @@ module.exports = class {
 
         socket.on(gameEvents.getBullet, this.getBullet.bind(this))
 
+        socket.on(gameEvents.saveClothIndex, this.saveClothIndex.bind(this))
+
+    }
+
+    saveClothIndex(data) {
+        let jsonData = JSON.parse(data["d"])
+        console.log('saveClothIndex',jsonData)
+        let clothIndex = jsonData[0]
+        const payload = {
+            "clothIndex": clothIndex || 0
+        }
+        axios.put(API.USER + `/user/${this.userID}`, payload).then(user_response => {
+            console.log("saveClothIndex-response", user_response.data)
+        }).catch(err => {
+            console.error("error",err)
+        })
+
     }
 
     reset() {
@@ -45,8 +63,8 @@ module.exports = class {
     }
     setupPlayer(data) {
         let jsonData = JSON.parse(data["d"])
-        console.log('data setup-player',jsonData)
-        this.cloathIndex = jsonData[0]
+        console.log('data setup-player', jsonData)
+        this.clothIndex = jsonData[0]
         this.reset()
         this.position = { x: 0, y: 20, z: 0 }
         this.sendPlayersDataCreateCharacter()
@@ -62,12 +80,12 @@ module.exports = class {
         this.sendPlayersDataCreateCharacter()
 
         this.setupEquipment()
-        
+
         let bulletInMap = this.currentRoom.gameWorld.getUpdateBulletInMap()
         this.socket.emit(gameEvents.setupBullet, { d: bulletInMap })
     }
 
-    setupEquipment(){
+    setupEquipment() {
         let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
         this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
     }
@@ -84,29 +102,29 @@ module.exports = class {
 
     }
 
-    discardEquitment(data){
-        console.log('d-discardEquitment0',data)
+    discardEquitment(data) {
+        console.log('d-discardEquitment0', data)
         data['d'] = data['d'].replace(/@/g, "\"")
-        console.log('d-discardEquitment1',data)
+        console.log('d-discardEquitment1', data)
         let jsonData = JSON.parse(data["d"])
         let weaponID = jsonData[0]
         let room = this.currentRoom
 
         let discardItem = _.clone(_.find(room.gameWorld.gottenEquitmentList, item => item.uid === weaponID))
-        if(!discardItem) return
+        if (!discardItem) return
         _.remove(room.gameWorld.gottenEquitmentList, item => item.uid === weaponID)
 
         let currentAmmo = parseInt(jsonData[1])
-        let posX = jsonData[2] ||0
-        let posY = jsonData[3] ||0
-        let posZ = jsonData[4] ||0
+        let posX = jsonData[2] || 0
+        let posY = jsonData[3] || 0
+        let posZ = jsonData[4] || 0
 
         // update data of discardItem
 
         discardItem.position = {
-            x:posX,
-            y:posY,
-            z:posZ
+            x: posX,
+            y: posY,
+            z: posZ
         }
 
         discardItem.capacity = currentAmmo
@@ -116,7 +134,7 @@ module.exports = class {
         this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
         this.broadcastRoom(gameEvents.setupEquipment, { d: weaponsInMap })
         // console.log('weaponInMap',weaponsInMap)
-        console.log('discard - item ',discardItem)
+        console.log('discard - item ', discardItem)
 
     }
 
@@ -350,7 +368,7 @@ module.exports = class {
             player.position.z,
             player.username,
             player.currentEquipment,
-            player.cloathIndex
+            player.clothIndex
         ]
     }
 

@@ -36,5 +36,7 @@ module.exports = {
     "finishCountdown": "w",
     "countdown": "x",
     "playerJoinRoom": "y",
-    "playerJoinGame": "z"
+    "playerJoinGame": "z",
+    
+    "saveClothIndex":"a1"
 }

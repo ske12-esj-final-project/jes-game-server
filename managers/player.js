@@ -44,6 +44,7 @@ module.exports = class {
         this.numberOfKill = 0
     }
     setupPlayer(data) {
+        console.log('data setup-player',data)
         this.reset()
         this.position = { x: 0, y: 20, z: 0 }
         this.sendPlayersDataCreateCharacter()

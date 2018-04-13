@@ -129,8 +129,9 @@ module.exports = class {
             winner.socket.emit(gameEvents.playerWin, { d: [winner.username, winner.numberOfKill, score] })
 
             // send to match api
+            const fixed2Dec = (n)=> Math.round(n * 100)/100;
             let matchID = this.matchID
-            let duration = this.duration || 0
+            let duration = fixed2Dec(this.duration) || 0
             axios.put(API.MATCH + `/${matchID}`, {
                 "duration": duration
             })

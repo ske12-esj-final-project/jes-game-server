@@ -89,9 +89,9 @@ module.exports = class {
         let weaponID = jsonData[0]
         let room = this.currentRoom
 
-        let discardItem = _.clone(_.find(room.gameWorld.gotttenEquitmensList, item => item.uid === weaponID))
+        let discardItem = _.clone(_.find(room.gameWorld.gottenEquitmentList, item => item.uid === weaponID))
         if(!discardItem) return
-        _.remove(room.gameWorld.gotttenEquitmensList, item => item.uid === weaponID)
+        _.remove(room.gameWorld.gottenEquitmentList, item => item.uid === weaponID)
 
         let currentAmmo = parseInt(jsonData[1])
         let posX = jsonData[2] ||0
@@ -125,7 +125,7 @@ module.exports = class {
             let room = this.currentRoom
 
             let gottenItem = _.clone(_.find(room.gameWorld.equipments, item => item.uid === weaponID))
-            room.gameWorld.gotttenEquitmensList.push(gottenItem)
+            room.gameWorld.gottenEquitmentList.push(gottenItem)
 
             _.remove(room.gameWorld.equipments, item => item.uid === weaponID)
             room.gameWorld.sendRemoveWeapon(weaponID)

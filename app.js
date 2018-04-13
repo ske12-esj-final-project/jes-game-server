@@ -97,13 +97,14 @@ app.post('/login', (req, res) => {
             "headers": { "access-token": token }
         }).then((me_response) => {
             let userID = me_response.data.id
-            let clothIndex =  me.me_response.data.clothIndex
+            let clothIndex = me_response.data.clothIndex
+            console.log('me_response',clothIndex)
             let err = checkUserID(userID)
             if (err) {
                 res.status(500).send({ message: err.message })
                 return
             }
-            res.send({ auth: true, token: token,clothIndex:clothIndex })
+            res.send({ auth: true, token: token,clothIndex:clothIndex})
         })
     }).catch(err => {
         console.log('error', err)

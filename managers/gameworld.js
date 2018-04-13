@@ -131,7 +131,7 @@ module.exports = class {
             // send to match api
             let matchID = this.matchID
             let duration = this.duration || 0
-            axios.put(API.MATCH + `/`, {
+            axios.put(API.MATCH + `/${matchID}`, {
                 "duration": duration
             })
                 .then((res) => {

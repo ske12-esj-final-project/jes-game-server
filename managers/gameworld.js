@@ -45,6 +45,7 @@ module.exports = class {
         this.updateAllPlayersMovement()
         if (this.isInGame()) {
             this.safeAreaDuration += 1000 / this.config.tickRate
+            this.duration += 1000 / this.config.tickRate
             this.updateSafeArea()
         }
     }
@@ -114,6 +115,20 @@ module.exports = class {
             let winner = Object.values(alivePlayers)[0]
             let score = Utils.calculateScore(winner)
             winner.socket.emit(gameEvents.playerWin, { d: [winner.username, winner.numberOfKill, score] })
+
+            // send to match api
+            let matchID = this.gameWorld.matchID
+            let duration = this.gameWorld.duration || 0
+            axios.put(API.MATCH + `/`, {
+                "duration": duration
+            })
+                .then((res) => {
+                    console.log('update duration match done.')
+                })
+                .catch((err) => {
+                    console.error(err)
+                })
+
             this.reset()
         }
     }
@@ -174,13 +189,14 @@ module.exports = class {
         let easterItem = {
             uid: shortid.generate(), weaponIndex: 10, position:
                 { "x": -81.63, "y": 41.25, "z": -165.34 },
-                capacity:6
+            capacity: 6
         }
         /* */
         this.equipments.push(easterItem)
         this.safeArea = new SafeArea()
 
         this.safeAreaDuration = 0
+        this.duration = 0
         this.setState(GAME_STATE.OPEN)
     }
 

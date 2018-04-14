@@ -44,7 +44,6 @@ module.exports = class {
         this.updateAllPlayersMovement()
         if (this.isInGame()) {
             this.safeAreaDuration += 1000 / this.config.tickRate
-            this.duration += 1000 / this.config.tickRate
             this.updateSafeArea()
         }
     }

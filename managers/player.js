@@ -366,8 +366,8 @@ module.exports = class {
             player.position.x,
             player.position.y,
             player.position.z,
-            // player.username,
-            // player.currentEquipment,
+            player.username,
+            player.currentEquipment,
             player.clothIndex
         ]
     }

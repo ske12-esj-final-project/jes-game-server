@@ -2,6 +2,7 @@ module.exports = {
     0: {
         "Index": 0,
         "Damage": 5,
+        "Game name": "Bare hand",
     },
     1: {
         "Index": 1,

@@ -131,7 +131,7 @@ module.exports = class {
             // send to match api
             const fixed2Dec = (n)=> Math.round(n * 100)/100;
             let matchID = this.matchID
-            let duration = fixed2Dec(this.duration) || 0
+            let duration = fixed2Dec((Date.now() - this.duration)/1000) || 0
             axios.put(API.MATCH + `/${matchID}`, {
                 "duration": duration
             })
@@ -207,7 +207,7 @@ module.exports = class {
         this.safeArea = new SafeArea()
 
         this.safeAreaDuration = 0
-        this.duration = 0
+        this.duration = Date.now()
         this.setState(GAME_STATE.OPEN)
     }
 

@@ -75,6 +75,7 @@ module.exports = class {
         clearInterval(this.countdownInterval)
         this.gameWorld.io.to(this.gameWorld.roomID).emit(gameEvents.finishCountdown)
         this.gameWorld.setState(GAME_STATE.INGAME)
+        this.gameWorld.duration = Date.now()
         this.onUpdateRoomInfo()
 
         let p = _.map(this.getPlayers(), player => {

@@ -127,6 +127,7 @@ module.exports = {
     11:{
         "Index": 11,
         "Game name": "Medkit",
-        "weight": 30
+        "weight": 30,
+        "Capacity": 0
     }
 }

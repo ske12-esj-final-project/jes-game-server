@@ -123,5 +123,10 @@ module.exports = {
         "Fire rate": "n/a",
         "Recoil": "High",
         "weight": 0
+    },
+    11:{
+        "Index": 11,
+        "Game name": "Medkit",
+        "weight": 30
     }
 }

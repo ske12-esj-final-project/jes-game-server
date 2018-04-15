@@ -146,6 +146,16 @@ module.exports = class {
             let room = this.currentRoom
 
             let gottenItem = _.clone(_.find(room.gameWorld.equipments, item => item.uid === weaponID))
+            // got medkit
+            if(gottenItem.weaponIndex===11){
+                this.hp += 30
+                if(this.hp>=100){
+                    this.hp = 100
+                }
+                room.gameWorld.sendRemoveWeapon(weaponID)
+                return 
+            }
+
             room.gameWorld.gottenEquitmentList.push(gottenItem)
 
             _.remove(room.gameWorld.equipments, item => item.uid === weaponID)

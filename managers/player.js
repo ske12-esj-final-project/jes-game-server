@@ -155,7 +155,7 @@ module.exports = class {
                 let sendData = { "d": [this.playerID, this.playerID, this.hp] }
                 this.socket.emit(gameEvents.updatePlayersStatus, sendData)
                 room.gameWorld.sendRemoveWeapon(weaponID)
-                cosnole.log('get item')
+                console.log('get item')
                 return 
             }
 

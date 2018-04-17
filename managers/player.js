@@ -46,7 +46,7 @@ module.exports = class {
         const payload = {
             "clothIndex": clothIndex || 0
         }
-        axios.put(API.USER + `/user/${this.userID}`, payload).then(user_response => {
+        axios.put(API.USER + `/u/${this.userID}/cloth`, payload).then(user_response => {
             console.log("saveClothIndex-response", user_response.data)
         }).catch(err => {
             console.error("error",err)
@@ -267,7 +267,13 @@ module.exports = class {
 
     getVictimData(victim) {
         let aliveNumber = _.size(victim.currentRoom.gameWorld.getAlivePlayers()) + 1
-        return [victim.username, aliveNumber, victim.numberOfKill, Utils.calculateScore(victim)]
+        let score = Utils.calculateScore(victim)
+        axios.put(API.USER + `/u/${victim.userID}/score`, { 'score': score }).then(user_response => {
+            console.log("saveScore-response", user_response.data)
+        }).catch(err => {
+            console.error("error",err)
+        })
+        return [victim.username, aliveNumber, victim.numberOfKill, Utils.calculateScore(score)]
     }
 
     updateCurrentEquipment(data) {

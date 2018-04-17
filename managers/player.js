@@ -273,7 +273,7 @@ module.exports = class {
         }).catch(err => {
             console.error("error",err)
         })
-        return [victim.username, aliveNumber, victim.numberOfKill, Utils.calculateScore(score)]
+        return [victim.username, aliveNumber, victim.numberOfKill, score]
     }
 
     updateCurrentEquipment(data) {

@@ -96,11 +96,11 @@ app.post('/login', (req, res) => {
     }).then(token => {
         axios.get(API.USER + '/me', {
             "headers": { "access-token": token }
-        }).then((res) => {
-            let userID = res.data.id
-            let username = res.data.username
-            let clothIndex = res.data.clothIndex
-            let score = res.data.score
+        }).then((me_response) => {
+            let userID = me_response.data.id
+            let username = me_response.data.username
+            let clothIndex = me_response.data.clothIndex
+            let score = me_response.data.score
             let err = checkUserID(userID)
             if (err) {
                 res.status(500).send({ message: err.message })

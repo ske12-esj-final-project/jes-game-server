@@ -2,6 +2,7 @@ module.exports = {
     0: {
         "Index": 0,
         "Damage": 5,
+        "Game name": "Bare hand",
     },
     1: {
         "Index": 1,
@@ -122,5 +123,11 @@ module.exports = {
         "Fire rate": "n/a",
         "Recoil": "High",
         "weight": 0
+    },
+    11:{
+        "Index": 11,
+        "Game name": "Medkit",
+        "weight": 30,
+        "Capacity": 0
     }
 }

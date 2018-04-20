@@ -125,6 +125,11 @@ module.exports = class {
         if (aliveNumber === 1 && this.isInGame()) {
             let winner = Object.values(alivePlayers)[0]
             let score = Utils.calculateScore(winner)
+            axios.put(API.USER + `/u/${winner.userID}/score`, { 'score': score }).then(user_response => {
+                console.log("saveScore-response", user_response.data)
+            }).catch(err => {
+                console.error("error",err)
+            })
             winner.socket.emit(gameEvents.playerWin, { d: [winner.username, winner.numberOfKill, score] })
 
             // send to match api

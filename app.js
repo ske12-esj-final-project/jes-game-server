@@ -98,6 +98,7 @@ app.post('/login', (req, res) => {
             "headers": { "access-token": token }
         }).then((res) => {
             let userID = res.data.id
+            let username = res.data.username
             let clothIndex = res.data.clothIndex
             let score = res.data.score
             let err = checkUserID(userID)
@@ -105,7 +106,7 @@ app.post('/login', (req, res) => {
                 res.status(500).send({ message: err.message })
                 return
             }
-            res.send({ auth: true, token: token, clothIndex: clothIndex, score: score })
+            res.send({ auth: true, token: token, username: username, clothIndex: clothIndex, score: score })
         })
     }).catch(err => {
         console.log('error', err)

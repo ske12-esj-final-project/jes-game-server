@@ -26,9 +26,9 @@ const gameWorldConfig3v3 = require('./config/gameworld3v3')
 
 let roomA = new Room(io, 'Room สอนหน่อยๆ', '0')
 let roomB = new Room(io, 'Room AR-TAG', '1')
-let room1v1 = new Room(io,'Room 1-1','2',gameWorldConfig1v1)
-let roomhod = new Room(io,'Room โหดจังครับ','3',gameWorldConfig1v1)
-let roomCookLab = new Room(io, 'Room คุกLab', '4',gameWorldConfig3v3)
+let room1v1 = new Room(io, 'Room 1-1', '2', gameWorldConfig1v1)
+let roomhod = new Room(io, 'Room โหดจังครับ', '3', gameWorldConfig1v1)
+let roomCookLab = new Room(io, 'Room คุกLab', '4', gameWorldConfig3v3)
 let roomManager
 
 const cors = require('cors')
@@ -51,7 +51,7 @@ io.on('connection', (socket) => {
         let player = GameManager.getPlayer(socket.playerID)
         if (player) player.leaveCurrentRoom()
         roomManager.onPlayerDisconnect(socket.playerID)
-        console.log('disconect-pid',socket.playerID)
+        console.log('disconect-pid', socket.playerID)
         io.emit(gameEvents.playerDisconnect, { d: socket.playerID })
         console.log('remain # players', _.size(GameManager.getPlayers()))
     })
@@ -59,7 +59,7 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 5000
 server.listen(PORT, () => {
-    console.log(`Listen on http://localhost:${PORT}`,new Date())
+    console.log(`Listen on http://localhost:${PORT}`, new Date())
 })
 
 
@@ -95,16 +95,16 @@ app.post('/login', (req, res) => {
     }).then(token => {
         axios.get(API.USER + '/me', {
             "headers": { "access-token": token }
-        }).then((me_response) => {
-            let userID = me_response.data.id
-            let clothIndex = me_response.data.clothIndex
-            console.log('me_response',clothIndex)
+        }).then((res) => {
+            let userID = res.data.id
+            let clothIndex = res.data.clothIndex
+            let score = res.data.score
             let err = checkUserID(userID)
             if (err) {
                 res.status(500).send({ message: err.message })
                 return
             }
-            res.send({ auth: true, token: token,clothIndex:clothIndex})
+            res.send({ auth: true, token: token, clothIndex: clothIndex, score: score })
         })
     }).catch(err => {
         console.log('error', err)
@@ -123,7 +123,7 @@ app.get('/p', (req, res) => {
         return {
             "userID": p.userID,
             "username": p.username,
-            "playerID":p.playerID
+            "playerID": p.playerID
         }
     })
     res.json(ps)

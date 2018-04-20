@@ -49,7 +49,7 @@ module.exports = {
         "Capacity": 10,
         "Fire rate": "n/a",
         "Recoil": "High",
-        "weight": 0
+        "weight": 20
     },
     5: {
         "Index": 5,

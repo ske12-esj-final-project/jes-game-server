@@ -15,8 +15,6 @@ module.exports = class {
         this.socketHandler(socket)
     }
 
-
-
     socketHandler(socket) {
         if (!socket) return
         socket.on(gameEvents.playerSetupPlayer, this.setupPlayer.bind(this))
@@ -30,18 +28,14 @@ module.exports = class {
         socket.on(gameEvents.playerOutSafeArea, this.onPlayerOutSafeArea.bind(this))
         socket.on(gameEvents.playerBackInSafeArea, this.onPlayerBackSafeArea.bind(this))
         socket.on(gameEvents.playerLeaveRoom, this.leaveCurrentRoom.bind(this))
-
         socket.on(gameEvents.discardEquitment, this.discardEquitment.bind(this))
-
         socket.on(gameEvents.getBullet, this.getBullet.bind(this))
-
         socket.on(gameEvents.saveClothIndex, this.saveClothIndex.bind(this))
-
     }
 
     saveClothIndex(data) {
         let jsonData = JSON.parse(data["d"])
-        console.log('saveClothIndex',jsonData)
+        console.log('saveClothIndex', jsonData)
         let clothIndex = jsonData[0]
         const payload = {
             "clothIndex": clothIndex || 0
@@ -49,7 +43,7 @@ module.exports = class {
         axios.put(API.USER + `/u/${this.userID}/cloth`, payload).then(user_response => {
             console.log("saveClothIndex-response", user_response.data)
         }).catch(err => {
-            console.error("error",err)
+            console.error("error", err)
         })
 
     }
@@ -61,6 +55,7 @@ module.exports = class {
         this.currentEquipment = 0
         this.numberOfKill = 0
     }
+
     setupPlayer(data) {
         let jsonData = JSON.parse(data["d"])
         console.log('data setup-player', jsonData)
@@ -78,7 +73,6 @@ module.exports = class {
             z: this.randomInt(-150, 150)
         }
         this.sendPlayersDataCreateCharacter()
-
         this.setupEquipment()
 
         let bulletInMap = this.currentRoom.gameWorld.getUpdateBulletInMap()
@@ -98,10 +92,6 @@ module.exports = class {
         this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
     }
 
-    removeEquipmentInClient(data) {
-
-    }
-
     discardEquitment(data) {
         console.log('d-discardEquitment0', data)
         data['d'] = data['d'].replace(/@/g, "\"")
@@ -115,16 +105,10 @@ module.exports = class {
         _.remove(room.gameWorld.gottenEquitmentList, item => item.uid === weaponID)
 
         let currentAmmo = parseInt(jsonData[1])
-        let posX = jsonData[2] || 0
-        let posY = jsonData[3] || 0
-        let posZ = jsonData[4] || 0
-
-        // update data of discardItem
-
         discardItem.position = {
-            x: posX,
-            y: posY,
-            z: posZ
+            x: jsonData[2] || 0,
+            y: jsonData[3] || 0,
+            z: jsonData[4] || 0
         }
 
         discardItem.capacity = currentAmmo
@@ -133,7 +117,6 @@ module.exports = class {
         let weaponsInMap = this.currentRoom.gameWorld.getUpdateWeaponInMap()
         this.socket.emit(gameEvents.setupEquipment, { d: weaponsInMap })
         this.broadcastRoom(gameEvents.setupEquipment, { d: weaponsInMap })
-        // console.log('weaponInMap',weaponsInMap)
         console.log('discard - item ', discardItem)
 
     }
@@ -147,16 +130,16 @@ module.exports = class {
 
             let gottenItem = _.clone(_.find(room.gameWorld.equipments, item => item.uid === weaponID))
             // got medkit
-            if(gottenItem.weaponIndex===11){
+            if (gottenItem.weaponIndex === 11) {
                 this.hp += 30
-                if(this.hp>=100){
+                if (this.hp >= 100) {
                     this.hp = 100
                 }
                 let sendData = { "d": [this.playerID, this.playerID, this.hp] }
                 this.socket.emit(gameEvents.updatePlayersStatus, sendData)
                 room.gameWorld.sendRemoveWeapon(weaponID)
                 console.log('get item')
-                return 
+                return
             }
 
             room.gameWorld.gottenEquitmentList.push(gottenItem)
@@ -198,6 +181,7 @@ module.exports = class {
         return setInterval(() => {
             this.hp -= damage
             if (this.hp <= 0) {
+                this.currentRoom.gameWorld.onPlayerDieSafeArea(this)
                 this.broadcastRoom(gameEvents.playerDie, { d: this.getKillData(this) })
                 this.socket.emit(gameEvents.getVictimData, { d: this.getVictimData(this) })
                 this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
@@ -223,12 +207,7 @@ module.exports = class {
     }
 
     playerShoot(data) {
-        let sendToOther = {
-            "d": [
-                this.playerID
-            ]
-        }
-        this.broadcastRoom(gameEvents.enemyShoot, sendToOther)
+        this.broadcastRoom(gameEvents.enemyShoot, { d: [this.playerID] })
     }
 
     checkShootHit(data) {
@@ -250,6 +229,7 @@ module.exports = class {
     hitPlayer(victim, damage) {
         victim.hp -= this.currentRoom.gameWorld.isInGame() ? damage : 0
         if (victim.hp <= 0) {
+            this.numberOfKill++
             this.currentRoom.gameWorld.onPlayerKill(this, victim)
             victim.broadcastRoom(gameEvents.playerDie, { d: this.getKillData(victim) })
             victim.socket.emit(gameEvents.getVictimData, { d: this.getVictimData(victim) })
@@ -271,7 +251,7 @@ module.exports = class {
         axios.put(API.USER + `/u/${victim.userID}/score`, { 'score': score }).then(user_response => {
             console.log("saveScore-response", user_response.data)
         }).catch(err => {
-            console.error("error",err)
+            console.error("error", err)
         })
         return [victim.username, aliveNumber, victim.numberOfKill, score]
     }
@@ -337,21 +317,15 @@ module.exports = class {
     leaveCurrentRoom() {
         if (this.currentRoom) {
 
-            const perform = () => {
-                this.currentRoom.removePlayer(this.playerID)
-                this.currentRoom.onUpdateRoomInfo()
-                this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
-                this.socket.leave(this.currentRoom.id)
-                this.currentRoom = null
-            }
-
             if (this.socket.broadcast != undefined) {
                 this.broadcastRoom(gameEvents.playerLeaveRoom, { d: [this.playerID] })
-                perform()
             }
-            else {
-                perform()
-            }
+
+            this.currentRoom.removePlayer(this.playerID)
+            this.currentRoom.onUpdateRoomInfo()
+            this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
+            this.socket.leave(this.currentRoom.id)
+            this.currentRoom = null
         }
     }
 

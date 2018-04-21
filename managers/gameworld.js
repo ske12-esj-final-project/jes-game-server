@@ -125,22 +125,25 @@ module.exports = class {
         if (aliveNumber === 1 && this.isInGame()) {
             let winner = Object.values(alivePlayers)[0]
             let score = Utils.calculateScore(winner)
+
             axios.put(API.USER + `/u/${winner.userID}/score`, { 'score': score }).then(user_response => {
                 console.log("saveScore-response", user_response.data)
             }).catch(err => {
-                console.error("error",err)
+                console.error("error", err)
             })
+
             winner.socket.emit(gameEvents.playerWin, { d: [winner.username, winner.numberOfKill, score] })
 
             // send to match api
-            const fixed2Dec = (n)=> Math.round(n * 100)/100;
+            const fixed2Dec = (n) => Math.round(n * 100) / 100;
             let matchID = this.matchID
-            let duration = fixed2Dec((Date.now() - this.duration)/1000) || 0
+            let duration = fixed2Dec((Date.now() - this.duration) / 1000) || 0
             axios.put(API.MATCH + `/${matchID}`, {
-                "duration": duration
+                "duration": duration,
+                "winner": winner.userID
             })
                 .then((res) => {
-                    console.log('update duration match done.')
+                    console.log('update match done.')
                 })
                 .catch((err) => {
                     console.error(err)
@@ -157,13 +160,28 @@ module.exports = class {
     }
 
     onPlayerKill(player, victim) {
-        player.numberOfKill++
         axios.post(API.KILL, {
             matchID: this.matchID,
             playerID: player.userID,
             victimID: victim.userID,
             victimPos: victim.position,
             weaponUsed: WEAPON[player.currentEquipment.toString()]["Game name"]
+        })
+            .then((res) => {
+                console.log(res.data)
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+    }
+
+    onPlayerDieSafeArea(player) {
+        axios.post(API.KILL, {
+            matchID: this.matchID,
+            playerID: player.userID,
+            victimID: player.userID,
+            victimPos: player.position,
+            weaponUsed: "Safe Area"
         })
             .then((res) => {
                 console.log(res.data)

@@ -53,7 +53,7 @@ module.exports = class {
         this.countdownInterval = setInterval(() => {
             if (!this.gameWorld.isCountdown()) {
                 this.gameWorld.io.to(this.gameWorld.roomID).emit(gameEvents.interruptCountdown)
-                clearInterval(this.countdownInterval)
+                return clearInterval(this.countdownInterval)
             }
 
             timeLeft -= 1

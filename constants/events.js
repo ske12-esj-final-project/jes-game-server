@@ -38,5 +38,6 @@ module.exports = {
     "playerJoinRoom": "y",
     "playerJoinGame": "z",
     
-    "saveClothIndex":"a1"
+    "saveClothIndex":"a1",
+    "interruptCountdown": "a2"
 }

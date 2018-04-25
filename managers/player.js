@@ -218,7 +218,7 @@ module.exports = class {
 
         let victim = GameManager.getPlayer(targetId)
 
-        if (victim) {
+        if (victim && victim.hp > 0) {
             this.hitPlayer(victim, damage)
 
         } else {

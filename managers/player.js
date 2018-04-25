@@ -219,6 +219,7 @@ module.exports = class {
         let victim = GameManager.getPlayer(targetId)
 
         if (victim && victim.hp > 0) {
+            console.log('hp', victim.hp)
             this.hitPlayer(victim, damage)
 
         } else {

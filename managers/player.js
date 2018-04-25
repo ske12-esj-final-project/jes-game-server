@@ -218,8 +218,7 @@ module.exports = class {
 
         let victim = GameManager.getPlayer(targetId)
 
-        if (victim && victim.hp > 0) {
-            console.log('hp', victim.hp)
+        if (victim) {
             this.hitPlayer(victim, damage)
 
         } else {
@@ -228,6 +227,7 @@ module.exports = class {
     }
 
     hitPlayer(victim, damage) {
+        if (victim.hp <= 0) return
         victim.hp -= this.currentRoom.gameWorld.isInGame() ? damage : 0
         if (victim.hp <= 0) {
             this.numberOfKill++

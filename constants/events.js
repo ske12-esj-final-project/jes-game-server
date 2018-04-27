@@ -19,7 +19,7 @@ module.exports = {
     "playerCannotJoinRoom": "f",
     "getBullet":"g",
     "setupBullet":"h",
-    "discardEquitment":"i",
+    "discardEquipment":"i",
     "warnSafeAreaTime": "j",
     "playerWin": "k",
     "playerLoadFinish": "l",

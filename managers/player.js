@@ -28,7 +28,7 @@ module.exports = class {
         socket.on(gameEvents.playerOutSafeArea, this.onPlayerOutSafeArea.bind(this))
         socket.on(gameEvents.playerBackInSafeArea, this.onPlayerBackSafeArea.bind(this))
         socket.on(gameEvents.playerLeaveRoom, this.leaveCurrentRoom.bind(this))
-        socket.on(gameEvents.discardEquitment, this.discardEquitment.bind(this))
+        socket.on(gameEvents.discardEquipment, this.discardEquipment.bind(this))
         socket.on(gameEvents.getBullet, this.getBullet.bind(this))
         socket.on(gameEvents.saveClothIndex, this.saveClothIndex.bind(this))
     }
@@ -92,17 +92,17 @@ module.exports = class {
         this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
     }
 
-    discardEquitment(data) {
-        console.log('d-discardEquitment0', data)
+    discardEquipment(data) {
+        console.log('d-discardEquipment0', data)
         data['d'] = data['d'].replace(/@/g, "\"")
-        console.log('d-discardEquitment1', data)
+        console.log('d-discardEquipment1', data)
         let jsonData = JSON.parse(data["d"])
         let weaponID = jsonData[0]
         let room = this.currentRoom
 
-        let discardItem = _.clone(_.find(room.gameWorld.gottenEquitmentList, item => item.uid === weaponID))
+        let discardItem = _.clone(_.find(room.gameWorld.gottenEquipmentList, item => item.uid === weaponID))
         if (!discardItem) return
-        _.remove(room.gameWorld.gottenEquitmentList, item => item.uid === weaponID)
+        _.remove(room.gameWorld.gottenEquipmentList, item => item.uid === weaponID)
 
         let currentAmmo = parseInt(jsonData[1])
         discardItem.position = {
@@ -126,30 +126,25 @@ module.exports = class {
         let jsonData = JSON.parse(data["d"])
         if (jsonData.length >= 1) {
             let weaponID = jsonData[0]
-            let room = this.currentRoom
+            let gottenItem = _.clone(_.find(this.currentRoom.gameWorld.equipments, { 'uid': weaponID }))
 
-            let gottenItem = _.clone(_.find(room.gameWorld.equipments, item => item.uid === weaponID))
-            // got medkit
-            if (gottenItem.weaponIndex === 11) {
-                this.hp += 30
-                if (this.hp >= 100) {
-                    this.hp = 100
-                }
-                let sendData = { "d": [this.playerID, this.playerID, this.hp] }
-                this.socket.emit(gameEvents.updatePlayersStatus, sendData)
-                room.gameWorld.sendRemoveWeapon(weaponID)
-                console.log('get item')
-                return
-            }
+            if (gottenItem.weaponIndex === 11) return this.getMedicalKit(weaponID)
 
-            room.gameWorld.gottenEquitmentList.push(gottenItem)
-
-            _.remove(room.gameWorld.equipments, item => item.uid === weaponID)
-            room.gameWorld.sendRemoveWeapon(weaponID)
+            this.currentRoom.gameWorld.gottenEquipmentList.push(gottenItem)
+            _.remove(this.currentRoom.gameWorld.equipments, item => item.uid === weaponID)
+            this.currentRoom.gameWorld.sendRemoveWeapon(weaponID)
         }
         else {
             console.error('[error]-checkShootHit wrong data pattern', data)
         }
+    }
+
+    getMedicalKit(medkitID) {
+        this.hp += 30
+        if (this.hp >= 100) this.hp = 100
+        let sendData = { "d": [this.playerID, this.playerID, this.hp] }
+        this.socket.emit(gameEvents.updatePlayersStatus, sendData)
+        this.currentRoom.gameWorld.sendRemoveWeapon(medkitID)
     }
 
     getBullet(data) {
@@ -218,7 +213,7 @@ module.exports = class {
 
         let victim = GameManager.getPlayer(targetId)
 
-        if (victim) {
+        if (victim && victim.hp > 0) {
             this.hitPlayer(victim, damage)
 
         } else {
@@ -227,7 +222,6 @@ module.exports = class {
     }
 
     hitPlayer(victim, damage) {
-        if (victim.hp <= 0) return
         victim.hp -= this.currentRoom.gameWorld.isInGame() ? damage : 0
         if (victim.hp <= 0) {
             this.numberOfKill++

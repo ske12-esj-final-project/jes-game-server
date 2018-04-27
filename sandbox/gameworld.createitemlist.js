@@ -3,18 +3,18 @@
  */
 const _ = require("lodash")
 
-const equitmentData = require("../data/equipments")
-const { createWeaponItemList,assignRandomPositions ,createBulletList} = require('../utils/createEquitmentItemList')
+const equipmentData = require("../data/equipments")
+const { createWeaponItemList,assignRandomPositions ,createBulletList} = require('../utils/createEquipmentItemList')
 const SPAWNPOINTS = require('../spawnpoints/spawnpoint.json')
 
 // let itemSize = 91
-// let mockWeightPercentList = createWeaponItemList(itemSize, equitmentData)
+// let mockWeightPercentList = createWeaponItemList(itemSize, equipmentData)
 
 // console.log(mockWeightPercentList)
 // console.log(_.size(mockWeightPercentList), itemSize)
 
 let itemSize = 100
-this.itemList = createWeaponItemList(itemSize, equitmentData)
+this.itemList = createWeaponItemList(itemSize, equipmentData)
 console.log(this.itemList)
 this.equipments = assignRandomPositions(this.itemList, SPAWNPOINTS)
 

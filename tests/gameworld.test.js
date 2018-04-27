@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = require('../config/gameworld')
 const API = require('../constants/api')
 const GAME_STATE = require('../constants/gamestate')
 const SAFE_AREA_STATE = require('../constants/safestate')
-const {assignRandomPositions} = require('../utils/createEquitmentItemList')
+const {assignRandomPositions} = require('../utils/createEquipmentItemList')
 chai.use(require('sinon-chai'))
 
 let options = {

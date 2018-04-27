@@ -28,8 +28,8 @@ const createItemList = (numberOfItem, itemData) => {
 }
 
 const createWeaponItemList = (numberOfItem, itemData) => {
-    let equitmentDataExceptHand = _.filter(itemData, e => e.Index !== 0)
-    let itemWeightPercentList = createItemList(numberOfItem, equitmentDataExceptHand)
+    let equipmentDataExceptHand = _.filter(itemData, e => e.Index !== 0)
+    let itemWeightPercentList = createItemList(numberOfItem, equipmentDataExceptHand)
     return _.map(itemWeightPercentList, m =>
         ({ uid: shortid.generate(), weaponIndex: m.Index, position: {},capacity:m.Capacity }))
 }
@@ -47,8 +47,8 @@ const assignRandomPositions = (items, spawnPoints) =>{
         return item
     })
 }
-const createBulletList = (equitments)=>{
-    return _.map(equitments,e=>{
+const createBulletList = (equipments)=>{
+    return _.map(equipments,e=>{
         let {x,y,z} = e.position
         // console.log(x,y)
         const getRandomVal = (n)=>{

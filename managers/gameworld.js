@@ -13,8 +13,8 @@ const GAME_STATE = require('../constants/gamestate')
 const SAFE_AREA_STATE = require('../constants/safestate')
 const DEFAULT_CONFIG = require('../config/gameworld')
 
-const equitmentData = require('../data/equipments')
-const { createWeaponItemList, assignRandomPositions, createBulletList } = require('../utils/createEquitmentItemList')
+const equipmentData = require('../data/equipments')
+const { createWeaponItemList, assignRandomPositions, createBulletList } = require('../utils/createEquipmentItemList')
 
 module.exports = class {
     constructor(io, config, roomID) {
@@ -30,6 +30,7 @@ module.exports = class {
     sendRemoveWeapon(weaponID) {
         this.io.to(this.roomID).emit(gameEvents.getEquipment, { d: [weaponID] })
     }
+
     sendRemoveBullet(bulletID) {
         this.io.to(this.roomID).emit(gameEvents.getBullet, { d: [bulletID] })
     }
@@ -213,9 +214,9 @@ module.exports = class {
         this.players = {}
         this.playerReadyCounter = 0
         let itemSize = this.config.NumberOfItems
-        this.itemList = createWeaponItemList(itemSize, equitmentData)
+        this.itemList = createWeaponItemList(itemSize, equipmentData)
         this.equipments = assignRandomPositions(this.itemList, SPAWNPOINTS)
-        this.gottenEquitmentList = []
+        this.gottenEquipmentList = []
         clearInterval(this.warnSafeAreaInterval)
         this.bulletList = createBulletList(this.equipments)
 

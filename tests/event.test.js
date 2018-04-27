@@ -50,6 +50,17 @@ describe('Events', () => {
             victimPos: { x: null, y: null, z: null },
             weaponUsed: "Shotgun"
         }).replyOnce(200, "Killfeed created")
+
+        axiosMock.onPost(API.KILL, {
+            playerID: "user_id_1",
+            victimID: "user_id_1",
+            victimPos: { x: null, y: null, z: null },
+            weaponUsed: "Safe Area"
+        }).replyOnce(200, "Killfeed created")
+
+        axiosMock.onPut(API.USER + '/u/user_id_1/score', {
+            score: 20
+        }).replyOnce(200, 'Score updated')
     })
 
     afterEach(() => {
@@ -186,21 +197,25 @@ describe('Events', () => {
         })
     })
 
-    /*describe('Players kill each other', () => {
-        let player, victim, playerID, victimID, gameWorld, room, expectedIndex
+    describe('Players kill each other', () => {
+        let client, player, victim, playerID, victimID, gameWorld, room, expectedIndex
 
         beforeEach(() => {
-            player = io.connect(SOCKET_URL, options)
-            player.on('connect', (data) => {
+            client = io.connect(SOCKET_URL, options)
+            client.on('connect', (data) => {
                 room = GameManager.getRoom('0')
                 gameWorld = room.gameWorld
                 gameWorld.setMaxPlayers(10)
-                player.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
+                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
             })
 
-            player.on(gameEvents.playerJoinGame, (data) => {
+            client.on(gameEvents.playerJoinGame, (data) => {
                 playerID = data.d[0]
-                player.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
+                client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
+            })
+
+            client.on(gameEvents.playerJoinRoom, (data) => {
+                player = room.getPlayer(playerID)
             })
 
             victim = io.connect(SOCKET_URL, options)
@@ -215,47 +230,138 @@ describe('Events', () => {
 
             victim.on(gameEvents.playerJoinRoom, (data) => {
                 expectedIndex = 4
-                room.getPlayer(playerID).currentEquipment = expectedIndex
+                player.currentEquipment = expectedIndex
                 let damage = 100
                 gameWorld.setState(GAME_STATE.INGAME)
                 gameWorld.matchID = "some_match_id"
-                player.emit(gameEvents.checkShootHit, { d: `[@${victimID}@,${damage}]` })
-            })
-        })
-
-        it('should increase number player kill by 1', (done) => {
-            player.on(gameEvents.playerDie, (data) => {
-                expect(room.getPlayer(playerID).numberOfKill).to.equal(1)
-                player.disconnect()
-                victim.disconnect()
-                done()
+                client.emit(gameEvents.checkShootHit, { d: `[@${victimID}@,${damage}]` })
             })
         })
 
         it('should reduce number of players alive by 1', (done) => {
-            player.on(gameEvents.updateNumberOfAlivePlayer, (data) => {
+            client.on(gameEvents.updateNumberOfAlivePlayer, (data) => {
                 expect(data.d[0]).to.equal(1)
                 gameWorld.reset()
                 gameWorld.setDefaultConfig()
-                player.disconnect()
+                client.disconnect()
                 victim.disconnect()
                 done()
             })
         })
 
-        it('should everyone in the room knows this player dies', (done) => {
-            player.on(gameEvents.updatePlayersStatus, (data) => {
-                expect(data.d[2]).to.equal(0)
-            })
-
-            victim.on(gameEvents.updatePlayersStatus, (data) => {
-                expect(data.d[2]).to.equal(0)
-                player.disconnect()
+        it('should not call hitPlayer when victim dies', (done) => {
+            client.on(gameEvents.updateNumberOfAlivePlayer, (data) => {
+                player.hitPlayer = sinon.spy()
+                client.emit(gameEvents.checkShootHit, { d: `[@${victimID}@,100]` })
+                expect(player.hitPlayer).to.not.have.been.called
+                gameWorld.reset()
+                gameWorld.setDefaultConfig()
+                client.disconnect()
                 victim.disconnect()
                 done()
             })
         })
-    })*/
+    })
+
+    describe('Player picks the weapon', () => {
+        let client, player, playerID, gameWorld, room, weapon
+
+        beforeEach(() => {
+            client = io.connect(SOCKET_URL, options)
+            client.on('connect', (data) => {
+                room = GameManager.getRoom('0')
+                gameWorld = room.gameWorld
+                gameWorld.setDamageInterval(0)
+                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
+            })
+
+            client.on(gameEvents.playerJoinGame, (data) => {
+                playerID = data.d[0]
+                client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
+            })
+
+            client.on(gameEvents.playerJoinRoom, (data) => {
+                player = room.getPlayer(playerID)
+                weapon = gameWorld.equipments[0]
+                client.emit(gameEvents.getEquipment, { d: `[@${weapon.uid}@]` })
+            })
+        })
+
+        it('should add weapon to gottenEquipmentList', (done) => {
+            client.on(gameEvents.getEquipment, (data) => {
+                let pickedWeapon = _.find(gameWorld.gottenEquipmentList, 'uid', weapon.uid)
+                expect(pickedWeapon).to.not.be.undefined
+                gameWorld.reset()
+                gameWorld.setDefaultConfig()
+                client.disconnect()
+                done()
+            })
+        })
+
+        it('should remove weapon from equipment', (done) => {
+            client.on(gameEvents.getEquipment, (data) => {
+                let pickedWeapon = _.find(gameWorld.equipments, { 'uid': weapon.uid })
+                expect(pickedWeapon).to.be.undefined
+                gameWorld.reset()
+                gameWorld.setDefaultConfig()
+                client.disconnect()
+                done()
+            })
+        })
+    })
+
+    describe('Player picks the medical kit', () => {
+        let client, player, playerID, gameWorld, room
+
+        beforeEach(() => {
+            client = io.connect(SOCKET_URL, options)
+            client.on('connect', (data) => {
+                room = GameManager.getRoom('0')
+                gameWorld = room.gameWorld
+                gameWorld.setDamageInterval(0)
+                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
+            })
+
+            client.on(gameEvents.playerJoinGame, (data) => {
+                playerID = data.d[0]
+                client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
+            })
+
+            client.on(gameEvents.playerJoinRoom, (data) => {
+                player = room.getPlayer(playerID)
+                player.hp = 10
+                let medkit = _.find(gameWorld.equipments, { 'weaponIndex': 11 })
+                client.emit(gameEvents.getEquipment, { d: `[@${medkit.uid}@]` })
+            })
+        })
+
+        it('should heal player hp by 30', (done) => {
+            client.on(gameEvents.getEquipment, (data) => {
+                expect(player.hp).to.equal(40)
+                gameWorld.reset()
+                gameWorld.setDefaultConfig()
+                client.disconnect()
+                done()
+            })
+        })
+
+        it('should not heal player if hp is already full', (done) => {
+            client.on(gameEvents.playerJoinRoom, (data) => {
+                player = room.getPlayer(playerID)
+                player.hp = 100
+                let medkit = _.find(gameWorld.equipments, 'weaponIndex', 11)
+                client.emit(gameEvents.getEquipment, { d: `[@${medkit.uid}@]` })
+            })
+
+            client.on(gameEvents.getEquipment, (data) => {
+                expect(player.hp).to.equal(100)
+                gameWorld.reset()
+                gameWorld.setDefaultConfig()
+                client.disconnect()
+                done()
+            })
+        })
+    })
 
     describe('Player leaves the room', () => {
         it('should reset gameWorld when last player leaves', (done) => {

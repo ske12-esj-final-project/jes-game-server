@@ -22,11 +22,11 @@ module.exports = class {
     }
 
     getDefaultPosition() {
-        return { x: 0, y: 0, z: 0 }
+        return { x: 300, y: 3, z: 60 }
     }
 
     getDefaultScale() {
-        return { x: 2.5, y: 1, z: 2.5 }
+        return { x: 300, y: 40, z: 300 }
     }
 
     isWaiting() {

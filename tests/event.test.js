@@ -238,17 +238,6 @@ describe('Events', () => {
             })
         })
 
-        it('should reduce number of players alive by 1', (done) => {
-            client.on(gameEvents.updateNumberOfAlivePlayer, (data) => {
-                expect(data.d[0]).to.equal(1)
-                gameWorld.reset()
-                gameWorld.setDefaultConfig()
-                client.disconnect()
-                victim.disconnect()
-                done()
-            })
-        })
-
         it('should not call hitPlayer when victim dies', (done) => {
             client.on(gameEvents.updateNumberOfAlivePlayer, (data) => {
                 player.hitPlayer = sinon.spy()

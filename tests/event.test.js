@@ -216,25 +216,24 @@ describe('Events', () => {
 
             client.on(gameEvents.playerJoinRoom, (data) => {
                 player = room.getPlayer(playerID)
-            })
+                victim = io.connect(SOCKET_URL, options)
+                victim.on('connect', (data) => {
+                    victim.emit(gameEvents.playerJoinGame, { d: '[@5678@,@defg@]' })
+                })
 
-            victim = io.connect(SOCKET_URL, options)
-            victim.on('connect', (data) => {
-                victim.emit(gameEvents.playerJoinGame, { d: '[@5678@,@defg@]' })
-            })
+                victim.on(gameEvents.playerJoinGame, (data) => {
+                    victimID = data.d[0]
+                    victim.emit(gameEvents.playerJoinRoom, { d: `[@${victimID}@,0]` })
+                })
 
-            victim.on(gameEvents.playerJoinGame, (data) => {
-                victimID = data.d[0]
-                victim.emit(gameEvents.playerJoinRoom, { d: `[@${victimID}@,0]` })
-            })
-
-            victim.on(gameEvents.playerJoinRoom, (data) => {
-                expectedIndex = 4
-                player.currentEquipment = expectedIndex
-                let damage = 100
-                gameWorld.setState(GAME_STATE.INGAME)
-                gameWorld.matchID = "some_match_id"
-                client.emit(gameEvents.checkShootHit, { d: `[@${victimID}@,${damage}]` })
+                victim.on(gameEvents.playerJoinRoom, (data) => {
+                    expectedIndex = 4
+                    player.currentEquipment = expectedIndex
+                    let damage = 100
+                    gameWorld.setState(GAME_STATE.INGAME)
+                    gameWorld.matchID = "some_match_id"
+                    client.emit(gameEvents.checkShootHit, { d: `[@${victimID}@,${damage}]` })
+                })
             })
         })
 

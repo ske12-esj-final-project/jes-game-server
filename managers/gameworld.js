@@ -74,14 +74,14 @@ module.exports = class {
 
         this.safeArea.position = {
             x: (sumX / count) + this.safeArea.scale.x,
-            y: 3,
+            y: 0,
             z: (sumZ / count)
         }
 
         this.safeArea.scale = {
-            x: this.safeArea.scale.x - 50,
-            y: 40,
-            z: this.safeArea.scale.z - 50
+            x: this.safeArea.scale.x - 0.5,
+            y: 1,
+            z: this.safeArea.scale.z - 0.5
         }
     }
 

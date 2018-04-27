@@ -180,7 +180,7 @@ module.exports = class {
         let currentGameWorld = this.currentRoom.gameWorld
         return setInterval(() => {
             this.hp -= damage
-            if (this.hp <= 0) {
+            if (this.hp <= 0 || !currentGameWorld.isInGame()) {
                 this.currentRoom.gameWorld.onPlayerDieSafeArea(this)
                 this.broadcastRoom(gameEvents.playerDie, { d: this.getKillData(this) })
                 this.socket.emit(gameEvents.getVictimData, { d: this.getVictimData(this) })

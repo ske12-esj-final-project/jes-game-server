@@ -277,7 +277,7 @@ describe('Events', () => {
 
         it('should add weapon to gottenEquipmentList', (done) => {
             client.on(gameEvents.getEquipment, (data) => {
-                let pickedWeapon = _.find(gameWorld.gottenEquipmentList, 'uid', weapon.uid)
+                let pickedWeapon = _.find(gameWorld.gottenEquipmentList, { 'uid': weapon.uid })
                 expect(pickedWeapon).to.not.be.undefined
                 gameWorld.reset()
                 gameWorld.setDefaultConfig()
@@ -290,6 +290,83 @@ describe('Events', () => {
             client.on(gameEvents.getEquipment, (data) => {
                 let pickedWeapon = _.find(gameWorld.equipments, { 'uid': weapon.uid })
                 expect(pickedWeapon).to.be.undefined
+                gameWorld.reset()
+                gameWorld.setDefaultConfig()
+                client.disconnect()
+                done()
+            })
+        })
+
+        describe('Player then discards the weapon', () => {
+            beforeEach(() => {
+                client.on(gameEvents.getEquipment, (data) => {
+                    client.emit(gameEvents.discardEquipment, { d: `[@${weapon.uid}@,9,0,0,0]` })
+                })
+            })
+
+            it('should remove weapon from gottenEquipmentList', (done) => {
+                client.on(gameEvents.setupEquipment, (data) => {
+                    let discardedWeapon = _.find(gameWorld.gottenEquipmentList, { 'uid': weapon.uid })
+                    expect(discardedWeapon).to.be.undefined
+                    gameWorld.reset()
+                    gameWorld.setDefaultConfig()
+                    client.disconnect()
+                    done()
+                })
+            })
+
+            it('should add discarded weapon to equipment list', (done) => {
+                client.on(gameEvents.setupEquipment, (data) => {
+                    let discardedWeapon = _.find(gameWorld.equipments, { 'uid': weapon.uid })
+                    expect(discardedWeapon).to.not.be.undefined
+                    gameWorld.reset()
+                    gameWorld.setDefaultConfig()
+                    client.disconnect()
+                    done()
+                })
+            })
+
+            it('should set current ammo of discarded weapon correctly', (done) => {
+                client.on(gameEvents.setupEquipment, (data) => {
+                    let discardedWeapon = _.find(gameWorld.equipments, { 'uid': weapon.uid })
+                    expect(discardedWeapon.capacity).to.equal(9)
+                    gameWorld.reset()
+                    gameWorld.setDefaultConfig()
+                    client.disconnect()
+                    done()
+                })
+            })
+        })
+    })
+
+    describe('Player picks the ammo box', () => {
+        let client, player, playerID, gameWorld, room, ammoBox
+
+        beforeEach(() => {
+            client = io.connect(SOCKET_URL, options)
+            client.on('connect', (data) => {
+                room = GameManager.getRoom('0')
+                gameWorld = room.gameWorld
+                gameWorld.setDamageInterval(0)
+                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
+            })
+
+            client.on(gameEvents.playerJoinGame, (data) => {
+                playerID = data.d[0]
+                client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
+            })
+
+            client.on(gameEvents.playerJoinRoom, (data) => {
+                player = room.getPlayer(playerID)
+                ammoBox = gameWorld.bulletList[0]
+                client.emit(gameEvents.getBullet, { d: `[@${ammoBox.uid}@]` })
+            })
+        })
+
+        it('should remove ammo box from the list', (done) => {
+            client.on(gameEvents.getBullet, (data) => {
+                let pickedAmmo = _.find(gameWorld.bulletList, { 'uid': ammoBox.uid })
+                expect(pickedAmmo).to.be.undefined
                 gameWorld.reset()
                 gameWorld.setDefaultConfig()
                 client.disconnect()

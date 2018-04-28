@@ -36,11 +36,11 @@ module.exports = class {
     saveClothIndex(data) {
         let jsonData = JSON.parse(data["d"])
         console.log('saveClothIndex', jsonData)
-        let clothIndex = jsonData[0]
-        const payload = {
-            "clothIndex": clothIndex || 0
-        }
-        axios.put(API.USER + `/u/${this.userID}/cloth`, payload).then(user_response => {
+        this.clothIndex = jsonData[0] || 0
+        this.socket.emit(gameEvents.saveClothIndex, { d: [this.clothIndex] })
+        axios.put(API.USER + `/u/${this.userID}/cloth`, {
+            "clothIndex": this.clothIndex
+        }).then(user_response => {
             console.log("saveClothIndex-response", user_response.data)
         }).catch(err => {
             console.error("error", err)
@@ -93,9 +93,7 @@ module.exports = class {
     }
 
     discardEquipment(data) {
-        console.log('d-discardEquipment0', data)
         data['d'] = data['d'].replace(/@/g, "\"")
-        console.log('d-discardEquipment1', data)
         let jsonData = JSON.parse(data["d"])
         let weaponID = jsonData[0]
         let room = this.currentRoom
@@ -152,9 +150,8 @@ module.exports = class {
         let jsonData = JSON.parse(data["d"])
         if (jsonData.length >= 1) {
             let bulletID = jsonData[0]
-            let room = this.currentRoom
-            _.remove(room.gameWorld.bulletList, item => item.uid === bulletID)
-            room.gameWorld.sendRemoveBullet(bulletID)
+            _.remove(this.currentRoom.gameWorld.bulletList, item => item.uid === bulletID)
+            this.currentRoom.gameWorld.sendRemoveBullet(bulletID)
         }
         else {
             console.error('[error]-check get bullet wrong data pattern', data)

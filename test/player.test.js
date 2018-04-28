@@ -25,13 +25,19 @@ let axiosMock
 describe('Player', () => {
 
     beforeEach(() => {
+        let mockUserID = 'user_id_1'
         axiosMock = new MockAdapter(axios)
+
         axiosMock.onGet(API.USER + '/me', {
             "headers": { "access-token": 'abcd' }
         }).replyOnce(200, {
-            id: 'user_id_1',
+            id: mockUserID,
             username: '1234'
         })
+
+        axiosMock.onPut(API.USER + `/u/${mockUserID}/cloth`, {
+            "clothIndex": 10
+        }).replyOnce(200, 'Cloth response')
     })
 
     afterEach(() => {
@@ -50,7 +56,7 @@ describe('Player', () => {
         it('should not send new position if it doesnt change', (done) => {
             client.on(gameEvents.playerJoinGame, (data) => {
                 let player = GameManager.getPlayer(data.d[0])
-                player.position = {x: 0, y: 0, z: 0}
+                player.position = { x: 0, y: 0, z: 0 }
                 player.lastMove = player.position
                 player.sendPositionData = sinon.spy()
                 player.updatePostionToClient()
@@ -63,11 +69,36 @@ describe('Player', () => {
         it('should not send new rotation if it doesnt change', (done) => {
             client.on(gameEvents.playerJoinGame, (data) => {
                 let player = GameManager.getPlayer(data.d[0])
-                player.rotation = {x: 0, y: 0}
+                player.rotation = { x: 0, y: 0 }
                 player.lastRotation = player.rotation
                 player.sendRotationData = sinon.spy()
                 player.updateRotationToClient()
                 expect(player.sendRotationData).to.not.have.been.calledOnce
+                client.disconnect()
+                done()
+            })
+        })
+    })
+
+    describe('change cloth', () => {
+        let client, player, room
+        beforeEach(() => {
+            room = GameManager.getRoom('0')
+            client = io.connect(SOCKET_URL, options)
+            client.on('connect', (data) => {
+                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
+            })
+
+            client.on(gameEvents.playerJoinGame, (data) => {
+                console.log('GameManager', GameManager.getPlayers())
+                player = GameManager.getPlayer(data.d[0])
+                client.emit(gameEvents.saveClothIndex, { d: '[10]' })
+            })
+        })
+
+        it('should change clothIndex of player', (done) => {
+            client.on(gameEvents.saveClothIndex, (data) => {
+                expect(player.clothIndex).to.equal(10)
                 client.disconnect()
                 done()
             })

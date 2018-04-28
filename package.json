@@ -26,6 +26,7 @@
   },
   "scripts": {
     "test": "mocha ./test/*.test.js --exit",
+    "coverage": "nyc yarn test && nyc report --reporter=text-lcov | node ./node_modules/coveralls/bin/coveralls.js",
     "start": "nodemon app.js"
   },
   "keywords": [],

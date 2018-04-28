@@ -33,7 +33,7 @@ jobs:
         
       # run tests!
       - run: yarn
-      - run: nyc yarn test && nyc report --reporter=text-lcov | node ./node_modules/coveralls/bin/coveralls.js
+      - run: yarn coverage
       - run: echo $KNOWN_HOST>> ~/.ssh/known_hosts
       - run:
           name: Deploy to Server

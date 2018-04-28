@@ -34,6 +34,8 @@ jobs:
       # run tests!
       - run: yarn
       - run: yarn coverage
+          environment:
+            COVERALLS_REPO_TOKEN: WheURYxTHMsXdbZ4heR6zK2rSZAVwkfne
       - run: echo $KNOWN_HOST>> ~/.ssh/known_hosts
       - run:
           name: Deploy to Server

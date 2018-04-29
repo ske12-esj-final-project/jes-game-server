@@ -6,5 +6,5 @@ module.exports = {
     restrictTime: 10000, // duration required safe area to re-position and re-scale (ms)
     damageInterval: 1000,
     countdownInterval: 1000,
-    NumberOfItems:70
+    NumberOfItems: 180
 }

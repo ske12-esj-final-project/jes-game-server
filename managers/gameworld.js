@@ -124,34 +124,40 @@ module.exports = class {
         console.log('aliveNumber', aliveNumber)
         this.io.to(this.roomID).emit(gameEvents.updateNumberOfAlivePlayer, { "d": [aliveNumber] })
         if (aliveNumber === 1 && this.isInGame()) {
-            let winner = Object.values(alivePlayers)[0]
-            let score = Utils.calculateScore(winner)
+            this.onPlayerWin(alivePlayers)
+        }
+    }
 
-            axios.put(API.USER + `/u/${winner.userID}/score`, { 'score': score }).then(user_response => {
+    onPlayerWin(alivePlayers) {
+        let winner = Object.values(alivePlayers)[0]
+        let score = Utils.calculateScore(winner)
+        winner.socket.emit(gameEvents.playerWin, { d: [winner.username, winner.numberOfKill, score] })
+        this.updateMatchScore(winner, score)
+        this.reset()
+    }
+
+    updateMatchScore(winner, score) {
+        const fixed2Dec = (n) => Math.round(n * 100) / 100
+        let matchID = this.matchID
+        let duration = fixed2Dec((Date.now() - this.duration) / 1000) || 0
+
+        axios.put(API.USER + `/u/${winner.userID}/score`, { 'score': score })
+            .then(user_response => {
                 console.log("saveScore-response", user_response.data)
             }).catch(err => {
                 console.error("error", err)
             })
 
-            winner.socket.emit(gameEvents.playerWin, { d: [winner.username, winner.numberOfKill, score] })
-
-            // send to match api
-            const fixed2Dec = (n) => Math.round(n * 100) / 100;
-            let matchID = this.matchID
-            let duration = fixed2Dec((Date.now() - this.duration) / 1000) || 0
-            axios.put(API.MATCH + `/${matchID}`, {
-                "duration": duration,
-                "winner": winner.userID
+        axios.put(API.MATCH + `/${matchID}`, {
+            "duration": duration,
+            "winner": winner.userID
+        })
+            .then((res) => {
+                console.log('update match done.')
             })
-                .then((res) => {
-                    console.log('update match done.')
-                })
-                .catch((err) => {
-                    console.error(err)
-                })
-
-            this.reset()
-        }
+            .catch((err) => {
+                console.error(err)
+            })
     }
 
     getAlivePlayers() {
@@ -211,6 +217,10 @@ module.exports = class {
     }
 
     reset() {
+        for (let playerID in this.players) {
+            this.players[playerID].leaveCurrentRoom()
+        }
+
         this.players = {}
         this.playerReadyCounter = 0
         let itemSize = this.config.NumberOfItems

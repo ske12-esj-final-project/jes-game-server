@@ -331,7 +331,7 @@ module.exports = class {
     }
 
     broadcastRoom(event, data) {
-        console.log(events)
+        console.log(event)
         this.socket.broadcast.to(this.currentRoom.id).emit(event, data)
     }
 

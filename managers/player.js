@@ -177,6 +177,7 @@ module.exports = class {
         return setInterval(() => {
             this.hp -= damage
             if (this.hp <= 0) {
+                this.isAlive = false
                 this.currentRoom.gameWorld.onPlayerDieSafeArea(this)
                 this.broadcastRoom(gameEvents.playerDie, { d: this.getSuicideData() })
                 this.socket.emit(gameEvents.getVictimData, { d: this.getVictimData(this) })

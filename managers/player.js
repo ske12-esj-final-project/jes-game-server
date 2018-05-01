@@ -331,8 +331,9 @@ module.exports = class {
     }
 
     broadcastRoom(event, data) {
-        console.log(event)
-        this.socket.broadcast.to(this.currentRoom.id).emit(event, data)
+        if (this.currentRoom) {
+            this.socket.broadcast.to(this.currentRoom.id).emit(event, data)
+        }
     }
 
     getAllPlayerSendData(players) {

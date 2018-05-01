@@ -54,6 +54,7 @@ module.exports = class {
         this.hp = 100
         this.currentEquipment = 0
         this.numberOfKill = 0
+        this.isAlive = true
     }
 
     setupPlayer(data) {
@@ -213,7 +214,7 @@ module.exports = class {
 
         let victim = GameManager.getPlayer(targetId)
 
-        if (victim && victim.hp > 0 && this.currentRoom.gameWorld.isInGame()) {
+        if (victim && victim.isAlive && this.currentRoom.gameWorld.isInGame()) {
             this.hitPlayer(victim, damage)
 
         } else {
@@ -224,6 +225,7 @@ module.exports = class {
     hitPlayer(victim, damage) {
         victim.hp -= damage
         if (victim.hp <= 0) {
+            victim.isAlive = false
             this.numberOfKill++
             this.currentRoom.gameWorld.onPlayerKill(this, victim)
             victim.broadcastRoom(gameEvents.playerDie, { d: this.getKillData(victim) })
@@ -373,7 +375,6 @@ module.exports = class {
     }
 
     getAllEnemies() {
-        console.log('currentRoom.id', this.currentRoom.id)
         return _.pickBy(this.currentRoom.getPlayers(), (value, key) => {
             return key != this.playerID
         })

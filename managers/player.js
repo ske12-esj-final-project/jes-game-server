@@ -58,7 +58,6 @@ module.exports = class {
 
     setupPlayer(data) {
         let jsonData = JSON.parse(data["d"])
-        console.log('data setup-player', jsonData)
         this.clothIndex = jsonData[0]
         this.reset()
         this.position = { x: 0, y: 20, z: 0 }
@@ -174,7 +173,7 @@ module.exports = class {
             this.hp -= damage
             if (this.hp <= 0) {
                 this.currentRoom.gameWorld.onPlayerDieSafeArea(this)
-                this.broadcastRoom(gameEvents.playerDie, { d: this.getKillData(this) })
+                this.broadcastRoom(gameEvents.playerDie, { d: this.getSuicideData() })
                 this.socket.emit(gameEvents.getVictimData, { d: this.getVictimData(this) })
                 this.currentRoom.gameWorld.updateNumberOfAlivePlayer()
                 clearInterval(this.damageInterval)
@@ -235,6 +234,11 @@ module.exports = class {
 
     getKillData(victim) {
         return [victim.playerID, this.username, victim.username, this.currentEquipment]
+    }
+
+    getSuicideData() {
+        const SAFE_AREA_INDEX = 12
+        return [this.playerID, this.username, this.username, SAFE_AREA_INDEX]
     }
 
     getVictimData(victim) {

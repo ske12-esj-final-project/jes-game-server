@@ -124,7 +124,7 @@ module.exports = {
         "Recoil": "High",
         "weight": 0
     },
-    11:{
+    11: {
         "Index": 11,
         "Game name": "Medkit",
         "weight": 30,

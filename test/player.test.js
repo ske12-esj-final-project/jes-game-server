@@ -90,7 +90,6 @@ describe('Player', () => {
             })
 
             client.on(gameEvents.playerJoinGame, (data) => {
-                console.log('GameManager', GameManager.getPlayers())
                 player = GameManager.getPlayer(data.d[0])
                 client.emit(gameEvents.saveClothIndex, { d: '[10]' })
             })

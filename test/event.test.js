@@ -59,8 +59,13 @@ describe('Events', () => {
         }).replyOnce(200, "Killfeed created")
 
         axiosMock.onPut(API.USER + '/u/user_id_1/score', {
-            score: 20
+            score: 90
         }).replyOnce(200, 'Score updated')
+
+        axiosMock.onPut(API.MATCH + '/matches/some_match_id', {
+            duration: 0.01,
+            winner: 'user_id_1'
+        }).replyOnce(200, 'Match updated')
     })
 
     afterEach(() => {

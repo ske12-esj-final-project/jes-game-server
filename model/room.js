@@ -32,6 +32,14 @@ module.exports = class {
         }
     }
 
+    canStartMatch() {
+        let maxPlayer = this.gameWorld.getMaxPlayers()
+        let numberOfplayerInRoom = _.size(this.getPlayers())
+        let morethan_80 = numberOfplayerInRoom >= Math.floor(0.8 * (maxPlayer))
+        return (morethan_80 && numberOfplayerInRoom >= 2 || this.isFull()) 
+        && this.gameWorld.isOpen()
+    }
+
     getPlayers() {
         return this.gameWorld.players
     }
@@ -60,15 +68,6 @@ module.exports = class {
             this.gameWorld.io.to(this.gameWorld.roomID).emit(gameEvents.countdown, { d: [timeLeft] })
             if (timeLeft <= 0) this.prepareStartGame()
         }, this.gameWorld.config.countdownInterval)
-    }
-
-    onPlayerInRoomLoadFinnish() {
-        // playerLoadFinish
-        let NumberOfPlayer = _.size(this.gameWorld.players)
-        this.gameWorld.playerReadyCounter++
-        if (this.gameWorld.playerReadyCounter >= NumberOfPlayer) {
-            this.gameWorld.io.to(this.gameWorld.roomID).emit(gameEvents.playerLoadFinish, { d: 1 })
-        }
     }
 
     prepareStartGame() {

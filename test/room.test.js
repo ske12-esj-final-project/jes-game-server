@@ -11,7 +11,7 @@ const Room = require('../model/room')
 const API = require('../constants/api')
 const GAME_STATE = require('../constants/gamestate')
 
-let axiosMock 
+let axiosMock
 
 describe('Room model', () => {
     io.emit = () => { return }
@@ -86,6 +86,39 @@ describe('Room model', () => {
 
             player.leaveCurrentRoom()
             expect(room.onUpdateRoomInfo).to.not.have.been.called
+        })
+    })
+
+    describe('canStartMatch', () => {
+        let room, player
+        beforeEach(() => {
+            room = new Room(io, 'Test Room', 'test')
+            player = new Player(null, 'player', 'Player')
+        })
+
+        it('should start match if room is full', () => {
+            room.gameWorld.setMaxPlayers(1)
+            room.gameWorld.players = [player]
+            expect(room.canStartMatch()).to.be.true
+        })
+
+        it('should not start match if numPlayers less than majority of maxPlayers', () => {
+            room.gameWorld.setMaxPlayers(6)
+            room.gameWorld.players = [player, player, player]
+            expect(room.canStartMatch()).to.be.false
+        })
+
+        it('should not start match  if numPlayers less than 2', () => {
+            room.gameWorld.setMaxPlayers(2)
+            room.gameWorld.players = [player]
+            expect(room.canStartMatch()).to.be.false
+        })
+
+        it('should not start match  if gameState is not OPEN', () => {
+            room.gameWorld.setMaxPlayers(2)
+            room.gameWorld.setState(GAME_STATE.INGAME)
+            room.gameWorld.players = [player, player]
+            expect(room.canStartMatch()).to.be.false
         })
     })
 })

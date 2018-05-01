@@ -60,6 +60,7 @@ module.exports = class {
     addPlayerToRoom(player, room, roomID) {
         if (!player) return
         player.currentRoom = room
+        console.log('roomID', room.id)
         room.addPlayer(player)
         this.socket.join(roomID)
         this.socket.emit(gameEvents.playerJoinRoom, { d: [player.playerID] })

@@ -66,6 +66,11 @@ describe('Events', () => {
             duration: 0.01,
             winner: 'user_id_1'
         }).replyOnce(200, 'Match updated')
+
+        axiosMock.onPut(API.MATCH + '/matches/some_match_id', {
+            duration: 0.02,
+            winner: 'user_id_1'
+        }).replyOnce(200, 'Match updated')
     })
 
     afterEach(() => {
@@ -143,6 +148,53 @@ describe('Events', () => {
                 gameWorld.reset()
                 gameWorld.setDefaultConfig()
                 client.disconnect()
+                done()
+            })
+        })
+    })
+
+    describe('Players setup', () => {
+        let client, player, friend, playerID, friendID, gameWorld, room, expectedIndex
+
+        beforeEach(() => {
+            client = io.connect(SOCKET_URL, options)
+            client.on('connect', (data) => {
+                room = GameManager.getRoom('0')
+                gameWorld = room.gameWorld
+                gameWorld.setMaxPlayers(10)
+                client.emit(gameEvents.playerJoinGame, { d: '[@1234@,@abcd@]' })
+            })
+
+            client.on(gameEvents.playerJoinGame, (data) => {
+                playerID = data.d[0]
+                client.emit(gameEvents.playerJoinRoom, { d: `[@${playerID}@,0]` })
+            })
+
+            client.on(gameEvents.playerJoinRoom, (data) => {
+                player = room.getPlayer(playerID)
+                friend = io.connect(SOCKET_URL, options)
+                friend.on('connect', (data) => {
+                    friend.emit(gameEvents.playerJoinGame, { d: '[@5678@,@defg@]' })
+                })
+
+                friend.on(gameEvents.playerJoinGame, (data) => {
+                    friendID = data.d[0]
+                    friend.emit(gameEvents.playerJoinRoom, { d: `[@${friendID}@,0]` })
+                })
+
+                friend.on(gameEvents.playerJoinRoom, (data) => {
+                    friend.emit(gameEvents.playerSetupPlayer, { d: '[10]' })
+                })
+            })
+        })
+
+        it('should send friend data to client correctly', (done) => {
+            client.on(gameEvents.playerEnemyCreated, (data) => {
+                expect(data.d[0]).to.equal(friendID)
+                gameWorld.reset()
+                gameWorld.setDefaultConfig()
+                client.disconnect()
+                friend.disconnect()
                 done()
             })
         })

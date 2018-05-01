@@ -60,7 +60,11 @@ module.exports = class {
         let jsonData = JSON.parse(data["d"])
         this.clothIndex = jsonData[0]
         this.reset()
-        this.position = { x: 0, y: 20, z: 0 }
+        this.position = {
+            x: this.randomInt(-31, 31),
+            y: 20,
+            z: this.randomInt(-31, 31)
+        }
         this.sendPlayersDataCreateCharacter()
         console.log('setup-player', this.socket.playerID, this.socket.userID)
     }

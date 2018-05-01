@@ -373,6 +373,7 @@ module.exports = class {
     }
 
     getAllEnemies() {
+        console.log('currentRoom.id', this.currentRoom.id)
         return _.pickBy(this.currentRoom.getPlayers(), (value, key) => {
             return key != this.playerID
         })

@@ -311,6 +311,7 @@ module.exports = class {
             this.rotation.x,
             this.rotation.y
         ]
+
         this.broadcastRoom(gameEvents.playerUpdateRotation, { d: sendToOther })
     }
 
@@ -330,6 +331,7 @@ module.exports = class {
     }
 
     broadcastRoom(event, data) {
+        console.log(events)
         this.socket.broadcast.to(this.currentRoom.id).emit(event, data)
     }
 

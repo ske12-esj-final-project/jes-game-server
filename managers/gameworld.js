@@ -230,15 +230,7 @@ module.exports = class {
         clearInterval(this.warnSafeAreaInterval)
         this.bulletList = createBulletList(this.equipments)
 
-        let easterItem = {
-            uid: shortid.generate(), weaponIndex: 10, position:
-                { "x": -81.63, "y": 41.25, "z": -165.34 },
-            capacity: 6
-        }
-
-        this.equipments.push(easterItem)
         this.safeArea = new SafeArea()
-
         this.safeAreaDuration = 0
         this.duration = Date.now()
         this.setState(GAME_STATE.OPEN)

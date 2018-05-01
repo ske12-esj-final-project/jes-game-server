@@ -108,13 +108,13 @@ describe('Room model', () => {
             expect(room.canStartMatch()).to.be.false
         })
 
-        it('should not start match  if numPlayers less than 2', () => {
+        it('should not start match if numPlayers less than 2', () => {
             room.gameWorld.setMaxPlayers(2)
             room.gameWorld.players = [player]
             expect(room.canStartMatch()).to.be.false
         })
 
-        it('should not start match  if gameState is not OPEN', () => {
+        it('should not start match if gameState is not OPEN', () => {
             room.gameWorld.setMaxPlayers(2)
             room.gameWorld.setState(GAME_STATE.INGAME)
             room.gameWorld.players = [player, player]

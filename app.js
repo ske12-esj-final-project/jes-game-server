@@ -28,7 +28,7 @@ const gameWorldConfig10v10 = require('./config/gameworld10v10')
 let roomA = new Room(io, 'Room LookGoods', '0')
 let roomB = new Room(io, 'Room AR-TAG', '1',gameWorldConfig10v10)
 let room1v1 = new Room(io,'Room Lenscape','2',gameWorldConfig1v1)
-let roomhod = new Room(io,'Room IVVA','3',gameWorldConfig1v1)
+let roomhod = new Room(io,'Room IVAA','3',gameWorldConfig1v1)
 let roomCookLab = new Room(io, 'Room คุกLab', '4',gameWorldConfig3v3)
 let roomManager
 
